@@ -14,7 +14,6 @@ Table user.user {
   ladder_level enum [ not null, note: "bronze, silver, gold" ]
   created_at datetime [ not null ]
   updated_at datetime [ not null ]
-  deleted_at datetime [ null ]
 }
 
 Table user.friendship {
@@ -63,6 +62,7 @@ Table chat.administrator {
   id integer [ pk, unique, default:0, increment ]
   channel integer [ not null ]
   user integer [ not null ]
+  created_at datetime [ not null ]
 }
 
 Ref: user.user.id < chat.administrator.user
@@ -92,6 +92,7 @@ Table chat.message {
   sender integer [ not null ]
   channel integer [ not null ]
   content varchar(2000) [ not null ]
+  created_at datetime [ not null ]
 }
 
 Ref: user.user.id < chat.message.sender
@@ -102,6 +103,7 @@ Table chat.direct_message {
   sender integer [ not null ]
   receiver integer [ not null ]
   content varchar(2000) [ not null ]
+  created_at datetime [ not null ]
 }
 
 Ref: user.user.id < chat.direct_message.sender
