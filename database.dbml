@@ -7,7 +7,7 @@ Project project_name {
 }
 
 Table user.user {
-  id integer [ pk, unique, default:0, increment ] // pk is not null.
+  id integer [ pk, unique, default:0, increment, not null ] // pk is not null.
   avatar text [ unique, not null ]
   win_count integer [ default:0, not null ]
   lose_count integer [ default:0, not null ]
@@ -17,7 +17,7 @@ Table user.user {
 }
 
 Table user.friendship {
-  id integer [ pk, unique, default:0, increment ]
+  id integer [ pk, unique, default:0, increment, not null ]
   first_user integer [ not null ]
   second_user integer [ not null ]
 }
@@ -26,7 +26,7 @@ Ref: user.user.id < user.friendship.first_user
 Ref: user.user.id < user.friendship.second_user
 
 Table user.match {
-  id integer [ pk, unique, default:0, increment ]
+  id integer [ pk, unique, default:0, increment, not null ]
   user integer [ not null ]
   opponent integer [ not null ]
   user_ladder_then enum [ not null ]
@@ -39,18 +39,17 @@ Ref: user.user.id < user.match.user
 Ref: user.user.id < user.match.opponent
 
 Table chat.channel {
-  id integer [ pk, unique, default:0, increment ]
+  id integer [ pk, unique, default:0, increment, not null ]
   owner integer [ not null ] 
   name text [ not null ]
-  type enum [ not null, note: "public, private, protected" ]
-  password varchar(20) [ null ]
+  type enum [ not null, note: "public, private, protected, one-to-one" ]
   created_at datetime [ not null ]
 }
 
 Ref: user.user.id < chat.channel.owner
 
 Table chat.participant {
-  id integer [ pk, unique, default:0, increment ]
+  id integer [ pk, unique, default:0, increment, not null ]
   channel integer [ not null ]
   user integer [ not null ]
 }
@@ -59,7 +58,7 @@ Ref: user.user.id < chat.participant.user
 Ref: chat.channel.id < chat.participant.channel
 
 Table chat.administrator {
-  id integer [ pk, unique, default:0, increment ]
+  id integer [ pk, unique, default:0, increment, not null ]
   channel integer [ not null ]
   user integer [ not null ]
   created_at datetime [ not null ]
@@ -69,7 +68,7 @@ Ref: user.user.id < chat.administrator.user
 Ref: chat.channel.id < chat.administrator.channel
 
 Table chat.banned {
-  id integer [ pk, unique, default:0, increment ]
+  id integer [ pk, unique, default:0, increment, not null ]
   channel integer [ not null ]
   user integer [ not null ]
 }
@@ -79,7 +78,7 @@ Ref: chat.channel.id < chat.banned.channel
 
 
 Table chat.blocked {
-  id integer [ pk, unique, default:0, increment ]
+  id integer [ pk, unique, default:0, increment, not null ]
   user integer [ not null ]
   target integer [ not null ]
 }
@@ -88,23 +87,30 @@ Ref: user.user.id < chat.blocked.user
 Ref: user.user.id < chat.blocked.target
 
 Table chat.message {
-  id integer [ pk, unique, default:0, increment ]
-  sender integer [ not null ]
+  id integer [ pk, unique, default:0, increment, not null ]
   channel integer [ not null ]
-  content varchar(2000) [ not null ]
+  sender integer [ not null ]
+  content text [ not null ]
   created_at datetime [ not null ]
 }
 
 Ref: user.user.id < chat.message.sender
-Ref: chat.channel.id < chat.message.id
+Ref: chat.channel.id < chat.message.channel
 
-Table chat.direct_message {
-  id integer [ pk, unique, default:0, increment ]
-  sender integer [ not null ]
-  receiver integer [ not null ]
-  content varchar(2000) [ not null ]
-  created_at datetime [ not null ]
+Table chat.channel_password {
+  id integer [ pk, unique, default:0, increment, not null ]
+  password varchar(20) [ not null ]
 }
 
-Ref: user.user.id < chat.direct_message.sender
-Ref: user.user.id < chat.direct_message.receiver
+Ref: chat.channel.id - chat.channel_password.id
+
+// Table chat.direct_message {
+//   id integer [ pk, unique, default:0, increment, not null ]
+//   sender integer [ not null ]
+//   receiver integer [ not null ]
+//   content varchar(2000) [ not null ]
+//   created_at datetime [ not null ]
+// }
+
+// Ref: user.user.id < chat.direct_message.sender
+// Ref: user.user.id < chat.direct_message.receiver
