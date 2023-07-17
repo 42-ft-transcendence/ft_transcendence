@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+
+  db:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=test
+    networks:
+      - ft_transcendence
+    restart: always
+
+  backend:
+    build: ./backend/
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - db
+    networks:
+      - ft_transcendence
+    volumes:
+      - type: bind
+        source: ./backend_bind_mount/application/
+        target: /application/
+    restart: always
+  # 데이터베이스 확인 용도. cli 환경보다 편해서 사용. 제출 시 제거하기
+  db-admin:
+    image: dpage/pgadmin4
+    ports:
+      - 5050:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=abc@def.com
+      - PGADMIN_DEFAULT_PASSWORD=123
+    depends_on:
+      - db
+    networks:
+      - ft_transcendence
+    restart: always
+
+networks:
+  ft_transcendence:
