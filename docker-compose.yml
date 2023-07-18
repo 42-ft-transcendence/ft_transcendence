@@ -23,10 +23,6 @@ services:
       - db
     networks:
       - ft_transcendence
-    volumes:
-      - type: bind
-        source: ./backend_bind_mount/application/
-        target: /application/
     restart: always
   # 데이터베이스 확인 용도. cli 환경보다 편해서 사용. 제출 시 제거하기
   db-admin:
