@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
 import { Channel } from "./channel.entity";
 import { User } from "src/users/entities/user.entity";
 
@@ -8,12 +8,12 @@ export class Banned {
 	id!: number;
 
 	// @Column({ type: "int", nullable: false })
-	@OneToMany(() => Channel, (channel) => channel.channel_banned, { nullable: false })
+	@ManyToOne(() => Channel, (channel) => channel.channel_banned, { nullable: false })
 	@JoinColumn({ name: "channel_id" })
 	channel!: Channel;
 
 	// @Column({ type: "int", nullable: false })
-	@OneToMany(() => User, (user) => user.user_banned, { nullable: false })
+	@ManyToOne(() => User, (user) => user.user_banned, { nullable: false })
 	@JoinColumn({ name: "user_id" })
 	user!: User;
 }
