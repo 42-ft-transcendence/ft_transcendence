@@ -23,7 +23,7 @@ export class User {
 	@Column({ type: "int", default: 0, nullable: false })
 	lose_count!: number;
 
-	@Column({ type: "enum", enum: LadderEnum, nullable: false })
+	@Column({ type: "enum", enum: LadderEnum, default: LadderEnum.BRONZE, nullable: false })
 	ladder!: LadderEnum;
 
 	@CreateDateColumn({ type: "timestamp", nullable: false })

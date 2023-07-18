@@ -17,10 +17,10 @@ export class Match {
 	@JoinColumn({ name: "opponent_id" })
 	opponent!: User;
 
-	@Column({ type: "enum", enum: LadderEnum, nullable: false })
+	@Column({ type: "enum", enum: LadderEnum, default: LadderEnum.BRONZE, nullable: false })
 	user_ladder_then!: LadderEnum;
 
-	@Column({ type: "enum", enum: LadderEnum, nullable: false })
+	@Column({ type: "enum", enum: LadderEnum, default: LadderEnum.BRONZE, nullable: false })
 	opponent_ladder_then!: LadderEnum;
 
 	@Column({ type: "boolean", default: false, nullable: false })

@@ -20,7 +20,7 @@ export class Channel {
 	@Column({ type: "text", nullable: false })
 	name!: string;
 
-	@Column({ type: "enum", enum: ChannelTypeEnum, nullable: false })
+	@Column({ type: "enum", enum: ChannelTypeEnum, default: ChannelTypeEnum.PUBLIC, nullable: false })
 	type!: ChannelTypeEnum;
 
 	@CreateDateColumn({ type: "timestamp", nullable: false })
