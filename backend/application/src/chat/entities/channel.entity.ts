@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { ChannelTypeEnum } from "./channel-type.enum"
 import { User } from "src/users/entities/user.entity";
 import { Administrator } from "./administrator.entity";
@@ -43,6 +43,6 @@ export class Channel {
 	channel_message: Message[]
 
 	// channel-password relation
-	@OneToMany(() => ChannelPassword, (password) => password.channel)
-	channel_password: ChannelPassword[];
+	@OneToOne(() => ChannelPassword, (password) => password.channel)
+	channel_password: ChannelPassword;
 }
