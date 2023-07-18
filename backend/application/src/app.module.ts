@@ -19,12 +19,21 @@ import { Participant } from './chat/entities/participant.entity';
   imports: [TypeOrmModule.forRoot({
     type: "postgres",
     entities: [
-      User, Friendship, Match, Blocked, Channel, Administrator, Banned, Participant, Message, ChannelPassword
+      User,
+      Friendship,
+      Match,
+      Blocked,
+      Channel,
+      Administrator,
+      Banned,
+      Participant,
+      Message,
+      ChannelPassword
     ],
     logging: true,
     maxQueryExecutionTime: 1000,
     // poolSize: ? // TODO: test performance on its value
-    synchronize: true, // database schema is auto-created on every application launch
+    synchronize: true, // TODO: remove. database schema is auto-created on every application launch
     // cache
     host: "db", // TODO: use .env
     port: 5432, // TODO: use .env
