@@ -18,91 +18,92 @@ Table user.user {
 
 Table user.friendship {
   id integer [ pk, unique, default:0, increment, not null ]
-  first_user integer [ not null ]
-  second_user integer [ not null ]
+  first_user_id integer [ not null ]
+  second_user_id integer [ not null ]
 }
 
-Ref: user.user.id < user.friendship.first_user
-Ref: user.user.id < user.friendship.second_user
+Ref: user.user.id < user.friendship.first_user_id
+Ref: user.user.id < user.friendship.second_user_id
 
 Table user.match {
   id integer [ pk, unique, default:0, increment, not null ]
-  user integer [ not null ]
-  opponent integer [ not null ]
+  user_id integer [ not null ]
+  opponent_id integer [ not null ]
   user_ladder_then enum [ not null ]
   opponent_ladder_then enum [ not null ]
   win_or_not boolean [ not null ]
   match_at datetime [ not null ]
 }
 
-Ref: user.user.id < user.match.user
-Ref: user.user.id < user.match.opponent
+Ref: user.user.id < user.match.user_id
+Ref: user.user.id < user.match.opponent_id
 
 Table chat.channel {
   id integer [ pk, unique, default:0, increment, not null ]
-  owner integer [ not null ] 
+  owner_id integer [ not null ] 
   name text [ not null ]
   type enum [ not null, note: "public, private, protected, one-to-one" ]
   created_at datetime [ not null ]
 }
 
-Ref: user.user.id < chat.channel.owner
+Ref: user.user.id < chat.channel.owner_id
 
 Table chat.participant {
   id integer [ pk, unique, default:0, increment, not null ]
-  channel integer [ not null ]
-  user integer [ not null ]
+  channel_id integer [ not null ]
+  user_id integer [ not null ]
 }
 
-Ref: user.user.id < chat.participant.user
-Ref: chat.channel.id < chat.participant.channel
+Ref: user.user.id < chat.participant.user_id
+Ref: chat.channel.id < chat.participant.channel_id
 
 Table chat.administrator {
   id integer [ pk, unique, default:0, increment, not null ]
-  channel integer [ not null ]
-  user integer [ not null ]
+  channel_id integer [ not null ]
+  user_id integer [ not null ]
   created_at datetime [ not null ]
 }
 
-Ref: user.user.id < chat.administrator.user
-Ref: chat.channel.id < chat.administrator.channel
+Ref: user.user.id < chat.administrator.user_id
+Ref: chat.channel.id < chat.administrator.channel_id
 
 Table chat.banned {
   id integer [ pk, unique, default:0, increment, not null ]
-  channel integer [ not null ]
-  user integer [ not null ]
+  channel_id integer [ not null ]
+  user_id integer [ not null ]
 }
 
-Ref: user.user.id < chat.banned.user
-Ref: chat.channel.id < chat.banned.channel
+Ref: user.user.id < chat.banned.user_id
+Ref: chat.channel.id < chat.banned.channel_id
 
 
 Table chat.blocked {
   id integer [ pk, unique, default:0, increment, not null ]
-  user integer [ not null ]
-  target integer [ not null ]
+  user_id integer [ not null ]
+  target_id integer [ not null ]
 }
 
-Ref: user.user.id < chat.blocked.user
-Ref: user.user.id < chat.blocked.target
+Ref: user.user.id < chat.blocked.user_id
+Ref: user.user.id < chat.blocked.target_id
 
 Table chat.message {
   id integer [ pk, unique, default:0, increment, not null ]
-  channel integer [ not null ]
-  sender integer [ not null ]
+  channel_id integer [ not null ]
+  sender_id integer [ not null ]
   content text [ not null ]
   created_at datetime [ not null ]
 }
 
-Ref: user.user.id < chat.message.sender
-Ref: chat.channel.id < chat.message.channel
+Ref: user.user.id < chat.message.sender_id
+Ref: chat.channel.id < chat.message.channel_id
 
 Table chat.channel_password {
   id integer [ pk, unique, default:0, increment, not null ]
+  channel_id integer [ not null ]
   password varchar(20) [ not null ]
 }
 
-Ref: chat.channel.id - chat.channel_password.id
+Ref: chat.channel.id - chat.channel_password.channel_id
 
 // Table chat.direct_message {
 //   id integer [ pk, unique, default:0, increment, not null ]
