@@ -9,7 +9,6 @@ export class Match {
 
 	// @Column({ type: "int", nullable: false })
 	@ManyToOne(() => User, (user) => user.user_match, {
-		onUpdate: "CASCADE",
 		onDelete: "SET NULL", // TODO: check - user나 opponent 중 하나라도 탈퇴하지 않은 경우에는 match history를 확인할 수 있어야 하기 때문에 SET NULL로 설정하고 둘 다 탈퇴해서 두 컬럼 모두의 값이 NULL일 때, 데이터베이스 트리거를 사용해서 해당 행을 제거하기. 이를 위해 nullable로 설정.
 	})
 	@JoinColumn({ name: "user_id" })
@@ -17,7 +16,6 @@ export class Match {
 
 	// @Column({ type: "int", nullable: false })
 	@ManyToOne(() => User, (user) => user.opponent, {
-		onUpdate: "CASCADE",
 		onDelete: "SET NULL", // TODO: check - user나 opponent 중 하나라도 탈퇴하지 않은 경우에는 match history를 확인할 수 있어야 하기 때문에 SET NULL로 설정하고 둘 다 탈퇴해서 두 컬럼 모두의 값이 NULL일 때, 데이터베이스 트리거를 사용해서 해당 행을 제거하기. 이를 위해 nullable로 설정.
 	})
 	@JoinColumn({ name: "opponent_id" })

@@ -15,7 +15,6 @@ export class Channel {
 	// @Column({ type: "int", nullable: false })
 	@ManyToOne(() => User, (user) => user.owner, {
 		nullable: false,
-		onUpdate: "CASCADE",
 		// TODO: check - onDelete는 기본값인 "NO ACTION"으로 두고 owner인 사용자가 탈퇴 시 다음의 작업을 사용자를 제거하기 위한 트랜잭션의 일부로 수행한다.
 		// 1. 관리자 목록을 확인해서 가장 먼저 관리자가 된 사용자를 이 채널의 owner로 만든다.
 		// 2. 관리자가 한 명도 없는 채널이라면 전체 참여자 중 한 명을 임의로 소유자로 지정하기. -> 프론트에서 소유자가 되었다는 정보를 띄운다.
