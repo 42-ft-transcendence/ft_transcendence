@@ -6,7 +6,11 @@ export class ChannelPassword {
 	@PrimaryGeneratedColumn({ type: "int" })
 	id!: number;
 
-	@OneToOne(() => Channel, (channel) => channel.channel_password, { nullable: false })
+	@OneToOne(() => Channel, (channel) => channel.channel_password, {
+		nullable: false,
+		onUpdate: "CASCADE",
+		onDelete: "CASCADE",	// TODO: check - protected 채널이 제거되면, 해당 채널의 비밀번호를 담는 행 또한 제거되는 게 맞다.
+	})
 	@JoinColumn({ name: "channel_id" })
 	channel!: Channel;
 
