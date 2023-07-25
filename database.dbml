@@ -6,9 +6,10 @@ Project project_name {
   Note: 'ER Diagram for ft_transcendence'
 }
 
-Table user.user {
+Table user.account {
   id integer [ pk, unique, default:0, increment, not null ] // pk is not null.
   avatar text [ unique, not null ]
+  nickname varchar(10) [ unique, not null ]
   win_count integer [ default:0, not null ]
   lose_count integer [ default:0, not null ]
   ladder_level enum [ not null, note: "bronze, silver, gold" ]
@@ -22,8 +23,8 @@ Table user.friendship {
   second_user_id integer [ not null ]
 }
 
-Ref: user.user.id < user.friendship.first_user_id
-Ref: user.user.id < user.friendship.second_user_id
+Ref: user.account.id < user.friendship.first_user_id
+Ref: user.account.id < user.friendship.second_user_id
 
 Table user.match {
   id integer [ pk, unique, default:0, increment, not null ]
@@ -35,8 +36,8 @@ Table user.match {
   match_at datetime [ not null ]
 }
 
-Ref: user.user.id < user.match.user_id
-Ref: user.user.id < user.match.opponent_id
+Ref: user.account.id < user.match.user_id
+Ref: user.account.id < user.match.opponent_id
 
 Table chat.channel {
   id integer [ pk, unique, default:0, increment, not null ]
@@ -46,7 +47,7 @@ Table chat.channel {
   created_at datetime [ not null ]
 }
 
-Ref: user.user.id < chat.channel.owner_id
+Ref: user.account.id < chat.channel.owner_id
 
 Table chat.participant {
   id integer [ pk, unique, default:0, increment, not null ]
@@ -54,7 +55,7 @@ Table chat.participant {
   user_id integer [ not null ]
 }
 
-Ref: user.user.id < chat.participant.user_id
+Ref: user.account.id < chat.participant.user_id
 Ref: chat.channel.id < chat.participant.channel_id
 
 Table chat.administrator {
@@ -64,7 +65,7 @@ Table chat.administrator {
   created_at datetime [ not null ]
 }
 
-Ref: user.user.id < chat.administrator.user_id
+Ref: user.account.id < chat.administrator.user_id
 Ref: chat.channel.id < chat.administrator.channel_id
 
 Table chat.banned {
@@ -73,7 +74,7 @@ Table chat.banned {
   user_id integer [ not null ]
 }
 
-Ref: user.user.id < chat.banned.user_id
+Ref: user.account.id < chat.banned.user_id
 Ref: chat.channel.id < chat.banned.channel_id
 
 
@@ -83,8 +84,8 @@ Table chat.blocked {
   target_id integer [ not null ]
 }
 
-Ref: user.user.id < chat.blocked.user_id
-Ref: user.user.id < chat.blocked.target_id
+Ref: user.account.id < chat.blocked.user_id
+Ref: user.account.id < chat.blocked.target_id
 
 Table chat.message {
   id integer [ pk, unique, default:0, increment, not null ]
@@ -94,7 +95,7 @@ Table chat.message {
   created_at datetime [ not null ]
 }
 
-Ref: user.user.id < chat.message.sender_id
+Ref: user.account.id < chat.message.sender_id
 Ref: chat.channel.id < chat.message.channel_id
 
 Table chat.channel_password {
