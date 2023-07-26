@@ -6,7 +6,7 @@ export interface MatchRepository extends Repository<Match> {
 	this: Repository<Match>;
 	createMatch(match: { user: User; opponent: User; result: boolean, matchAt: Date }): Promise<InsertResult>;
 	getMatchesOfUser(user_id: number): Promise<Match[]>;
-	// updateMatch
+	// updateMatch //TODO: 로직 상 Match 정보를 변경할 일이 있다면 구현하기
 	deleteMatch(id: number): Promise<DeleteResult>;
 }
 
