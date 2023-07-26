@@ -21,12 +21,19 @@ export class Match {
 	@JoinColumn({ name: "lose_account_id" })
 	loser!: User;
 
-	@Column({ type: "enum", enum: LadderEnum, default: LadderEnum.BRONZE, nullable: false, name: "user_ladder_then" })
-	userLadderthen!: LadderEnum;
+	@Column({ type: "enum", enum: LadderEnum, default: LadderEnum.BRONZE, nullable: false, name: "winner_ladder_then" })
+	winnerLadderthen!: LadderEnum;
 
-	@Column({ type: "enum", enum: LadderEnum, default: LadderEnum.BRONZE, nullable: false, name: "opponent_ladder_then" })
-	opponentLadderthen!: LadderEnum;
+	@Column({ type: "enum", enum: LadderEnum, default: LadderEnum.BRONZE, nullable: false, name: "loser_ladder_then" })
+	loserLadderthen!: LadderEnum;
 
 	@Column({ type: "timestamp", nullable: false, name: "match_at" }) //TODO: timestamp에 대한 정렬은 int에 대한 정렬보다 성능이 떨어지는데, 이 컬럼이 그 외의 필요가 있을지 고민해보고, 없다면 제거하기
 	matchAt!: Date;
+
+	// 테이블을 JOIN하지 않고 외래키 컬럼 값을 사용하기 위한 컬럼. TypeORM 기능 상 데이터베이스 테이블에 들어갈 컬럼명과 엔티티의 속성명을 따로 지정하는 옵션이 없기 때문에 name으로 지정한 snake case를 예외적으로 적용. PostgreSQL은 모든 identifier를 소문자로 다루기 떄문이다.
+	@Column({ nullable: true })
+	win_account_id: User;
+
+	@Column({ nullable: true })
+	lose_account_id: User;
 }
