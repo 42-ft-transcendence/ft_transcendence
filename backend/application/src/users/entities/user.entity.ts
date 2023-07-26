@@ -9,7 +9,7 @@ import { Banned } from "src/chat/entities/banned.entity";
 import { Participant } from "src/chat/entities/participant.entity";
 import { Message } from "src/chat/entities/message.entity";
 
-@Entity()
+@Entity({ name: "account" })
 export class User {
 	@PrimaryGeneratedColumn({ type: "int" })
 	id!: number;
@@ -17,9 +17,9 @@ export class User {
 	@Column({ type: "text", unique: true, nullable: false }) //TODO: 사용자가 이미지를 지정하지 않을 때 기본 이미지 경로를 42 인트라 프로필 이미지로 하지 않고,  공통 이미지를 적용하려면 unique 옵션 제거하기
 	avatar!: string;
 
-	@Column({ type: "varchar", length: 10, unique: true, nullable: false})
+	@Column({ type: "varchar", length: 10, unique: true, nullable: false })
 	nickname!: string;
-	
+
 	@Column({ type: "int", default: 0, nullable: false })
 	win_count!: number;
 

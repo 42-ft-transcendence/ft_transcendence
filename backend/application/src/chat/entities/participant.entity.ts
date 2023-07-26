@@ -20,6 +20,6 @@ export class Participant {
 		nullable: false,
 		onDelete: "CASCADE", // TODO: check - 해당 채널의 참여자가 탈퇴한 경우, 채널의 참여자 목록에 계속 포함시킬 이유가 없다.
 	})
-	@JoinColumn({ name: "user_id" })
+	@JoinColumn({ name: "account_id" })
 	user!: User;
 }

@@ -11,7 +11,7 @@ export class Blocked {
 		nullable: false,
 		onDelete: "CASCADE", // TODO: check - 사용자가 소통을 막은 유저들에 대한 정보를 담는 테이블이므로, 제거될 사용자가 블록한 다른 사용자들에 대한 정보도 제거하는 게 맞다.
 	})
-	@JoinColumn({ name: "user_id" })
+	@JoinColumn({ name: "account_id" })
 	user!: User;
 
 	// @Column({ type: "int", nullable: false })
