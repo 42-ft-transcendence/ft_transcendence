@@ -11,7 +11,7 @@ export class UserService {
 		private readonly userRepository: UserRepository,
 	) { }
 
-	async createUser(user: { avatar_path: string; nickname: string }): Promise<InsertResult> {
+	async createUser(user: { avatarPath: string; nickname: string; }): Promise<InsertResult> {
 		return await this.userRepository.createUser(user);
 	}
 
@@ -19,7 +19,7 @@ export class UserService {
 		return await this.userRepository.getUser(id);
 	}
 
-	async updateUser(id: number, user: { avatar_path: string; nickname: string }): Promise<UpdateResult> {
+	async updateUser(id: number, user: { avatarPath: string; nickname: string }): Promise<UpdateResult> {
 		return await this.userRepository.updateUser(id, user);
 	}
 
