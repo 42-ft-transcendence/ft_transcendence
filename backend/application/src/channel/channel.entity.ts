@@ -24,7 +24,7 @@ export class Channel {
 	@JoinColumn({ name: "owner_id" })
 	owner!: User;
 
-	@Column({ type: "text", nullable: false })
+	@Column({ type: "text", unique: true, nullable: false })
 	name!: string;
 
 	@Column({ type: "enum", enum: ChannelTypeEnum, default: ChannelTypeEnum.PUBLIC, nullable: false })
