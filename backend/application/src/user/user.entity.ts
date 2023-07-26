@@ -43,11 +43,11 @@ export class User {
 	secondUser!: Friendship[];
 
 	// match relation
-	@OneToMany(() => Match, (match: Match) => match.user)
-	userMatch!: Match[];
+	@OneToMany(() => Match, (match: Match) => match.winner)
+	winnerMatch!: Match[];
 
-	@OneToMany(() => Match, (match: Match) => match.opponent)
-	opponent!: Match[];
+	@OneToMany(() => Match, (match: Match) => match.loser)
+	loserMatch!: Match[];
 
 	// blocked relation
 	@OneToMany(() => Blocked, (blocked: Blocked) => blocked.user)
