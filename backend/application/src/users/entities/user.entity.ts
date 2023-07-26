@@ -20,59 +20,59 @@ export class User {
 	@Column({ type: "varchar", length: 10, unique: true, nullable: false })
 	nickname!: string;
 
-	@Column({ type: "int", default: 0, nullable: false })
-	win_count!: number;
+	@Column({ type: "int", default: 0, nullable: false, name: "win_count" })
+	winCount!: number;
 
-	@Column({ type: "int", default: 0, nullable: false })
-	lose_count!: number;
+	@Column({ type: "int", default: 0, nullable: false, name: "lose_count" })
+	loseCount!: number;
 
 	@Column({ type: "enum", enum: LadderEnum, default: LadderEnum.BRONZE, nullable: false })
 	ladder!: LadderEnum;
 
-	@CreateDateColumn({ type: "timestamp", nullable: false })
-	created_at!: Date;
+	@CreateDateColumn({ type: "timestamp", nullable: false, name: "created_at" })
+	createdAt!: Date;
 
-	@UpdateDateColumn({ type: "timestamp", nullable: false })
-	updated_at!: Date;
+	@UpdateDateColumn({ type: "timestamp", nullable: false, name: "updated_at" })
+	updatedAt!: Date;
 
 	// friendship relation
-	@OneToMany(() => Friendship, (friendship) => friendship.first_user)
-	first_user!: Friendship[];
+	@OneToMany(() => Friendship, (friendship: Friendship) => friendship.secondUser)
+	firstUser!: Friendship[];
 
-	@OneToMany(() => Friendship, (friendship) => friendship.second_user)
-	second_user!: Friendship[];
+	@OneToMany(() => Friendship, (friendship: Friendship) => friendship.secondUser)
+	secondUser!: Friendship[];
 
 	// match relation
-	@OneToMany(() => Match, (match) => match.user)
-	user_match!: Match[];
+	@OneToMany(() => Match, (match: Match) => match.user)
+	userMatch!: Match[];
 
-	@OneToMany(() => Match, (match) => match.opponent)
+	@OneToMany(() => Match, (match: Match) => match.opponent)
 	opponent!: Match[];
 
 	// blocked relation
-	@OneToMany(() => Blocked, (blocked) => blocked.user)
-	user_blocked!: Blocked[];
+	@OneToMany(() => Blocked, (blocked: Blocked) => blocked.user)
+	userBlocked!: Blocked[];
 
-	@OneToMany(() => Blocked, (blocked) => blocked.target)
+	@OneToMany(() => Blocked, (blocked: Blocked) => blocked.target)
 	target!: Blocked[];
 
 	// channel relation
-	@OneToMany(() => Channel, (channel) => channel.owner)
+	@OneToMany(() => Channel, (channel: Channel) => channel.owner)
 	owner!: Channel[]
 
 	// administrator relation
-	@OneToMany(() => Administrator, (administrator) => administrator.user)
-	user_administrator!: Administrator[];
+	@OneToMany(() => Administrator, (administrator: Administrator) => administrator.user)
+	userAdministrator!: Administrator[];
 
 	// banned relation
-	@OneToMany(() => Banned, (banned) => banned.user)
-	user_banned!: Banned[];
+	@OneToMany(() => Banned, (banned: Banned) => banned.user)
+	userBanned!: Banned[];
 
 	// participant relation
-	@OneToMany(() => Participant, (participant) => participant.user)
-	user_participant!: Participant[];
+	@OneToMany(() => Participant, (participant: Participant) => participant.user)
+	userParticipant!: Participant[];
 
 	// message relation
-	@OneToMany(() => Message, (message) => message.sender)
+	@OneToMany(() => Message, (message: Message) => message.sender)
 	sender!: Message[];
 }

@@ -8,7 +8,7 @@ export class Administrator {
 	id!: number;
 
 	// @Column({ type: "int", nullable: false })
-	@ManyToOne(() => Channel, (channel) => channel.channel_administrator, {
+	@ManyToOne(() => Channel, (channel: Channel) => channel.channelAdministrator, {
 		nullable: false,
 		onDelete: "CASCADE"	// TODO: check - 이 외래키가 참조하는 채널이 데이터베이스에서 제거되면 해당 채널의 관리자들에 대한 정보는 모두 불필요해지므로 지우는 게 당연하다.
 	})
@@ -16,13 +16,13 @@ export class Administrator {
 	channel!: Channel;
 
 	// @Column({ type: "int", nullable: false })
-	@ManyToOne(() => User, (user) => user.user_administrator, {
+	@ManyToOne(() => User, (user: User) => user.userAdministrator, {
 		nullable: false,
 		onDelete: "CASCADE"	// TODO: check - 이 외래키가 참조하는 채널이 데이터베이스에서 제거되면 해당 채널의 관리자들에 대한 정보는 모두 불필요해지므로 지우는 게 당연하다.
 	})
 	@JoinColumn({ name: "account_id" })
 	user!: User;
 
-	@CreateDateColumn({ type: "timestamp", nullable: false })
-	created_at!: Date;
+	@CreateDateColumn({ type: "timestamp", nullable: false, name: "created_at" })
+	createdAt!: Date;
 }

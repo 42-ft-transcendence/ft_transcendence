@@ -8,7 +8,7 @@ export class Message {
 	id!: number;
 
 	// @Column({ type: "int", nullable: false })
-	@ManyToOne(() => Channel, (channel) => channel.channel_message, {
+	@ManyToOne(() => Channel, (channel: Channel) => channel.channelMessage, {
 		nullable: false,
 		onDelete: "CASCADE", // TODO: check - 채널이 제거된 경우엔 당연히 해당 채널의 메시지들이 제거되는 게 맞다.
 	})
@@ -25,6 +25,6 @@ export class Message {
 	@Column({ type: "text", nullable: false })
 	content!: string;
 
-	@CreateDateColumn({ type: "timestamp", nullable: false })
-	created_at!: Date;
+	@CreateDateColumn({ type: "timestamp", nullable: false, name: "created_at" })
+	createdAt!: Date;
 }

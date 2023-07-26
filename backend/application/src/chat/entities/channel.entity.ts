@@ -13,7 +13,7 @@ export class Channel {
 	id!: number;
 
 	// @Column({ type: "int", nullable: false })
-	@ManyToOne(() => User, (user) => user.owner, {
+	@ManyToOne(() => User, (user: User) => user.owner, {
 		nullable: false,
 		// TODO: check - onDelete는 기본값인 "NO ACTION"으로 두고 owner인 사용자가 탈퇴 시 다음의 작업을 사용자를 제거하기 위한 트랜잭션의 일부로 수행한다.
 		// 1. 관리자 목록을 확인해서 가장 먼저 관리자가 된 사용자를 이 채널의 owner로 만든다.
@@ -30,26 +30,26 @@ export class Channel {
 	@Column({ type: "enum", enum: ChannelTypeEnum, default: ChannelTypeEnum.PUBLIC, nullable: false })
 	type!: ChannelTypeEnum;
 
-	@CreateDateColumn({ type: "timestamp", nullable: false })
-	created_at: Date;
+	@CreateDateColumn({ type: "timestamp", nullable: false, name: "created_at" })
+	createdAt: Date;
 
 	// Administrator relation
-	@OneToMany(() => Administrator, (administrator) => administrator.channel)
-	channel_administrator: Administrator[]
+	@OneToMany(() => Administrator, (administrator: Administrator) => administrator.channel)
+	channelAdministrator: Administrator[]
 
 	// banned relation
-	@OneToMany(() => Banned, (banned) => banned.channel)
-	channel_banned: Banned[]
+	@OneToMany(() => Banned, (banned: Banned) => banned.channel)
+	channelBanned: Banned[]
 
 	// participant relation
-	@OneToMany(() => Participant, (participant) => participant.channel)
-	channel_participant: Participant[]
+	@OneToMany(() => Participant, (participant: Participant) => participant.channel)
+	channelParticipant: Participant[]
 
 	// message relation
-	@OneToMany(() => Message, (message) => message.channel)
-	channel_message: Message[]
+	@OneToMany(() => Message, (message: Message) => message.channel)
+	channelMessage: Message[]
 
 	// channel-password relation
-	@OneToOne(() => ChannelPassword, (password) => password.channel)
-	channel_password: ChannelPassword;
+	@OneToOne(() => ChannelPassword, (password: ChannelPassword) => password.channel)
+	channelPassword: ChannelPassword;
 }
