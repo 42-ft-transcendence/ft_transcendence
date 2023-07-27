@@ -28,10 +28,10 @@ Ref: user.account.id < user.follow.followed_account_id
 
 Table user.match {
   id integer [ pk, unique, default:0, increment, not null ]
+  type enum [ not null, note: "normal, rank" ]
+  map_type enum [ not null, note: "normal, inverse, vertical, fast"]
   win_account_id integer [ not null ]
   lose_account_id integer [ not null ]
-  user_ladder_then enum [ not null ]
-  opponent_ladder_then enum [ not null ]
   match_at datetime [ not null ]
 }
 
@@ -104,14 +104,3 @@ Table chat.channel_password {
 }
 
 Ref: chat.channel.id - chat.channel_password.channel_id
-
-// Table chat.direct_message {
-//   id integer [ pk, unique, default:0, increment, not null ]
-//   sender integer [ not null ]
-//   receiver integer [ not null ]
-//   content varchar(2000) [ not null ]
-//   created_at datetime [ not null ]
-// }
-
-// Ref: user.user.id < chat.direct_message.sender
-// Ref: user.user.id < chat.direct_message.receiver
