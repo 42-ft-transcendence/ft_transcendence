@@ -11,6 +11,6 @@ export class MatchService {
 	) { }
 
 	getMatches(id: number): Promise<Match[]> {
-		return this.matchRepository.getMatchesOfUser(id);
+		return this.matchRepository.getMatchList(id);
 	}
 }

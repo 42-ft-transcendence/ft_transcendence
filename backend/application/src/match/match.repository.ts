@@ -1,31 +1,23 @@
 import { DeleteResult, InsertResult, Repository } from "typeorm";
 import { Match } from "./match.entity";
 import { User } from "../user/user.entity";
+import { MatchTypeEnum } from "src/common/enum/match-type.enum";
+import { MapTypeEnum } from "src/common/enum/map-type.enum";
 
 export interface MatchRepository extends Repository<Match> {
 	this: Repository<Match>;
-	createMatch(match: { winner: User; loser: User; matchAt: Date }): Promise<InsertResult>;
-	getMatchesOfUser(user_id: number): Promise<Match[]>;
+	createMatch(match: { winner: User; loser: User; type: MatchTypeEnum, mapType: MapTypeEnum, matchAt: Date }): Promise<InsertResult>;
+	getMatchList(userId: number): Promise<Match[]>;
 	// updateMatch //TODO: 로직 상 Match 정보를 변경할 일이 있다면 구현하기
 	deleteMatch(id: number): Promise<DeleteResult>;
 }
 
-export const customMatchRepository: Pick<MatchRepository, "createMatch" | "getMatchesOfUser" | "deleteMatch"> = {
+export const customMatchRepository: Pick<MatchRepository, "createMatch" | "getMatchList" | "deleteMatch"> = {
 	async createMatch(this: Repository<Match>, match): Promise<InsertResult> {
-		const { winner, loser, matchAt } = match;
-
-		return await this.insert(
-			this.create({
-				winner: winner,
-				loser: loser,
-				winnerLadderthen: winner.ladder,
-				loserLadderthen: loser.ladder,
-				matchAt: matchAt
-			})
-		);
+		return await this.insert(this.create(match));
 	},
-
-	async getMatchesOfUser(this: Repository<Match>, userId): Promise<Match[]> {
+	//TODO: UI에서 표시할 winner, loser에 해당하는 user 정보들을 정한 후, subquery를 이용해서 조회하고, 이에 대한 DTO를 정의해서 반환하기
+	async getMatchList(this: Repository<Match>, userId): Promise<Match[]> {
 		return await this
 			.createQueryBuilder("match")
 			.where("match.win_account_id = :winnerId", { winnerId: userId })
