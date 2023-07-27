@@ -1,4 +1,4 @@
 import { Controller } from '@nestjs/common';
 
 @Controller('friendship')
-export class FriendshipController {}
+export class FollowController {}

@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/user.entity';
-import { Friendship } from './friendship/friendship.entity';
+import { Follow } from './follow/follow.entity';
 import { Match } from './match/match.entity';
 import { Administrator } from './administrator/administrator.entity';
 import { Banned } from './banned/banned.entity';
@@ -13,7 +13,6 @@ import { ChannelPassword } from './channel-password/channel-password.entity';
 import { Message } from './message/message.entity';
 import { Participant } from './participant/participant.entity';
 import { MatchModule } from './match/match.module';
-import { FriendshipModule } from './friendship/friendship.module';
 import { AdministratorModule } from './administrator/administrator.module';
 import { BannedModule } from './banned/banned.module';
 import { BlockedModule } from './blocked/blocked.module';
@@ -22,6 +21,7 @@ import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
 import { ParticipantModule } from './participant/participant.module';
 import { Blocked } from './blocked/blocked.entity';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
   imports: [
@@ -29,7 +29,7 @@ import { Blocked } from './blocked/blocked.entity';
       type: "postgres",
       entities: [
         User,
-        Friendship,
+        Follow,
         Match,
         Blocked,
         Channel,
@@ -52,7 +52,7 @@ import { Blocked } from './blocked/blocked.entity';
     }),
     UserModule,
     MatchModule,
-    FriendshipModule,
+    FollowModule,
     AdministratorModule,
     BannedModule,
     BlockedModule,

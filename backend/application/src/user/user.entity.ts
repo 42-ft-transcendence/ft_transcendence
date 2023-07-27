@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { LadderEnum } from "../common/enum/ladder.enum";
-import { Friendship } from "../friendship/friendship.entity";
+import { Follow } from "../follow/follow.entity";
 import { Match } from "../match/match.entity";
 import { Blocked } from "src/blocked/blocked.entity";
 import { Administrator } from "src/administrator/administrator.entity";
@@ -35,12 +35,12 @@ export class User {
 	@UpdateDateColumn({ type: "timestamp", nullable: false, name: "updated_at" })
 	updatedAt!: Date;
 
-	// friendship relation
-	@OneToMany(() => Friendship, (friendship: Friendship) => friendship.secondUser)
-	firstUser!: Friendship[];
+	// follow relation
+	@OneToMany(() => Follow, (follow: Follow) => follow.following)
+	following!: Follow[];
 
-	@OneToMany(() => Friendship, (friendship: Friendship) => friendship.secondUser)
-	secondUser!: Friendship[];
+	@OneToMany(() => Follow, (follow: Follow) => follow.followed)
+	followed!: Follow[];
 
 	// match relation
 	@OneToMany(() => Match, (match: Match) => match.winner)
