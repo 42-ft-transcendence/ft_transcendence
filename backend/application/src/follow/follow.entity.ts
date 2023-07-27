@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
 import { User } from "../user/user.entity";
 
 @Entity()
@@ -19,4 +19,10 @@ export class Follow {
 	})
 	@JoinColumn({ name: "followed_account_id" })
 	followed!: User;
+
+	@Column()
+	following_account_id: number;
+
+	@Column()
+	followed_account_id: number;
 }
