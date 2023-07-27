@@ -32,8 +32,8 @@ export class Match {
 
 	// 테이블을 JOIN하지 않고 외래키 컬럼 값을 사용하기 위한 컬럼. TypeORM 기능 상 데이터베이스 테이블에 들어갈 컬럼명과 엔티티의 속성명을 따로 지정하는 옵션이 없기 때문에 name으로 지정한 snake case를 예외적으로 적용. PostgreSQL은 모든 identifier를 소문자로 다루기 떄문이다.
 	@Column({ nullable: true })
-	win_account_id: User;
+	win_account_id: number;
 
 	@Column({ nullable: true })
-	lose_account_id: User;
+	lose_account_id: number;
 }
