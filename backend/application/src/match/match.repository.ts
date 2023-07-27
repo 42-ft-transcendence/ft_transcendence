@@ -28,8 +28,8 @@ export const customMatchRepository: Pick<MatchRepository, "createMatch" | "getMa
 	async getMatchesOfUser(this: Repository<Match>, userId): Promise<Match[]> {
 		return await this
 			.createQueryBuilder("match")
-			.where("match.winner_account_id = :winnerId", { winnerId: userId })
-			.orWhere("match.lower_account_id = :loserId", { loserId: userId })
+			.where("match.win_account_id = :winnerId", { winnerId: userId })
+			.orWhere("match.lose_account_id = :loserId", { loserId: userId })
 			.getMany();
 	},
 	//TODO: 데이터베이스 트리거로 winner, loser 모두 탈퇴했을 때 지우도록 구현하기

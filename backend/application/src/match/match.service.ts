@@ -9,4 +9,8 @@ export class MatchService {
 		@InjectRepository(Match)
 		private matchRepository: MatchRepository
 	) { }
+
+	getMatches(id: number): Promise<Match[]> {
+		return this.matchRepository.getMatchesOfUser(id);
+	}
 }
