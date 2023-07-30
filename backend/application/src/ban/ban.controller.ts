@@ -1,4 +1,7 @@
 import { Controller } from '@nestjs/common';
+import { BanService } from './ban.service';
 
 @Controller('ban')
-export class BanController { }
+export class BanController {
+	constructor(private banService: BanService) { }
+ }

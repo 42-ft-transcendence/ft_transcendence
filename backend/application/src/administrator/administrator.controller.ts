@@ -1,4 +1,7 @@
 import { Controller } from '@nestjs/common';
+import { AdministratorService } from './administrator.service';
 
 @Controller('administrator')
-export class AdministratorController {}
+export class AdministratorController {
+	constructor(private administratorService: AdministratorService) { }
+}
