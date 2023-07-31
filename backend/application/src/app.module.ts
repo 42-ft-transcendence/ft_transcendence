@@ -11,6 +11,7 @@ import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
 import { ParticipantModule } from './participant/participant.module';
 import { FollowModule } from './follow/follow.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { FollowModule } from './follow/follow.module';
     ChannelPasswordModule,
     ChannelModule,
     MessageModule,
-    ParticipantModule
+    ParticipantModule,
+    PrismaModule
   ],
   controllers: [AppController],
   providers: [AppService],
