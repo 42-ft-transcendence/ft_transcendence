@@ -1,4 +1,4 @@
 export enum MatchTypeEnum {
-	NORMAL,
-	RANK
+  NORMAL,
+  RANK,
 }

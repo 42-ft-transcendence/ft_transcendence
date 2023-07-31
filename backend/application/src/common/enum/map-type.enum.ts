@@ -1,6 +1,6 @@
 export enum MapTypeEnum {
-	NORMAL,
-	INVERSE,
-	VERTICAL,
-	FAST
+  NORMAL,
+  INVERSE,
+  VERTICAL,
+  FAST,
 }

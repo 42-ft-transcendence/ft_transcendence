@@ -1,5 +1,5 @@
 export enum LadderEnum {
-	BRONZE,
-	SILVER,
-	GOLD,
+  BRONZE,
+  SILVER,
+  GOLD,
 }

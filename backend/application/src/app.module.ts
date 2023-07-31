@@ -25,9 +25,9 @@ import { PrismaModule } from './prisma/prisma.module';
     ChannelModule,
     MessageModule,
     ParticipantModule,
-    PrismaModule
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

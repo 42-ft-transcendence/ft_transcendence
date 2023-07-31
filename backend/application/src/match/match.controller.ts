@@ -3,5 +3,5 @@ import { MatchService } from './match.service';
 
 @Controller('match')
 export class MatchController {
-	constructor(private matchService: MatchService) { }
+  constructor(private matchService: MatchService) {}
 }

@@ -3,5 +3,5 @@ import { FollowService } from './follow.service';
 
 @Controller('friendship')
 export class FollowController {
-	constructor(private followService: FollowService) { }
+  constructor(private followService: FollowService) {}
 }

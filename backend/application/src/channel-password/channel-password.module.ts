@@ -4,6 +4,6 @@ import { ChannelPasswordService } from './channel-password.service';
 
 @Module({
   controllers: [ChannelPasswordController],
-  providers: [ChannelPasswordService]
+  providers: [ChannelPasswordService],
 })
 export class ChannelPasswordModule {}

@@ -3,5 +3,5 @@ import { ChannelService } from './channel.service';
 
 @Controller('channel')
 export class ChannelController {
-	constructor(private channelService: ChannelService) { }
+  constructor(private channelService: ChannelService) {}
 }

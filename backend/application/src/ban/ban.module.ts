@@ -4,6 +4,6 @@ import { BanService } from './ban.service';
 
 @Module({
   controllers: [BanController],
-  providers: [BanService]
+  providers: [BanService],
 })
-export class BanModule { }
+export class BanModule {}

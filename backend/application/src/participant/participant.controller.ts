@@ -3,5 +3,5 @@ import { ParticipantService } from './participant.service';
 
 @Controller('participant')
 export class ParticipantController {
-	constructor(private participantService: ParticipantService) { }
+  constructor(private participantService: ParticipantService) {}
 }

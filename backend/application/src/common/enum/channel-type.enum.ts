@@ -1,6 +1,6 @@
 export enum ChannelTypeEnum {
-	PUBLIC,
-	PRIVATE,
-	PROTECTED,
-	ONETOONE,
+  PUBLIC,
+  PRIVATE,
+  PROTECTED,
+  ONETOONE,
 }

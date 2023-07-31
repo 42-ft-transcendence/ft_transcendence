@@ -3,5 +3,5 @@ import { BanService } from './ban.service';
 
 @Controller('ban')
 export class BanController {
-	constructor(private banService: BanService) { }
- }
+  constructor(private banService: BanService) {}
+}
