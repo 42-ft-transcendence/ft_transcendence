@@ -17,8 +17,8 @@ model User {
   winCount       Int             @default(0) @map("win_count")
   loseCount      Int             @default(0) @map("lose_count")
   ladder         Ladder          @default(BRONZE)
-  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt      DateTime        @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at") // @updatedAt does @default(now()) and updates value whenever it is updated. 
   administrators Administrator[]
   banneds        Ban[]
   channels       channel[]
