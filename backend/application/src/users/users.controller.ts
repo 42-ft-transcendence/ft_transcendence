@@ -6,13 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { UserEntity } from './entities/user.entity';
+import { CreateUserDto, UpdateUserDto } from './dto';
+import { UserEntity } from './entities';
+import { UsersService } from './users.service';
+import { ParsePositiveIntPipe } from 'src/common/pipe';
 
 @Controller('users')
 @ApiTags('users')
@@ -33,14 +32,14 @@ export class UsersController {
 
   @Get(':id')
   @ApiCreatedResponse({ type: UserEntity })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   @ApiCreatedResponse({ type: UserEntity })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParsePositiveIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.update(id, updateUserDto);
@@ -48,7 +47,7 @@ export class UsersController {
 
   @Delete(':id')
   @ApiCreatedResponse({ type: UserEntity })
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParsePositiveIntPipe) id: number) {
     return this.usersService.remove(id);
   }
 }

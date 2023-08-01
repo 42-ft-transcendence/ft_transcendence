@@ -8,16 +8,16 @@ export class UserEntity implements User {
   @ApiProperty()
   avatar: string;
 
-  @ApiProperty()
+  @ApiProperty({ maxLength: 10 })
   nickname: string;
 
-  @ApiProperty()
+  @ApiProperty({ default: 0 })
   winCount: number;
 
-  @ApiProperty()
+  @ApiProperty({ default: 0 })
   loseCount: number;
 
-  @ApiProperty()
+  @ApiProperty({ enum: Ladder, default: Ladder.BRONZE })
   ladder: Ladder;
 
   @ApiProperty()
