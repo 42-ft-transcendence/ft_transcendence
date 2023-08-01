@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   UseFilters,
-  NotFoundException,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto, UpdateUserDto } from './dto';
@@ -37,12 +36,7 @@ export class UsersController {
   @Get(':id')
   @ApiCreatedResponse({ type: UserEntity })
   async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
-    const user = await this.usersService.findOne(id);
-
-    if (!user) {
-      throw new NotFoundException(`User with id: ${id} not found`);
-    }
-    return user;
+    return await this.usersService.findOne(id);
   }
 
   @Patch(':id')
