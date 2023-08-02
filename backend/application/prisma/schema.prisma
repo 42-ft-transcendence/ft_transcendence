@@ -11,14 +11,15 @@ datasource db {
 }
 
 model User {
-  id             Int             @id() @default(autoincrement())
-  avatar         String          @unique()
-  nickname       String          @unique() @db.VarChar(10)
-  winCount       Int             @default(0) @map("win_count")
-  loseCount      Int             @default(0) @map("lose_count")
-  ladder         Ladder          @default(BRONZE)
-  createdAt      DateTime        @default(now()) @map("created_at")
-  updatedAt      DateTime        @updatedAt @map("updated_at") // @updatedAt does @default(now()) and updates value whenever it is updated. 
+  id        Int      @id() @default(autoincrement())
+  avatar    String   @unique()
+  nickname  String   @unique() @db.VarChar(10)
+  winCount  Int      @default(0) @map("win_count")
+  loseCount Int      @default(0) @map("lose_count")
+  ladder    Ladder   @default(BRONZE)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at") // @updatedAt does @default(now()) and updates value whenever it is updated. 
+
   administrators Administrator[]
   banneds        Ban[]
   channels       Channel[]
@@ -39,39 +40,43 @@ model Administrator {
   createdAt DateTime @default(now()) @map("created_at")
   channelId Int      @map("channel_id")
   userId    Int      @map("account_id")
-  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("administrator")
 }
 
 model Ban {
-  id        Int     @id() @default(autoincrement())
-  channelId Int     @map("channel_id")
-  userId    Int     @map("account_id")
-  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id        Int @id() @default(autoincrement())
+  channelId Int @map("channel_id")
+  userId    Int @map("account_id")
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("ban")
 }
 
 model Block {
-  id        Int  @id() @default(autoincrement())
-  blockerId Int  @map("blocker_id")
-  blockeeId Int  @map("blockee_id")
-  blocker   User @relation("blocker_to_account", fields: [blockerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  blockee   User @relation("blockee_to_account", fields: [blockeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id        Int @id() @default(autoincrement())
+  blockerId Int @map("blocker_id")
+  blockeeId Int @map("blockee_id")
+
+  blocker User @relation("blocker_to_account", fields: [blockerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  blockee User @relation("blockee_to_account", fields: [blockeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("block")
 }
 
 model Channel {
-  id             Int              @id() @default(autoincrement())
-  name           String           @unique()
-  type           ChannelType      @default(PUBLIC)
-  ownerId        Int              @map("owner_id")
-  createdAt      DateTime         @default(now()) @map("created_at")
-  user           User             @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id        Int         @id() @default(autoincrement())
+  name      String      @unique()
+  type      ChannelType @default(PUBLIC)
+  ownerId   Int         @map("owner_id")
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  owner          User             @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   administrators Administrator[]
   banned         Ban[]
   message        Message[]
@@ -82,21 +87,24 @@ model Channel {
 }
 
 model ChannelPassword {
-  id        Int     @id() @default(autoincrement())
-  password  String  @db.VarChar(20)
-  channelId Int     @unique() @map("channel_id")
-  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id        Int    @id() @default(autoincrement())
+  password  String @db.VarChar(20)
+  channelId Int    @unique() @map("channel_id")
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("channel_password")
 }
 
 model Follow {
-  id         Int  @id() @default(autoincrement())
-  followerId Int  @map("follower_id")
-  followeeId Int  @map("followee_id")
-  follower   User @relation("follower_to_account", fields: [followeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  followee   User @relation("followee_to_account", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id         Int @id() @default(autoincrement())
+  followerId Int @map("follower_id")
+  followeeId Int @map("followee_id")
 
+  follower User @relation("follower_to_account", fields: [followeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  followee User @relation("followee_to_account", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([followerId, followeeId])
   @@map("follow")
 }
 
@@ -107,8 +115,9 @@ model Match {
   matchAt  DateTime  @map("match_at")
   winnerId Int?      @map("win_account_id")
   loserId  Int?      @map("lose_account_id")
-  winner   User?     @relation("winner_to_account", fields: [winnerId], references: [id], onUpdate: NoAction)
-  loser    User?     @relation("loser_to_account", fields: [loserId], references: [id], onUpdate: NoAction)
+
+  winner User? @relation("winner_to_account", fields: [winnerId], references: [id], onUpdate: NoAction)
+  loser  User? @relation("loser_to_account", fields: [loserId], references: [id], onUpdate: NoAction)
 
   @@map("match")
 }
@@ -119,18 +128,20 @@ model Message {
   createdAt DateTime @default(now()) @map("created_at")
   channelId Int      @map("channel_id")
   senderId  Int?     @map("sender_id")
-  sender    User?    @relation(fields: [senderId], references: [id], onUpdate: NoAction)
-  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  sender  User?   @relation(fields: [senderId], references: [id], onUpdate: NoAction)
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("message")
 }
 
 model Participant {
-  id        Int     @id() @default(autoincrement())
-  channelId Int     @map("channel_id")
-  userId    Int     @map("account_id")
-  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id        Int @id() @default(autoincrement())
+  channelId Int @map("channel_id")
+  userId    Int @map("account_id")
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("participant")
 }
