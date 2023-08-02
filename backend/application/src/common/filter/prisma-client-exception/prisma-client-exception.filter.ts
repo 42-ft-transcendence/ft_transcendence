@@ -9,7 +9,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
     const response = host.switchToHttp().getResponse<Response>();
 
     switch (exception.code) {
-      case 'P2002':
+      case 'P2002': // unique constraints
         response.status(HttpStatus.CONFLICT).json({
           message: `${exception.meta.target} field should be unique`,
           error: 'Conflict',

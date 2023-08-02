@@ -8,10 +8,11 @@ import {
   Delete,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { FollowsService } from './follows.service';
 import { ParsePositiveIntPipe, ValidateFollowInterceptor } from 'src/common';
 import { CreateFollowDto, UpdateFollowDto } from './dto';
+import { FollowEntity } from './entities';
 
 @Controller('follows')
 @UseInterceptors(ValidateFollowInterceptor)
@@ -22,21 +23,25 @@ export class FollowsController {
   //TODO: followerId와 followeeId가 서로 다른지 확인하기
   //TODO: 데이터베이스 테이블에 이미 동일한 행이 존재하는지 먼저 확인하기
   @Post()
+  @ApiCreatedResponse({ type: FollowEntity })
   async create(@Body() createFollowDto: CreateFollowDto) {
     return await this.followsService.create(createFollowDto);
   }
 
   @Get()
+  @ApiCreatedResponse({ type: FollowEntity, isArray: true })
   async findAll() {
     return await this.followsService.findAll();
   }
 
   @Get(':id')
+  @ApiCreatedResponse({ type: FollowEntity })
   async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.followsService.findOne(id);
   }
 
   @Patch(':id')
+  @ApiCreatedResponse({ type: FollowEntity })
   async update(
     @Param('id', ParsePositiveIntPipe) id: number,
     @Body() updateFollowDto: UpdateFollowDto,
@@ -45,6 +50,7 @@ export class FollowsController {
   }
 
   @Delete(':id')
+  @ApiCreatedResponse({ type: FollowEntity })
   async remove(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.followsService.remove(id);
   }
@@ -52,6 +58,7 @@ export class FollowsController {
   //TODO: 관계를 가진 엔티티를 같이 로드해서 반환하게 구현하기
   //TODO: pagination 적용하기
   @Get(':followerId')
+  @ApiCreatedResponse({ type: FollowEntity, isArray: true })
   async findMany(
     @Param('followerId', ParsePositiveIntPipe) followerId: number,
   ) {
@@ -60,6 +67,7 @@ export class FollowsController {
   //TODO: 인증을 통해 현재 사용자의 User 테이블 id 값이 createFollowDto의 followerId와 같은지 확인하기
   //TODO: followerId와 followeeId가 서로 다른지 확인하기
   @Delete('/:followerId/:followeeId')
+  @ApiCreatedResponse({ type: FollowEntity })
   async removeByIds(
     @Param('followerId', ParsePositiveIntPipe) followerId: number,
     @Param('followeeId', ParsePositiveIntPipe) followeeId: number,

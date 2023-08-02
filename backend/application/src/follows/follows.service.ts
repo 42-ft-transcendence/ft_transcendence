@@ -20,7 +20,7 @@ export class FollowsService {
     const found = await this.prisma.follow.findUnique({ where: { id: id } });
 
     if (!found) {
-      throw new NotFoundException(`Follow with id: ${id} not found`);
+      throw new NotFoundException(`Follow with id: ${id} is not found`);
     }
     return found;
   }

@@ -3,9 +3,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { FollowsModule } from './follows/follows.module';
+import { ChannelsModule } from './channels/channels.module';
+import { ChannelPasswordsModule } from './channel-passwords/channel-passwords.module';
 
 @Module({
-  imports: [UsersModule, FollowsModule],
+  imports: [UsersModule, FollowsModule, ChannelsModule, ChannelPasswordsModule],
   controllers: [AppController],
   providers: [AppService],
 })
