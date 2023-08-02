@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateFollowDto, UpdateFollowDto } from './dto';
 import { PrismaService } from 'src/common';
 
@@ -17,12 +17,7 @@ export class FollowsService {
   }
 
   async findOne(id: number) {
-    const found = await this.prisma.follow.findUnique({ where: { id: id } });
-
-    if (!found) {
-      throw new NotFoundException(`Follow with id: ${id} is not found`);
-    }
-    return found;
+    return await this.prisma.follow.findUniqueOrThrow({ where: { id: id } });
   }
 
   async update(id: number, updateFollowDto: UpdateFollowDto) {

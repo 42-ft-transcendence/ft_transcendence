@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ChannelType } from '@prisma/client';
 import { PrismaService } from 'src/common';
 import { CreateChannelDto, UpdateChannelDto } from './dto';
@@ -22,12 +22,7 @@ export class ChannelsService {
   }
 
   async findOne(id: number) {
-    const found = await this.prisma.channel.findUnique({ where: { id: id } });
-
-    if (!found) {
-      throw new NotFoundException(`Channel with id: ${id} is not found`);
-    }
-    return found;
+    return await this.prisma.channel.findUniqueOrThrow({ where: { id: id } });
   }
 
   async update(id: number, updateChannelDto: UpdateChannelDto) {

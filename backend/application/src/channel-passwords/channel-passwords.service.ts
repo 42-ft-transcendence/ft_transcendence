@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateChannelPasswordDto, UpdateChannelPasswordDto } from './dto';
 import { PrismaService } from 'src/common';
 
@@ -18,16 +18,9 @@ export class ChannelPasswordsService {
   }
 
   async findOne(id: number) {
-    const found = await this.prisma.channelPassword.findUnique({
+    return await this.prisma.channelPassword.findUniqueOrThrow({
       where: { id },
     });
-
-    if (!found) {
-      throw new NotFoundException(
-        `Channel password with id: ${id} is not found`,
-      );
-    }
-    return found;
   }
 
   async update(id: number, updateChannelPasswordDto: UpdateChannelPasswordDto) {

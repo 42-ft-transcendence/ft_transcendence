@@ -21,7 +21,7 @@ export class FollowsController {
   constructor(private readonly followsService: FollowsService) {}
   //TODO: 인증을 통해 현재 사용자의 User 테이블 id 값이 createFollowDto의 followerId와 같은지 확인하기
   //TODO: followerId와 followeeId가 서로 다른지 확인하기
-  //TODO: 데이터베이스 테이블에 이미 동일한 행이 존재하는지 먼저 확인하기
+  //TODO: 데이터베이스 테이블에 이미 동일한 행이 존재하는지 먼저 확인하기 -> unique 제약조건 적용으로 해결
   @Post()
   @ApiCreatedResponse({ type: FollowEntity })
   async create(@Body() createFollowDto: CreateFollowDto) {
