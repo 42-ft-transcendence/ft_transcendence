@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto, UpdateMessageDto } from './dto';
 import { MessageEntity } from './entities';
@@ -25,13 +25,13 @@ export class MessagesController {
   }
 
   @Get()
-  @ApiCreatedResponse({ type: MessageEntity, isArray: true })
+  @ApiOkResponse({ type: MessageEntity, isArray: true })
   async findAll() {
     return await this.messagesService.findAll();
   }
 
   @Get(':id')
-  @ApiCreatedResponse({ type: MessageEntity })
+  @ApiOkResponse({ type: MessageEntity })
   async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.messagesService.findOne(id);
   }
@@ -46,7 +46,7 @@ export class MessagesController {
   }
 
   @Delete(':id')
-  @ApiCreatedResponse({ type: MessageEntity })
+  @ApiOkResponse({ type: MessageEntity })
   async remove(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.messagesService.remove(id);
   }

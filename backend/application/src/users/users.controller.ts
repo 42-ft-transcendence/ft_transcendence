@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UserEntity } from './entities';
 import { CreateUserDto, UpdateUserDto } from './dto';
@@ -25,13 +25,13 @@ export class UsersController {
   }
 
   @Get()
-  @ApiCreatedResponse({ type: UserEntity, isArray: true })
+  @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll() {
     return await this.usersService.findAll();
   }
 
   @Get(':id')
-  @ApiCreatedResponse({ type: UserEntity })
+  @ApiOkResponse({ type: UserEntity })
   async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.usersService.findOne(id);
   }
@@ -46,7 +46,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @ApiCreatedResponse({ type: UserEntity })
+  @ApiOkResponse({ type: UserEntity })
   async remove(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.usersService.remove(id);
   }

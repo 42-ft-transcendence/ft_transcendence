@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { FollowsService } from './follows.service';
 import { ParsePositiveIntPipe } from 'src/common';
 import { CreateFollowDto, UpdateFollowDto } from './dto';
@@ -27,13 +27,13 @@ export class FollowsController {
   }
 
   @Get()
-  @ApiCreatedResponse({ type: FollowEntity, isArray: true })
+  @ApiOkResponse({ type: FollowEntity, isArray: true })
   async findAll() {
     return await this.followsService.findAll();
   }
 
   @Get(':id')
-  @ApiCreatedResponse({ type: FollowEntity })
+  @ApiOkResponse({ type: FollowEntity })
   async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.followsService.findOne(id);
   }
@@ -48,7 +48,7 @@ export class FollowsController {
   }
 
   @Delete(':id')
-  @ApiCreatedResponse({ type: FollowEntity })
+  @ApiOkResponse({ type: FollowEntity })
   async remove(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.followsService.remove(id);
   }

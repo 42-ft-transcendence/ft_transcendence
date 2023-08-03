@@ -10,7 +10,7 @@ import {
 import { ParticipantsService } from './participants.service';
 import { CreateParticipantDto, UpdateParticipantDto } from './dto';
 import { ParsePositiveIntPipe } from 'src/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ParticipantEntity } from './entities';
 
 @Controller('participants')
@@ -25,13 +25,13 @@ export class ParticipantsController {
   }
 
   @Get()
-  @ApiCreatedResponse({ type: ParticipantEntity, isArray: true })
+  @ApiOkResponse({ type: ParticipantEntity, isArray: true })
   async findAll() {
     return await this.participantsService.findAll();
   }
 
   @Get(':id')
-  @ApiCreatedResponse({ type: ParticipantEntity })
+  @ApiOkResponse({ type: ParticipantEntity })
   async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.participantsService.findOne(id);
   }
@@ -46,7 +46,7 @@ export class ParticipantsController {
   }
 
   @Delete(':id')
-  @ApiCreatedResponse({ type: ParticipantEntity })
+  @ApiOkResponse({ type: ParticipantEntity })
   async remove(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.participantsService.remove(id);
   }

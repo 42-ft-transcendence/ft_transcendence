@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelPasswordsService } from './channel-passwords.service';
 import { CreateChannelPasswordDto, UpdateChannelPasswordDto } from './dto';
 import { ParsePositiveIntPipe } from 'src/common';
@@ -27,13 +27,13 @@ export class ChannelPasswordsController {
   }
 
   @Get()
-  @ApiCreatedResponse({ type: ChannelPasswordEntity, isArray: true })
+  @ApiOkResponse({ type: ChannelPasswordEntity, isArray: true })
   findAll() {
     return this.channelPasswordsService.findAll();
   }
 
   @Get(':id')
-  @ApiCreatedResponse({ type: ChannelPasswordEntity })
+  @ApiOkResponse({ type: ChannelPasswordEntity })
   findOne(@Param('id', ParsePositiveIntPipe) id: number) {
     return this.channelPasswordsService.findOne(id);
   }
@@ -48,7 +48,7 @@ export class ChannelPasswordsController {
   }
 
   @Delete(':id')
-  @ApiCreatedResponse({ type: ChannelPasswordEntity })
+  @ApiOkResponse({ type: ChannelPasswordEntity })
   remove(@Param('id', ParsePositiveIntPipe) id: number) {
     return this.channelPasswordsService.remove(id);
   }

@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
 import { ParsePositiveIntPipe } from 'src/common';
 import { ChannelEntity } from './entities';
@@ -25,13 +25,13 @@ export class ChannelsController {
   }
 
   @Get()
-  @ApiCreatedResponse({ type: ChannelEntity, isArray: true })
+  @ApiOkResponse({ type: ChannelEntity, isArray: true })
   async findAll() {
     return await this.channelsService.findAll();
   }
 
   @Get(':id')
-  @ApiCreatedResponse({ type: ChannelEntity })
+  @ApiOkResponse({ type: ChannelEntity })
   async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.channelsService.findOne(id);
   }
@@ -46,7 +46,7 @@ export class ChannelsController {
   }
 
   @Delete(':id')
-  @ApiCreatedResponse({ type: ChannelEntity })
+  @ApiOkResponse({ type: ChannelEntity })
   async remove(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.channelsService.remove(id);
   }
