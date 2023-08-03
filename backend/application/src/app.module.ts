@@ -6,6 +6,7 @@ import { FollowsModule } from './follows/follows.module';
 import { ChannelsModule } from './channels/channels.module';
 import { ChannelPasswordsModule } from './channel-passwords/channel-passwords.module';
 import { MessagesModule } from './messages/messages.module';
+import { ParticipantsModule } from './participants/participants.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { MessagesModule } from './messages/messages.module';
     ChannelsModule,
     ChannelPasswordsModule,
     MessagesModule,
+    ParticipantsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
