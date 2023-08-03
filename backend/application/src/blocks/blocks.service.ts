@@ -15,7 +15,7 @@ export class BlocksService {
   }
 
   async findOne(id: number) {
-    return await this.prisma.block.findUnique({ where: { id } });
+    return await this.prisma.block.findUniqueOrThrow({ where: { id } });
   }
 
   async update(id: number, updateBlockDto: UpdateBlockDto) {

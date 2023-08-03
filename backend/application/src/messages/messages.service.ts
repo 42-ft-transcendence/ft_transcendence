@@ -16,7 +16,7 @@ export class MessagesService {
   }
 
   async findOne(id: number) {
-    return await this.prisma.message.findUnique({ where: { id } });
+    return await this.prisma.message.findUniqueOrThrow({ where: { id } });
   }
 
   async update(id: number, updateMessageDto: UpdateMessageDto) {

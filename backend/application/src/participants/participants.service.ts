@@ -15,7 +15,7 @@ export class ParticipantsService {
   }
 
   async findOne(id: number) {
-    return await this.prisma.participant.findUnique({ where: { id } });
+    return await this.prisma.participant.findUniqueOrThrow({ where: { id } });
   }
 
   async update(id: number, updateParticipantDto: UpdateParticipantDto) {

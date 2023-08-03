@@ -10,6 +10,7 @@ import { ParticipantsModule } from './participants/participants.module';
 import { AdministratorsModule } from './administrators/administrators.module';
 import { BansModule } from './bans/bans.module';
 import { BlocksModule } from './blocks/blocks.module';
+import { MatchesModule } from './matches/matches.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { BlocksModule } from './blocks/blocks.module';
     AdministratorsModule,
     BansModule,
     BlocksModule,
+    MatchesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

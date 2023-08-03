@@ -15,7 +15,7 @@ export class BansService {
   }
 
   async findOne(id: number) {
-    return await this.prisma.ban.findUnique({ where: { id } });
+    return await this.prisma.ban.findUniqueOrThrow({ where: { id } });
   }
 
   async update(id: number, updateBanDto: UpdateBanDto) {
