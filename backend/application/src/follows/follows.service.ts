@@ -22,19 +22,13 @@ export class FollowsService {
 
   async update(id: number, updateFollowDto: UpdateFollowDto) {
     return await this.prisma.follow.update({
-      where: {
-        id: id,
-      },
+      where: { id },
       data: updateFollowDto,
     });
   }
 
   async remove(id: number) {
-    return await this.prisma.follow.delete({
-      where: {
-        id: id,
-      },
-    });
+    return await this.prisma.follow.delete({ where: { id } });
   }
   //TODO: 인증을 통해 현재 사용자의 User 테이블 id 값이 createFollowDto의 followerId와 같은지 확인하기
   //TODO: 관계를 가진 엔티티를 같이 로드해서 반환하게 구현하기
