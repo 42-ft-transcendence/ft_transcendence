@@ -9,6 +9,7 @@ import { MessagesModule } from './messages/messages.module';
 import { ParticipantsModule } from './participants/participants.module';
 import { AdministratorsModule } from './administrators/administrators.module';
 import { BansModule } from './bans/bans.module';
+import { BlocksModule } from './blocks/blocks.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { BansModule } from './bans/bans.module';
     ParticipantsModule,
     AdministratorsModule,
     BansModule,
+    BlocksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
