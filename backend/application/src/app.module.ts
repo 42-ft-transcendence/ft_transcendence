@@ -8,6 +8,7 @@ import { ChannelPasswordsModule } from './channel-passwords/channel-passwords.mo
 import { MessagesModule } from './messages/messages.module';
 import { ParticipantsModule } from './participants/participants.module';
 import { AdministratorsModule } from './administrators/administrators.module';
+import { BansModule } from './bans/bans.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AdministratorsModule } from './administrators/administrators.module';
     MessagesModule,
     ParticipantsModule,
     AdministratorsModule,
+    BansModule,
   ],
   controllers: [AppController],
   providers: [AppService],
