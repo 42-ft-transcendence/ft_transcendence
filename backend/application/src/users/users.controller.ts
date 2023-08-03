@@ -6,20 +6,22 @@ import {
   Patch,
   Param,
   Delete,
+  UseFilters,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UserEntity } from './entities';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { ParsePositiveIntPipe } from 'src/common';
+import { ParsePositiveIntPipe, PrismaClientExceptionFilter } from 'src/common';
 
 @Controller('users')
+@UseFilters(PrismaClientExceptionFilter)
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @ApiCreatedResponse({ type: UserEntity })
+  @ApiCreatedResponse({ type: UserEntity }) //TODO: ApiCreatedResponse는 생성(Post method)에 성공했을 때를 나타내는 것이다. 다음 링크를 참고해서 수정하자. 모든 컨트롤러를 다 수정하자. https://docs.nestjs.com/openapi/operations
   async create(@Body() createUserDto: CreateUserDto) {
     return await this.usersService.create(createUserDto);
   }
