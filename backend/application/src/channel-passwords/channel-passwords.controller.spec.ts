@@ -11,7 +11,9 @@ describe('ChannelPasswordsController', () => {
       providers: [ChannelPasswordsService],
     }).compile();
 
-    controller = module.get<ChannelPasswordsController>(ChannelPasswordsController);
+    controller = module.get<ChannelPasswordsController>(
+      ChannelPasswordsController,
+    );
   });
 
   it('should be defined', () => {

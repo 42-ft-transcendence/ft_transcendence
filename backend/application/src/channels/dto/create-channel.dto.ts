@@ -1,4 +1,4 @@
-import { ApiProperty, ApiTags } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { ChannelType } from '@prisma/client';
 import {
   IsEnum,

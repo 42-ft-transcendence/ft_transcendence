@@ -7,6 +7,7 @@ import { ChannelsModule } from './channels/channels.module';
 import { ChannelPasswordsModule } from './channel-passwords/channel-passwords.module';
 import { MessagesModule } from './messages/messages.module';
 import { ParticipantsModule } from './participants/participants.module';
+import { AdministratorsModule } from './administrators/administrators.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ParticipantsModule } from './participants/participants.module';
     ChannelPasswordsModule,
     MessagesModule,
     ParticipantsModule,
+    AdministratorsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
