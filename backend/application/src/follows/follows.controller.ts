@@ -6,16 +6,14 @@ import {
   Patch,
   Param,
   Delete,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { FollowsService } from './follows.service';
-import { ParsePositiveIntPipe, ValidateFollowInterceptor } from 'src/common';
+import { ParsePositiveIntPipe } from 'src/common';
 import { CreateFollowDto, UpdateFollowDto } from './dto';
 import { FollowEntity } from './entities';
 
 @Controller('follows')
-@UseInterceptors(ValidateFollowInterceptor)
 @ApiTags('follows')
 export class FollowsController {
   constructor(private readonly followsService: FollowsService) {}

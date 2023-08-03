@@ -6,15 +6,13 @@ import {
   Patch,
   Param,
   Delete,
-  UseFilters,
 } from '@nestjs/common';
 import { BansService } from './bans.service';
 import { CreateBanDto, UpdateBanDto } from './dto';
-import { ParsePositiveIntPipe, PrismaClientExceptionFilter } from 'src/common';
+import { ParsePositiveIntPipe } from 'src/common';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('bans')
-@UseFilters(PrismaClientExceptionFilter)
 @ApiTags('bans')
 export class BansController {
   constructor(private readonly bansService: BansService) {}

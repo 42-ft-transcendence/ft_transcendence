@@ -6,15 +6,13 @@ import {
   Patch,
   Param,
   Delete,
-  UseFilters,
 } from '@nestjs/common';
 import { AdministratorsService } from './administrators.service';
 import { CreateAdministratorDto, UpdateAdministratorDto } from './dto';
-import { ParsePositiveIntPipe, PrismaClientExceptionFilter } from 'src/common';
+import { ParsePositiveIntPipe } from 'src/common';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('administrators')
-@UseFilters(PrismaClientExceptionFilter)
 @ApiTags('administrators')
 export class AdministratorsController {
   constructor(private readonly administratorsService: AdministratorsService) {}

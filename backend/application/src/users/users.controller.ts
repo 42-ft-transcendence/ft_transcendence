@@ -6,16 +6,14 @@ import {
   Patch,
   Param,
   Delete,
-  UseFilters,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UserEntity } from './entities';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { ParsePositiveIntPipe, PrismaClientExceptionFilter } from 'src/common';
+import { ParsePositiveIntPipe } from 'src/common';
 
 @Controller('users')
-@UseFilters(PrismaClientExceptionFilter)
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

@@ -6,16 +6,14 @@ import {
   Patch,
   Param,
   Delete,
-  UseFilters,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
-import { ParsePositiveIntPipe, PrismaClientExceptionFilter } from 'src/common';
+import { ParsePositiveIntPipe } from 'src/common';
 import { ChannelEntity } from './entities';
 import { CreateChannelDto, UpdateChannelDto } from './dto';
 
 @Controller('channels')
-@UseFilters(PrismaClientExceptionFilter)
 @ApiTags('channels')
 export class ChannelsController {
   constructor(private readonly channelsService: ChannelsService) {}

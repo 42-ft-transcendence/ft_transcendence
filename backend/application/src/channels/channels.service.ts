@@ -22,7 +22,7 @@ export class ChannelsService {
   }
 
   async findOne(id: number) {
-    return await this.prisma.channel.findUniqueOrThrow({ where: { id: id } });
+    return await this.prisma.channel.findUniqueOrThrow({ where: { id } });
   }
 
   async update(id: number, updateChannelDto: UpdateChannelDto) {

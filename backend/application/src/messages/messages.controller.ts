@@ -6,16 +6,14 @@ import {
   Patch,
   Param,
   Delete,
-  UseFilters,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto, UpdateMessageDto } from './dto';
 import { MessageEntity } from './entities';
-import { ParsePositiveIntPipe, PrismaClientExceptionFilter } from 'src/common';
+import { ParsePositiveIntPipe } from 'src/common';
 
 @Controller('messages')
-@UseFilters(PrismaClientExceptionFilter)
 @ApiTags('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}

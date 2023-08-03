@@ -6,16 +6,14 @@ import {
   Patch,
   Param,
   Delete,
-  UseFilters,
 } from '@nestjs/common';
 import { ParticipantsService } from './participants.service';
 import { CreateParticipantDto, UpdateParticipantDto } from './dto';
-import { ParsePositiveIntPipe, PrismaClientExceptionFilter } from 'src/common';
+import { ParsePositiveIntPipe } from 'src/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { ParticipantEntity } from './entities';
 
 @Controller('participants')
-@UseFilters(PrismaClientExceptionFilter)
 @ApiTags('participants')
 export class ParticipantsController {
   constructor(private readonly participantsService: ParticipantsService) {}
