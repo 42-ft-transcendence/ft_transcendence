@@ -22,34 +22,43 @@ export class ChannelPasswordsController {
 
   @Post()
   @ApiCreatedResponse({ type: ChannelPasswordEntity })
-  create(@Body() createChannelPasswordDto: CreateChannelPasswordDto) {
-    return this.channelPasswordsService.create(createChannelPasswordDto);
+  async create(@Body() createChannelPasswordDto: CreateChannelPasswordDto) {
+    return new ChannelPasswordEntity(
+      await this.channelPasswordsService.create(createChannelPasswordDto),
+    );
   }
 
   @Get()
   @ApiOkResponse({ type: ChannelPasswordEntity, isArray: true })
-  findAll() {
-    return this.channelPasswordsService.findAll();
+  async findAll() {
+    const passwords = await this.channelPasswordsService.findAll();
+    return passwords.map((pw) => new ChannelPasswordEntity(pw));
   }
 
   @Get(':id')
   @ApiOkResponse({ type: ChannelPasswordEntity })
-  findOne(@Param('id', ParsePositiveIntPipe) id: number) {
-    return this.channelPasswordsService.findOne(id);
+  async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
+    return new ChannelPasswordEntity(
+      await this.channelPasswordsService.findOne(id),
+    );
   }
 
   @Patch(':id')
   @ApiCreatedResponse({ type: ChannelPasswordEntity })
-  update(
+  async update(
     @Param('id', ParsePositiveIntPipe) id: number,
     @Body() updateChannelPasswordDto: UpdateChannelPasswordDto,
   ) {
-    return this.channelPasswordsService.update(id, updateChannelPasswordDto);
+    return new ChannelPasswordEntity(
+      await this.channelPasswordsService.update(id, updateChannelPasswordDto),
+    );
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: ChannelPasswordEntity })
-  remove(@Param('id', ParsePositiveIntPipe) id: number) {
-    return this.channelPasswordsService.remove(id);
+  async remove(@Param('id', ParsePositiveIntPipe) id: number) {
+    return new ChannelPasswordEntity(
+      await this.channelPasswordsService.remove(id),
+    );
   }
 }
