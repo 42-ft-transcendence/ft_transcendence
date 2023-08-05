@@ -87,8 +87,8 @@ CREATE TABLE "match" (
     "type" "match_type_enum" NOT NULL,
     "mapType" "map_type_enum" NOT NULL,
     "match_at" TIMESTAMP(3) NOT NULL,
-    "win_account_id" INTEGER,
-    "lose_account_id" INTEGER,
+    "winner_id" INTEGER,
+    "loser_id" INTEGER,
 
     CONSTRAINT "match_pkey" PRIMARY KEY ("id")
 );
@@ -156,10 +156,10 @@ ALTER TABLE "follow" ADD CONSTRAINT "follow_followee_id_fkey" FOREIGN KEY ("foll
 ALTER TABLE "follow" ADD CONSTRAINT "follow_follower_id_fkey" FOREIGN KEY ("follower_id") REFERENCES "account"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "match" ADD CONSTRAINT "match_win_account_id_fkey" FOREIGN KEY ("win_account_id") REFERENCES "account"("id") ON DELETE SET NULL ON UPDATE NO ACTION;
+ALTER TABLE "match" ADD CONSTRAINT "match_winner_id_fkey" FOREIGN KEY ("winner_id") REFERENCES "account"("id") ON DELETE SET NULL ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "match" ADD CONSTRAINT "match_lose_account_id_fkey" FOREIGN KEY ("lose_account_id") REFERENCES "account"("id") ON DELETE SET NULL ON UPDATE NO ACTION;
+ALTER TABLE "match" ADD CONSTRAINT "match_loser_id_fkey" FOREIGN KEY ("loser_id") REFERENCES "account"("id") ON DELETE SET NULL ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "message" ADD CONSTRAINT "message_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "account"("id") ON DELETE SET NULL ON UPDATE NO ACTION;
