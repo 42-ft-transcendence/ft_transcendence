@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ChannelType } from '@prisma/client';
 import {
+  IsByteLength,
   IsEnum,
   IsNotEmpty,
   IsPositive,
@@ -27,6 +28,7 @@ export class CreateChannelDto {
   @ApiProperty()
   ownerId: number;
 
+  @IsByteLength(0, 72)
   @Length(4, 20)
   @IsString()
   @IsNotEmpty()
