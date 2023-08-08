@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateChannelPasswordDto, UpdateChannelPasswordDto } from './dto';
-import { PrismaService } from 'src/common';
+import { PrismaService, hash } from 'src/common';
 
 @Injectable()
 export class ChannelPasswordsService {
@@ -8,8 +8,9 @@ export class ChannelPasswordsService {
   //TODO: password에 hash 적용하기
   //TODO: 얘가 필요한 함수인지 고민해보기 나머지 모든 자원들의 모든 함수들도 다!
   async create(createChannelPasswordDto: CreateChannelPasswordDto) {
+    const { password, channelId } = createChannelPasswordDto;
     return await this.prisma.channelPassword.create({
-      data: createChannelPasswordDto,
+      data: { password: await hash(password), channelId: channelId },
     });
   }
 
@@ -26,7 +27,7 @@ export class ChannelPasswordsService {
   async update(id: number, updateChannelPasswordDto: UpdateChannelPasswordDto) {
     return await this.prisma.channelPassword.update({
       where: { id },
-      data: updateChannelPasswordDto,
+      data: { password: await hash(updateChannelPasswordDto.password) },
     });
   }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ChannelType } from '@prisma/client';
-import { PrismaService } from 'src/common';
+import { PrismaService, hash } from 'src/common';
 import { CreateChannelDto, UpdateChannelDto } from './dto';
 
 @Injectable()
@@ -12,7 +12,9 @@ export class ChannelsService {
     const createChannelObject = { name: name, type: type, ownerId: ownerId };
     //TODO: password에 hash 적용하기
     if (type === ChannelType.PROTECTED) {
-      createChannelObject['password'] = { create: { password } };
+      createChannelObject['password'] = {
+        create: { password: await hash(password) },
+      };
     }
     return await this.prisma.channel.create({ data: createChannelObject });
   }
@@ -30,7 +32,13 @@ export class ChannelsService {
     const updateChannelObject = { name: name, type: type, ownerId: ownerId };
     //TODO: password에 hash 적용하기
     if (type === ChannelType.PROTECTED) {
-      updateChannelObject['password'] = { update: { password } };
+      const hashed = await hash(password);
+      updateChannelObject['password'] = {
+        upsert: {
+          create: { password: hashed },
+          update: { password: hashed },
+        },
+      };
     }
     return await this.prisma.channel.update({
       where: { id },
