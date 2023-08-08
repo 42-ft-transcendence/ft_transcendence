@@ -47,7 +47,7 @@ async function seed() {
     })),
   });
 
-  const protectedChannels = (
+  const protectedChannelIds = (
     await prisma.channel.findMany({
       where: { type: ChannelType.PROTECTED },
     })
@@ -56,9 +56,9 @@ async function seed() {
   // create passwords for protected channels
   await prisma.channelPassword.createMany({
     data: Array.from({
-      length: protectedChannels.length,
+      length: protectedChannelIds.length,
     }).map((_, i) => ({
-      channelId: protectedChannels.at(i),
+      channelId: protectedChannelIds.at(i),
       password: bcrypt.hashSync(
         faker.internet.password(),
         bcrypt.genSaltSync(),
@@ -66,31 +66,70 @@ async function seed() {
     })),
   });
 
-  const channelIds = (await prisma.channel.findMany()).map(
-    (channel) => channel.id,
-  );
+  const channelIds = await prisma.channel.findMany({
+    select: {
+      id: true,
+      ownerId: true,
+    },
+  });
+
+  const oneToOneChannelIds = await prisma.channel.findMany({
+    where: { type: ChannelType.ONETOONE },
+    select: {
+      id: true,
+      ownerId: true,
+    },
+  });
+
+  const otherChannelIds = await prisma.channel.findMany({
+    where: {
+      NOT: [{ type: ChannelType.ONETOONE }],
+    },
+    select: {
+      id: true,
+      ownerId: true,
+    },
+  });
+
   //TODO: 채널 소유자를 participant나 administrator 테이블에 저장할 지 아니면 쿼리를 이용할 지 고민해보기.
   // create participants
-  channelIds.map(async (id) => {
+  oneToOneChannelIds.map(async (channel) => {
     await prisma.participant.createMany({
-      data: Array.from({
-        length: faker.number.int({
-          min: 0,
-          max: 100,
-        }),
-      }).map(() => ({
-        channelId: id,
-        userId: faker.helpers.arrayElement(userIds),
-      })),
+      data: [
+        { channelId: channel.id, userId: channel.ownerId },
+        {
+          channelId: channel.id,
+          userId: faker.helpers.arrayElement(
+            userIds.filter((userId) => userId != channel.ownerId),
+          ),
+        },
+      ],
+    });
+  });
+
+  otherChannelIds.map(async (channel) => {
+    const data = Array.from({
+      length: faker.number.int({ min: 2, max: 100 }),
+    }).map(() => ({
+      channelId: channel.id,
+      userId: faker.helpers.arrayElement(
+        userIds.filter((p) => p !== channel.ownerId),
+      ),
+    }));
+
+    data.push({ channelId: channel.id, userId: channel.ownerId });
+
+    await prisma.participant.createMany({
+      data: data,
       skipDuplicates: true,
     });
   });
 
   // create administrators
-  channelIds.map(async (id) => {
+  otherChannelIds.map(async (channel) => {
     const participantIds = (
       await prisma.participant.findMany({
-        where: { channelId: id },
+        where: { channelId: channel.id },
       })
     ).map((result) => result.userId);
 
@@ -100,9 +139,11 @@ async function seed() {
         max: participantIds.length > 5 ? 5 : participantIds.length,
       }),
     }).map(() => ({
-      channelId: id,
+      channelId: channel.id,
       userId: faker.helpers.arrayElement(participantIds),
     }));
+
+    administrators.push({ channelId: channel.id, userId: channel.ownerId });
 
     await prisma.administrator.createMany({
       data: administrators,
@@ -113,20 +154,22 @@ async function seed() {
   // create messages
   // 같은 결과지만 userIds.map(...)과 같은 방식으로 쿼리를 실행하면 훨씬 오래 걸린다.
   // 사용자 수가 채널 수보다 훨씬 많기 때문에, 쿼리를 훨씬 많이 던지기 때문이다.
-  channelIds.map(async (id) => {
-    const channelParticipants = (
-      await prisma.participant.findMany({
-        where: { channelId: id },
-      })
-    ).map((p) => p.userId);
+  channelIds.map(async (channel) => {
+    const channelParticipants = await prisma.participant.findMany({
+      where: { channelId: channel.id },
+      select: { userId: true },
+    });
 
     if (channelParticipants.length > 0) {
       const messages = Array.from({
-        length: faker.number.int({ min: 0, max: 1000 }),
+        length: faker.number.int({
+          min: channelParticipants.length * 3,
+          max: 1000,
+        }),
       }).map(() => ({
         content: faker.lorem.sentences({ min: 1, max: 5 }),
-        channelId: id,
-        senderId: faker.helpers.arrayElement(channelParticipants),
+        channelId: channel.id,
+        senderId: faker.helpers.arrayElement(channelParticipants).userId,
       }));
 
       await prisma.message.createMany({
@@ -182,11 +225,11 @@ async function seed() {
   });
 
   const bans = Array.from({ length: 100 }).map(() => {
-    const channel = faker.helpers.arrayElement(channelIds);
+    const channel = faker.helpers.arrayElement(otherChannelIds);
     const user = faker.helpers.arrayElement(userIds);
 
     return {
-      channelId: channel,
+      channelId: channel.id,
       userId: user,
     };
   });
