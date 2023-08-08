@@ -7,7 +7,9 @@ import { PrismaClientExceptionFilter } from './common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({ whitelist: true, stopAtFirstError: true }),
+  );
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
