@@ -1,0 +1,185 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table account {
+  id Int [pk, increment]
+  avatar String [unique, not null]
+  nickname String [unique, not null]
+  winCount Int [not null, default: 0]
+  loseCount Int [not null, default: 0]
+  ladder Ladder [not null, default: 'BRONZE']
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  administrators administrator [not null]
+  banneds ban [not null]
+  channels channel [not null]
+  blockees block [not null]
+  blockers block [not null]
+  followers follow [not null]
+  followees follow [not null]
+  losers match [not null]
+  winners match [not null]
+  messages message [not null]
+  participants participant [not null]
+}
+
+Table administrator {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  channelId Int [not null]
+  userId Int [not null]
+  user account [not null]
+  channel channel [not null]
+
+  indexes {
+    (channelId, userId) [unique]
+  }
+}
+
+Table ban {
+  id Int [pk, increment]
+  channelId Int [not null]
+  userId Int [not null]
+  user account [not null]
+  channel channel [not null]
+
+  indexes {
+    (channelId, userId) [unique]
+  }
+}
+
+Table block {
+  id Int [pk, increment]
+  blockerId Int [not null]
+  blockeeId Int [not null]
+  blockee account [not null]
+  blocker account [not null]
+
+  indexes {
+    (blockerId, blockeeId) [unique]
+  }
+}
+
+Table channel {
+  id Int [pk, increment]
+  name String [unique, not null]
+  type ChannelType [not null, default: 'PUBLIC']
+  ownerId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  administrators administrator [not null]
+  banned ban [not null]
+  owner account [not null]
+  password channel_password
+  message message [not null]
+  participant participant [not null]
+}
+
+Table channel_password {
+  id Int [pk, increment]
+  password String [not null]
+  channelId Int [unique, not null]
+  channel channel [not null]
+}
+
+Table follow {
+  id Int [pk, increment]
+  followerId Int [not null]
+  followeeId Int [not null]
+  follower account [not null]
+  followee account [not null]
+
+  indexes {
+    (followerId, followeeId) [unique]
+  }
+}
+
+Table match {
+  id Int [pk, increment]
+  type MatchType [not null]
+  mapType MapType [not null]
+  matchAt DateTime [not null]
+  winnerId Int
+  loserId Int
+  loser account
+  winner account
+}
+
+Table message {
+  id Int [pk, increment]
+  content String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  channelId Int [not null]
+  senderId Int
+  channel channel [not null]
+  sender account
+}
+
+Table participant {
+  id Int [pk, increment]
+  channelId Int [not null]
+  userId Int [not null]
+  user account [not null]
+  channel channel [not null]
+
+  indexes {
+    (channelId, userId) [unique]
+  }
+}
+
+Enum Ladder {
+  BRONZE
+  SILVER
+  GOLD
+}
+
+Enum ChannelType {
+  PUBLIC
+  PRIVATE
+  PROTECTED
+  ONETOONE
+}
+
+Enum MapType {
+  NORMAL
+  INVERSE
+  VERTICAL
+  FAST
+}
+
+Enum MatchType {
+  NORMAL
+  RANK
+}
+
+Ref: administrator.userId > account.id [delete: Cascade]
+
+Ref: administrator.channelId > channel.id [delete: Cascade]
+
+Ref: ban.userId > account.id [delete: Cascade]
+
+Ref: ban.channelId > channel.id [delete: Cascade]
+
+Ref: block.blockeeId > account.id [delete: Cascade]
+
+Ref: block.blockerId > account.id [delete: Cascade]
+
+Ref: channel.ownerId > account.id [delete: No Action]
+
+Ref: channel_password.channelId - channel.id [delete: Cascade]
+
+Ref: follow.followeeId > account.id [delete: Cascade]
+
+Ref: follow.followerId > account.id [delete: Cascade]
+
+Ref: match.loserId > account.id
+
+Ref: match.winnerId > account.id
+
+Ref: message.channelId > channel.id [delete: Cascade]
+
+Ref: message.senderId > account.id
+
+Ref: participant.userId > account.id [delete: Cascade]
+
+Ref: participant.channelId > channel.id [delete: Cascade]
