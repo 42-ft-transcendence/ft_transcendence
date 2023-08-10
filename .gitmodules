@@ -1,0 +1,3 @@
+[submodule "ft_transcendence_front"]
+	path = frontend
+	url = https://github.com/42-ft-transcendence/ft_transcendence_front
