@@ -6,9 +6,10 @@ Project project_name {
   Note: 'ER Diagram for ft_transcendence'
 }
 
-Table user.user {
-  id integer [ pk, unique, default:0, increment ] // pk is not null.
+Table user.account {
+  id integer [ pk, unique, default:0, increment, not null ] // pk is not null.
   avatar text [ unique, not null ]
+  nickname varchar(10) [ unique, not null ]
   win_count integer [ default:0, not null ]
   lose_count integer [ default:0, not null ]
   ladder_level enum [ not null, note: "bronze, silver, gold" ]
@@ -16,95 +17,90 @@ Table user.user {
   updated_at datetime [ not null ]
 }
 
-Table user.friendship {
-  id integer [ pk, unique, default:0, increment ]
-  first_user integer [ not null ]
-  second_user integer [ not null ]
+Table user.follow {
+  id integer [ pk, unique, default:0, increment, not null ]
+  following_account_id integer [ not null ]
+  followed_account_id integer [ not null ]
 }
 
-Ref: user.user.id < user.friendship.first_user
-Ref: user.user.id < user.friendship.second_user
+Ref: user.account.id < user.follow.following_account_id
+Ref: user.account.id < user.follow.followed_account_id
 
 Table user.match {
-  id integer [ pk, unique, default:0, increment ]
-  user integer [ not null ]
-  opponent integer [ not null ]
-  user_ladder_then enum [ not null ]
-  opponent_ladder_then enum [ not null ]
-  win_or_not boolean [ not null ]
+  id integer [ pk, unique, default:0, increment, not null ]
+  type enum [ not null, note: "normal, rank" ]
+  map_type enum [ not null, note: "normal, inverse, vertical, fast"]
+  win_account_id integer [ not null ]
+  lose_account_id integer [ not null ]
   match_at datetime [ not null ]
 }
 
-Ref: user.user.id < user.match.user
-Ref: user.user.id < user.match.opponent
+Ref: user.account.id < user.match.win_account_id
+Ref: user.account.id < user.match.lose_account_id
 
 Table chat.channel {
-  id integer [ pk, unique, default:0, increment ]
-  owner integer [ not null ] 
-  name text [ not null ]
-  type enum [ not null, note: "public, private, protected" ]
-  password varchar(20) [ null ]
+  id integer [ pk, unique, default:0, increment, not null ]
+  owner_id integer [ not null ] 
+  name text [ unique, not null ]
+  type enum [ not null, note: "public, private, protected, one-to-one" ]
   created_at datetime [ not null ]
 }
 
-Ref: user.user.id < chat.channel.owner
+Ref: user.account.id < chat.channel.owner_id
 
 Table chat.participant {
-  id integer [ pk, unique, default:0, increment ]
-  channel integer [ not null ]
-  user integer [ not null ]
+  id integer [ pk, unique, default:0, increment, not null ]
+  channel_id integer [ not null ]
+  user_id integer [ not null ]
 }
 
-Ref: user.user.id < chat.participant.user
-Ref: chat.channel.id < chat.participant.channel
+Ref: user.account.id < chat.participant.user_id
+Ref: chat.channel.id < chat.participant.channel_id
 
 Table chat.administrator {
-  id integer [ pk, unique, default:0, increment ]
-  channel integer [ not null ]
-  user integer [ not null ]
+  id integer [ pk, unique, default:0, increment, not null ]
+  channel_id integer [ not null ]
+  user_id integer [ not null ]
   created_at datetime [ not null ]
 }
 
-Ref: user.user.id < chat.administrator.user
-Ref: chat.channel.id < chat.administrator.channel
+Ref: user.account.id < chat.administrator.user_id
+Ref: chat.channel.id < chat.administrator.channel_id
 
 Table chat.banned {
-  id integer [ pk, unique, default:0, increment ]
-  channel integer [ not null ]
-  user integer [ not null ]
+  id integer [ pk, unique, default:0, increment, not null ]
+  channel_id integer [ not null ]
+  user_id integer [ not null ]
 }
 
-Ref: user.user.id < chat.banned.user
-Ref: chat.channel.id < chat.banned.channel
+Ref: user.account.id < chat.banned.user_id
+Ref: chat.channel.id < chat.banned.channel_id
 
 
 Table chat.blocked {
-  id integer [ pk, unique, default:0, increment ]
-  user integer [ not null ]
-  target integer [ not null ]
+  id integer [ pk, unique, default:0, increment, not null ]
+  user_id integer [ not null ]
+  target_id integer [ not null ]
 }
 
-Ref: user.user.id < chat.blocked.user
-Ref: user.user.id < chat.blocked.target
+Ref: user.account.id < chat.blocked.user_id
+Ref: user.account.id < chat.blocked.target_id
 
 Table chat.message {
-  id integer [ pk, unique, default:0, increment ]
-  sender integer [ not null ]
-  channel integer [ not null ]
-  content varchar(2000) [ not null ]
+  id integer [ pk, unique, default:0, increment, not null ]
+  channel_id integer [ not null ]
+  sender_id integer [ not null ]
+  content text [ not null ]
   created_at datetime [ not null ]
 }
 
-Ref: user.user.id < chat.message.sender
-Ref: chat.channel.id < chat.message.id
+Ref: user.account.id < chat.message.sender_id
+Ref: chat.channel.id < chat.message.channel_id
 
-Table chat.direct_message {
-  id integer [ pk, unique, default:0, increment ]
-  sender integer [ not null ]
-  receiver integer [ not null ]
-  content varchar(2000) [ not null ]
-  created_at datetime [ not null ]
+Table chat.channel_password {
+  id integer [ pk, unique, default:0, increment, not null ]
+  channel_id integer [ not null ]
+  password varchar(20) [ not null ]
 }
 
-Ref: user.user.id < chat.direct_message.sender
-Ref: user.user.id < chat.direct_message.receiver
+Ref: chat.channel.id - chat.channel_password.channel_id
