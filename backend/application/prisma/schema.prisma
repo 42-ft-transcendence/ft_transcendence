@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int             @id @default(autoincrement())
+  avatar         String          @unique
+  nickname       String          @unique @db.VarChar(10)
+  winCount       Int             @default(0) @map("win_count")
+  loseCount      Int             @default(0) @map("lose_count")
+  ladder         Ladder          @default(BRONZE)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  administrators Administrator[]
+  banneds        Ban[]
+  channels       Channel[]
+  blockees       Block[]         @relation("blockee_to_account")
+  blockers       Block[]         @relation("blocker_to_account")
+  followers      Follow[]        @relation("follower_to_account")
+  followees      Follow[]        @relation("followee_to_account")
+  losers         Match[]         @relation("loser_to_account")
+  winners        Match[]         @relation("winner_to_account")
+  messages       Message[]
+  participants   Participant[]
+
+  @@map("account")
+}
+
+model Administrator {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  channelId Int      @map("channel_id")
+  userId    Int      @map("account_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([channelId, userId])
+  @@map("administrator")
+}
+
+model Ban {
+  id        Int     @id @default(autoincrement())
+  channelId Int     @map("channel_id")
+  userId    Int     @map("account_id")
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([channelId, userId])
+  @@map("ban")
+}
+
+model Block {
+  id        Int  @id @default(autoincrement())
+  blockerId Int  @map("blocker_id")
+  blockeeId Int  @map("blockee_id")
+  blockee   User @relation("blockee_to_account", fields: [blockeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  blocker   User @relation("blocker_to_account", fields: [blockerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([blockerId, blockeeId])
+  @@map("block")
+}
+
+model Channel {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  type           ChannelType      @default(PUBLIC)
+  ownerId        Int              @map("owner_id")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  administrators Administrator[]
+  banned         Ban[]
+  owner          User             @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  password       ChannelPassword?
+  message        Message[]
+  participant    Participant[]
+
+  @@map("channel")
+}
+
+model ChannelPassword {
+  id        Int     @id @default(autoincrement())
+  password  String
+  channelId Int     @unique @map("channel_id")
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("channel_password")
+}
+
+model Follow {
+  id         Int  @id @default(autoincrement())
+  followerId Int  @map("follower_id")
+  followeeId Int  @map("followee_id")
+  follower   User @relation("follower_to_account", fields: [followeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  followee   User @relation("followee_to_account", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([followerId, followeeId])
+  @@map("follow")
+}
+
+model Match {
+  id       Int       @id @default(autoincrement())
+  type     MatchType
+  mapType  MapType
+  matchAt  DateTime  @map("match_at")
+  winnerId Int?      @map("winner_id")
+  loserId  Int?      @map("loser_id")
+  loser    User?     @relation("loser_to_account", fields: [loserId], references: [id], onUpdate: NoAction)
+  winner   User?     @relation("winner_to_account", fields: [winnerId], references: [id], onUpdate: NoAction)
+
+  @@map("match")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  channelId Int      @map("channel_id")
+  senderId  Int?     @map("sender_id")
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  sender    User?    @relation(fields: [senderId], references: [id], onUpdate: NoAction)
+
+  @@map("message")
+}
+
+model Participant {
+  id        Int     @id @default(autoincrement())
+  channelId Int     @map("channel_id")
+  userId    Int     @map("account_id")
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([channelId, userId])
+  @@map("participant")
+}
+
+enum Ladder {
+  BRONZE
+  SILVER
+  GOLD
+
+  @@map("ladder_enum")
+}
+
+enum ChannelType {
+  PUBLIC
+  PRIVATE
+  PROTECTED
+  ONETOONE
+
+  @@map("channel_type_enum")
+}
+
+enum MapType {
+  NORMAL
+  INVERSE
+  VERTICAL
+  FAST
+
+  @@map("map_type_enum")
+}
+
+enum MatchType {
+  NORMAL
+  RANK
+
+  @@map("match_type_enum")
+}

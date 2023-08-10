@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+
+  db:
+    image: postgres:15.3
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=test
+    networks:
+      - ft_transcendence
+    restart: always
+
+  backend:
+    build: ./backend/
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development # 완성 시 production으로 변경
+    depends_on:
+      - db
+    networks:
+      - ft_transcendence
+    restart: always
+
+  frontend:
+    build: ./frontend/
+    ports:
+      - 8080:80
+    environment:
+      - NODE_ENV=development # 완성 시 production으로 변경
+    depends_on:
+      - backend
+    networks:
+      - ft_transcendence
+    restart: always
+
+networks:
+  ft_transcendence:
