@@ -9,6 +9,7 @@ datasource db {
 
 model User {
   id             Int             @id @default(autoincrement())
+  fourtyTwoId    Int             @unique @map("fourty_two_id")
   avatar         String          @unique
   nickname       String          @unique @db.VarChar(10)
   winCount       Int             @default(0) @map("win_count")

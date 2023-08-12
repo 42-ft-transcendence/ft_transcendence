@@ -5,7 +5,7 @@ import { PrismaService } from 'src/common';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createUserDto: CreateUserDto) {
     return await this.prisma.user.create({ data: createUserDto });
@@ -17,6 +17,10 @@ export class UsersService {
 
   async findOne(id: number): Promise<User> {
     return await this.prisma.user.findUniqueOrThrow({ where: { id } });
+  }
+
+  async findOneByFourtyTwoId(fourtyTwoId: number): Promise<User> {
+    return await this.prisma.user.findUnique({ where: { fourtyTwoId: fourtyTwoId } });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
