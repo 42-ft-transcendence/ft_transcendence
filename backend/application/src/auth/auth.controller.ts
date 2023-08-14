@@ -1,11 +1,11 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { FourtyTwoAuthGuard } from './fourty-two-auth.guard';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { FourtyTwoAuthGuard } from './guards/fourty-two-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Get('42/login')
   @UseGuards(FourtyTwoAuthGuard)
@@ -16,7 +16,7 @@ export class AuthController {
   @Get('42/redirect')
   @UseGuards(FourtyTwoAuthGuard)
   async redirect(@Req() req) {
-    return this.authService.login(req.user);
+    return this.authService.issueJwt(req.user);
     // console.log(req.user);
 
     // const jwt: string = req.user.jwt;

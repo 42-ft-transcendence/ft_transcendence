@@ -3,11 +3,11 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
-import { FourtyTwoStrategy } from './fourty-two.strategy';
 import { AuthService } from './auth.service';
 import { UsersModule } from 'src/users/users.module';
-import { JwtStrategy } from './jwt.strategy';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { FourtyTwoStrategy } from './strategies/fourty-two.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -24,4 +24,4 @@ import { JwtAuthGuard } from './jwt-auth.guard';
     }),
   ],
 })
-export class AuthModule {}
+export class AuthModule { }
