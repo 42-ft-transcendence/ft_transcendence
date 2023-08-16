@@ -7,10 +7,11 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
-import { ParsePositiveIntPipe } from 'src/common';
+import { AddUserIdToBodyInterceptor, ParsePositiveIntPipe } from 'src/common';
 import { ChannelEntity } from './entities';
 import { CreateChannelDto, UpdateChannelDto } from './dto';
 import { JwtAuthGuard } from 'src/auth';
@@ -18,9 +19,10 @@ import { JwtAuthGuard } from 'src/auth';
 @Controller('channels')
 @ApiTags('channels')
 export class ChannelsController {
-  constructor(private readonly channelsService: ChannelsService) {}
+  constructor(private readonly channelsService: ChannelsService) { }
 
   @Post()
+  @UseInterceptors(new AddUserIdToBodyInterceptor('ownerId'))
   @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: ChannelEntity })
   async create(@Body() createChannelDto: CreateChannelDto) {

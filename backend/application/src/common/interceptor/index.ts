@@ -1,1 +1,1 @@
-export * from './validate-follow/validate-follow.interceptor';
+export * from './add-user-id-to-body/add-user-id-to-body.interceptor';

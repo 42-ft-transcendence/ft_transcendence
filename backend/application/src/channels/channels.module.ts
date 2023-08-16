@@ -8,4 +8,4 @@ import { PrismaModule } from 'src/common';
   providers: [ChannelsService],
   imports: [PrismaModule],
 })
-export class ChannelsModule {}
+export class ChannelsModule { }
