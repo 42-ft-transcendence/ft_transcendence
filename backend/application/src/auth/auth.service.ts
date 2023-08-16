@@ -10,16 +10,14 @@ export class AuthService {
     private usersService: UsersService,
     private configService: ConfigService,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async validateUser(fourtyTwoId: number) {
     return await this.usersService.findOneByFourtyTwoId(fourtyTwoId);
   }
 
-  async issueJwt(user: User) {
+  issueJwt(user: User) {
     const payload = { sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    return this.jwtService.sign(payload);
   }
 }

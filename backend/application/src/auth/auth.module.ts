@@ -24,4 +24,4 @@ import { FourtyTwoStrategy } from './strategies/fourty-two.strategy';
     }),
   ],
 })
-export class AuthModule { }
+export class AuthModule {}

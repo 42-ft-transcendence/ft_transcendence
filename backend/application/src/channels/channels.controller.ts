@@ -6,12 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
 import { ParsePositiveIntPipe } from 'src/common';
 import { ChannelEntity } from './entities';
 import { CreateChannelDto, UpdateChannelDto } from './dto';
+import { JwtAuthGuard } from 'src/auth';
 
 @Controller('channels')
 @ApiTags('channels')
@@ -19,24 +21,28 @@ export class ChannelsController {
   constructor(private readonly channelsService: ChannelsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: ChannelEntity })
   async create(@Body() createChannelDto: CreateChannelDto) {
     return await this.channelsService.create(createChannelDto);
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ChannelEntity, isArray: true })
   async findAll() {
     return await this.channelsService.findAll();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ChannelEntity })
   async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.channelsService.findOne(id);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: ChannelEntity })
   async update(
     @Param('id', ParsePositiveIntPipe) id: number,
@@ -46,6 +52,7 @@ export class ChannelsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ChannelEntity })
   async remove(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.channelsService.remove(id);
