@@ -21,7 +21,7 @@ export class ChannelsService {
 			data: {
 				...createChannelObject,
 				administrators: { create: [{ userId: ownerId }] },
-				participant: { create: [{ userId: ownerId }] },
+				participants: { create: [{ userId: ownerId }] },
 			},
 		});
 	}
@@ -38,14 +38,14 @@ export class ChannelsService {
 		return await this.prisma.channel.findUniqueOrThrow({
 			where: { id },
 			include: {
-				message: {
+				messages: {
 					select: {
 						content: true,
 						createdAt: true,
 						sender: { select: { nickname: true, avatar: true } }
 					},
 				},
-				_count: { select: { participant: true } },
+				_count: { select: { participants: true } },
 				owner: { select: { nickname: true } },
 			},
 		});

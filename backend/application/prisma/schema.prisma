@@ -18,7 +18,7 @@ model User {
   createdAt      DateTime        @default(now()) @map("created_at")
   updatedAt      DateTime        @updatedAt @map("updated_at")
   administrators Administrator[]
-  banneds        Ban[]
+  bans           Ban[]
   channels       Channel[]
   blockees       Block[]         @relation("blockee_to_account")
   blockers       Block[]         @relation("blocker_to_account")
@@ -73,11 +73,11 @@ model Channel {
   ownerId        Int              @map("owner_id")
   createdAt      DateTime         @default(now()) @map("created_at")
   administrators Administrator[]
-  banned         Ban[]
+  bans           Ban[]
   owner          User             @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   password       ChannelPassword?
-  message        Message[]
-  participant    Participant[]
+  messages       Message[]
+  participants   Participant[]
 
   @@map("channel")
 }
