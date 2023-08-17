@@ -6,7 +6,7 @@ import { ParticipantsService } from 'src/participants/participants.service';
 
 @Injectable()
 export class ChannelsService {
-	constructor(private prisma: PrismaService, private participantsService: ParticipantsService) { }
+	constructor(private prisma: PrismaService) { }
 
 	async create(createChannelDto: CreateChannelDto) {
 		const { name, type, ownerId, password } = createChannelDto;
@@ -52,7 +52,10 @@ export class ChannelsService {
 	}
 
 	async findParticipantsById(id: number) {
-		return (await this.participantsService.findManyByChannelId(id)).map(p => p.user);
+		return (await this.prisma.participant.findMany({
+			where: { channelId: id },
+			select: { user: { select: { nickname: true, avatar: true } } }
+		})).map(p => p.user);
 	}
 
 	async findByName(name: string) {

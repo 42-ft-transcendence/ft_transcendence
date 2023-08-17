@@ -18,13 +18,6 @@ export class ParticipantsService {
 		return await this.prisma.participant.findUniqueOrThrow({ where: { id } });
 	}
 
-	async findManyByChannelId(channelId: number) {
-		return await this.prisma.participant.findMany({
-			where: { channelId: channelId },
-			select: { user: { select: { nickname: true, avatar: true } } }
-		});
-	}
-
 	async update(id: number, updateParticipantDto: UpdateParticipantDto) {
 		return await this.prisma.participant.update({
 			where: { id },
