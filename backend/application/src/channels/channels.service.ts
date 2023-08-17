@@ -16,7 +16,13 @@ export class ChannelsService {
         create: { password: await hash(password) },
       };
     }
-    return await this.prisma.channel.create({ data: createChannelObject });
+    return await this.prisma.channel.create({
+      data: {
+        ...createChannelObject,
+        administrators: { create: [{ userId: ownerId }] },
+        participant: { create: [{ userId: ownerId }] },
+      },
+    });
   }
 
   async findAll() {
@@ -25,6 +31,16 @@ export class ChannelsService {
 
   async findOne(id: number) {
     return await this.prisma.channel.findUniqueOrThrow({ where: { id } });
+  }
+
+  async findOneInDetail(id: number) {
+    return await this.prisma.channel.findUniqueOrThrow({
+      where: { id },
+      include: {
+        message: true,
+        _count: { select: { participant: true } },
+      },
+    });
   }
 
   async update(id: number, updateChannelDto: UpdateChannelDto) {

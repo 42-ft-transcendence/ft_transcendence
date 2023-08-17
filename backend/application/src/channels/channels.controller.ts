@@ -19,7 +19,7 @@ import { JwtAuthGuard } from 'src/auth';
 @Controller('channels')
 @ApiTags('channels')
 export class ChannelsController {
-  constructor(private readonly channelsService: ChannelsService) { }
+  constructor(private readonly channelsService: ChannelsService) {}
 
   @Post()
   @UseInterceptors(new AddUserIdToBodyInterceptor('ownerId'))
@@ -41,6 +41,13 @@ export class ChannelsController {
   @ApiOkResponse({ type: ChannelEntity })
   async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
     return await this.channelsService.findOne(id);
+  }
+
+  @Get(':id/detail')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: ChannelEntity })
+  async findOneInDetail(@Param('id', ParsePositiveIntPipe) id: number) {
+    return await this.channelsService.findOneInDetail(id);
   }
 
   @Patch(':id')
