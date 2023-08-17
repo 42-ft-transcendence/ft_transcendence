@@ -37,10 +37,38 @@ export class ChannelsService {
     return await this.prisma.channel.findUniqueOrThrow({
       where: { id },
       include: {
-        message: true,
+        message: {
+          select: {
+            content: true,
+            createdAt: true,
+            sender: { select: { nickname: true, avatar: true } },
+          },
+        },
         _count: { select: { participant: true } },
+        owner: { select: { nickname: true } },
       },
     });
+  }
+
+  async findParticipantsById(id: number) {
+    const participants = (
+      await this.prisma.channel.findUniqueOrThrow({
+        where: { id },
+        select: {
+          participant: {
+            select: {
+              user: {
+                select: { nickname: true, avatar: true },
+              },
+            },
+          },
+        },
+      })
+    ).participant;
+    return participants.map((p) => ({
+      nickname: p.user.nickname,
+      avatar: p.user.avatar,
+    }));
   }
 
   async update(id: number, updateChannelDto: UpdateChannelDto) {

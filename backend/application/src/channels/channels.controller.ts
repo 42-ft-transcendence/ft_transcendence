@@ -50,6 +50,13 @@ export class ChannelsController {
     return await this.channelsService.findOneInDetail(id);
   }
 
+  @Get(':id/participants')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: ChannelEntity })
+  async findParticipantsById(@Param('id', ParsePositiveIntPipe) id: number) {
+    return await this.channelsService.findParticipantsById(id);
+  }
+
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: ChannelEntity })
