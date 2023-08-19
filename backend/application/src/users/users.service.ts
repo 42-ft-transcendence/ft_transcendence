@@ -5,14 +5,22 @@ import { PrismaService } from 'src/common';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createUserDto: CreateUserDto) {
     return await this.prisma.user.create({ data: createUserDto });
   }
 
-  async findAll(): Promise<User[]> {
-    return await this.prisma.user.findMany();
+  async findAll(id: number): Promise<User[]> {
+    return await this.prisma.user.findMany({
+      where: { id: { not: id } }
+    });
+  }
+
+  async findByName(id: number, name: string) {
+    return await this.prisma.user.findMany({
+      where: { id: { not: id }, nickname: { contains: name } }
+    });
   }
 
   async findOne(id: number): Promise<User> {

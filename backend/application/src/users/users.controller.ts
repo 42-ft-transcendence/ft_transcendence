@@ -7,13 +7,16 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
+  Req,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UserEntity } from './entities';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { ParsePositiveIntPipe } from 'src/common';
+import { ParsePositiveIntPipe, UserPropertyString } from 'src/common';
 import { JwtAuthGuard } from 'src/auth';
+import { CurrentUser } from 'src/common/decorator';
 
 @Controller('users')
 @ApiTags('users')
@@ -30,8 +33,15 @@ export class UsersController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: UserEntity, isArray: true })
-  async findAll() {
-    return await this.usersService.findAll();
+  async findAll(@CurrentUser(UserPropertyString.ID) id: number) {
+    return await this.usersService.findAll(id);
+  }
+
+  @Get('name')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: UserEntity, isArray: true })
+  async findByName(@CurrentUser(UserPropertyString.ID) id: number, @Query('name') name: string) {
+    return await this.usersService.findByName(id, name);
   }
 
   @Get(':id')
