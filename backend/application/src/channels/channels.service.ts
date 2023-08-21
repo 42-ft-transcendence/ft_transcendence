@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ChannelType } from '@prisma/client';
 import { PrismaService, hash } from 'src/common';
-import { CreateChannelDto, UpdateChannelDto } from './dto';
+import { CreateChannelDto, QueryChannelDto, UpdateChannelDto } from './dto';
+import { QueryNameChannelDto } from './dto/query-name-channel.dto';
 @Injectable()
 export class ChannelsService {
   constructor(private prisma: PrismaService) {}
@@ -24,10 +25,20 @@ export class ChannelsService {
     });
   }
 
-  async findAll() {
-    return await this.prisma.channel.findMany();
+  async findAll(queryChannelDto: QueryChannelDto) {
+    return await this.prisma.channel.findMany({
+      where: { type: { in: queryChannelDto.type } },
+    });
   }
 
+  async findAllWithName(queryNameChannelDto: QueryNameChannelDto) {
+    return await this.prisma.channel.findMany({
+      where: {
+        type: { in: queryNameChannelDto.type },
+        name: { contains: queryNameChannelDto.partialName },
+      },
+    });
+  }
   async findOne(id: number) {
     return await this.prisma.channel.findUniqueOrThrow({ where: { id } });
   }
