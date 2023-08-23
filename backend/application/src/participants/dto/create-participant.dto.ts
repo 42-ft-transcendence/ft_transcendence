@@ -6,9 +6,4 @@ export class CreateParticipantDto {
   @IsNotEmpty()
   @ApiProperty()
   channelId: number;
-
-  @IsPositive()
-  @IsNotEmpty()
-  @ApiProperty()
-  userId: number;
 }

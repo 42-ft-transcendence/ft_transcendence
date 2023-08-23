@@ -10,10 +10,11 @@ import {
 } from '@nestjs/common';
 import { ParticipantsService } from './participants.service';
 import { CreateParticipantDto, UpdateParticipantDto } from './dto';
-import { ParsePositiveIntPipe } from 'src/common';
+import { ParsePositiveIntPipe, UserPropertyString } from 'src/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ParticipantEntity } from './entities';
 import { JwtAuthGuard } from 'src/auth';
+import { CurrentUser } from 'src/common/decorator';
 
 @Controller('participants')
 @ApiTags('participants')
@@ -23,8 +24,11 @@ export class ParticipantsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: ParticipantEntity })
-  async create(@Body() createParticipantDto: CreateParticipantDto) {
-    return await this.participantsService.create(createParticipantDto);
+  async create(
+    @CurrentUser(UserPropertyString.ID) userId: number,
+    @Body() createParticipantDto: CreateParticipantDto,
+  ) {
+    return await this.participantsService.create(userId, createParticipantDto);
   }
 
   @Get()
