@@ -24,18 +24,27 @@ import { CreateChannelDto, QueryChannelDto, UpdateChannelDto } from './dto';
 import { JwtAuthGuard } from 'src/auth';
 import { CurrentUser } from 'src/common/decorator';
 import { QueryNameChannelDto } from './dto/query-name-channel.dto';
+import { CreateDirectChannelDto } from './dto/create-direct-channel.dto';
 
 @Controller('channels')
 @ApiTags('channels')
 export class ChannelsController {
-  constructor(private readonly channelsService: ChannelsService) {}
+  constructor(private readonly channelsService: ChannelsService) { }
 
   @Post()
-  @UseInterceptors(new AddUserIdToBodyInterceptor('ownerId'))
+  @UseInterceptors(new AddUserIdToBodyInterceptor('ownerId')) //TODO: @CurrentUser 데코레이터로 교체할까?
   @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: ChannelEntity })
   async create(@Body() createChannelDto: CreateChannelDto) {
     return await this.channelsService.create(createChannelDto);
+  }
+
+  @Post('directChannel')
+  @UseInterceptors(new AddUserIdToBodyInterceptor('ownerId'))
+  @UseGuards(JwtAuthGuard)
+  @ApiCreatedResponse({ type: ChannelEntity })
+  async createDirectChannel(@CurrentUser(UserPropertyString.NICKNAME) userName: string, @Body() createDirectChannelDto: CreateDirectChannelDto) {
+    return await this.channelsService.createDirectChannel(userName, createDirectChannelDto);
   }
 
   @Get()
@@ -55,11 +64,18 @@ export class ChannelsController {
     return await this.channelsService.findAllWithName(queryNameChannelDto);
   }
 
-  @Get('ofCurrentUser')
+  @Get('channelsUserIn')
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ChannelEntity })
-  async findAllUserIn(@CurrentUser(UserPropertyString.ID) id: number) {
-    return await this.channelsService.findAllUserIn(id);
+  async findChannelsUserIn(@CurrentUser(UserPropertyString.ID) id: number) {
+    return await this.channelsService.findChannelsUserIn(id);
+  }
+
+  @Get('directsUserIn')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: ChannelEntity })
+  async findDirectsUserIn(@CurrentUser(UserPropertyString.ID) id: number) {
+    return await this.channelsService.findDirectsUserIn(id);
   }
 
   @Get(':id')

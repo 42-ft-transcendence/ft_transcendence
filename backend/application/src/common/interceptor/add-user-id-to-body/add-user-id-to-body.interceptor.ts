@@ -16,7 +16,7 @@ export class AddUserIdToBodyInterceptor implements NestInterceptor {
 		const request = context.switchToHttp().getRequest<Request>();
 
 		request.body[this.newPropertyName] = (request.user)['id'];
-		delete request.user; //TOOD: 꼭 지워야 하나? 지우지 않았을 때의 단점과 지웠을 때의 장점 찾아보기.
+		// delete request.user; //TOOD: 꼭 지워야 하나? 지우지 않았을 때의 단점과 지웠을 때의 장점 찾아보기. -> 지우면 @CurrentUser로 사용하지 못함
 		return next.handle();
 	}
 }
