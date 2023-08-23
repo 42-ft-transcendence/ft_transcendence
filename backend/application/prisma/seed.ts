@@ -12,7 +12,7 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function seed() {
-  const userCount = 10000;
+  const userCount = 500;
   const channelCount = 200;
 
   // 시간이 많이 걸림...
