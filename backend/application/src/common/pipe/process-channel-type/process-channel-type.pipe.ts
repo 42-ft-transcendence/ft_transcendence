@@ -10,7 +10,7 @@ export class ProcessChannelTypePipe implements PipeTransform {
       delete value['type'];
       value['type'] =
         type === QueryChannelType.GROUP
-          ? [ChannelType.PUBLIC, ChannelType.PRIVATE, ChannelType.PROTECTED]
+          ? [ChannelType.PUBLIC, ChannelType.PROTECTED]
           : [ChannelType.ONETOONE];
     }
     return value;
