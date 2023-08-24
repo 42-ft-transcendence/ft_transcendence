@@ -7,7 +7,7 @@ import { CreateDirectChannelDto } from './dto/create-direct-channel.dto';
 
 @Injectable()
 export class ChannelsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createChannelDto: CreateChannelDto) {
     //TODO: custom validator를 활용함으로써 type이 'PROTECTED'면 비밀번호 속성에 값이 들어온 것이 확실하다. 따라서 hash를 적용하는 transformer를 만들어서 적용하고 if문을 제거하자.
@@ -27,26 +27,36 @@ export class ChannelsService {
     });
   }
 
-  async createDirectChannel(userName: string, createDirectChannelDto: CreateDirectChannelDto) {
-    const { ownerId, interlocatorId, interlocatorName } = createDirectChannelDto;
+  async createDirectChannel(
+    userName: string,
+    createDirectChannelDto: CreateDirectChannelDto,
+  ) {
+    const { ownerId, interlocatorId, interlocatorName } =
+      createDirectChannelDto;
     const result = await this.prisma.channel.create({
       data: {
         name: `${userName}, ${interlocatorName}`,
         type: ChannelType.ONETOONE,
         ownerId: ownerId,
         administrators: { create: [{ userId: ownerId }] },
-        participants: { create: [{ userId: ownerId }, { userId: interlocatorId }] },
-      }, select: {
-        id: true, participants: { where: { userId: interlocatorId }, select: { user: { select: { nickname: true, avatar: true } } } }
-      }
+        participants: {
+          create: [{ userId: ownerId }, { userId: interlocatorId }],
+        },
+      },
+      select: {
+        id: true,
+        participants: {
+          where: { userId: interlocatorId },
+          select: { user: { select: { nickname: true, avatar: true } } },
+        },
+      },
     });
     return {
       id: result.id,
       userName: result.participants[0].user.nickname,
-      avatar: result.participants[0].user.avatar
+      avatar: result.participants[0].user.avatar,
     };
   }
-
 
   async findAll(queryChannelDto: QueryChannelDto) {
     return await this.prisma.channel.findMany({
@@ -66,9 +76,9 @@ export class ChannelsService {
     return await this.prisma.channel.findUniqueOrThrow({ where: { id } });
   }
 
-  async findOneInDetail(id: number) {
-    return await this.prisma.channel.findUniqueOrThrow({
-      where: { id },
+  async findOneInDetail(userName: string, channelId: number) {
+    const result = await this.prisma.channel.findUniqueOrThrow({
+      where: { id: channelId },
       include: {
         messages: {
           select: {
@@ -81,6 +91,11 @@ export class ChannelsService {
         owner: { select: { nickname: true } },
       },
     });
+    result.messages = result.messages.map((message) => ({
+      ...message,
+      isMine: userName === message.sender.nickname,
+    }));
+    return result;
   }
 
   async findParticipantsById(id: number) {
@@ -103,7 +118,7 @@ export class ChannelsService {
       await this.prisma.participant.findMany({
         where: {
           userId: id,
-          channel: { type: { in: ['PUBLIC', 'PRIVATE', 'PROTECTED'] } }
+          channel: { type: { in: ['PUBLIC', 'PRIVATE', 'PROTECTED'] } },
         },
         select: {
           channel: { select: { name: true, type: true, id: true } },
@@ -120,14 +135,15 @@ export class ChannelsService {
           id: true,
           participants: {
             where: { userId: { not: id } },
-            select: { user: { select: { nickname: true, avatar: true } } }
-          }
-        }
-      })).map((result) => ({
-        channelId: result.id,
-        avatar: result.participants[0].user.avatar,
-        userName: result.participants[0].user.nickname
-      }));
+            select: { user: { select: { nickname: true, avatar: true } } },
+          },
+        },
+      })
+    ).map((result) => ({
+      channelId: result.id,
+      avatar: result.participants[0].user.avatar,
+      userName: result.participants[0].user.nickname,
+    }));
   }
 
   async update(id: number, updateChannelDto: UpdateChannelDto) {

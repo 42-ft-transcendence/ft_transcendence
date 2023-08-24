@@ -29,7 +29,7 @@ import { CreateDirectChannelDto } from './dto/create-direct-channel.dto';
 @Controller('channels')
 @ApiTags('channels')
 export class ChannelsController {
-  constructor(private readonly channelsService: ChannelsService) { }
+  constructor(private readonly channelsService: ChannelsService) {}
 
   @Post()
   @UseInterceptors(new AddUserIdToBodyInterceptor('ownerId')) //TODO: @CurrentUser 데코레이터로 교체할까?
@@ -43,8 +43,14 @@ export class ChannelsController {
   @UseInterceptors(new AddUserIdToBodyInterceptor('ownerId'))
   @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: ChannelEntity })
-  async createDirectChannel(@CurrentUser(UserPropertyString.NICKNAME) userName: string, @Body() createDirectChannelDto: CreateDirectChannelDto) {
-    return await this.channelsService.createDirectChannel(userName, createDirectChannelDto);
+  async createDirectChannel(
+    @CurrentUser(UserPropertyString.NICKNAME) userName: string,
+    @Body() createDirectChannelDto: CreateDirectChannelDto,
+  ) {
+    return await this.channelsService.createDirectChannel(
+      userName,
+      createDirectChannelDto,
+    );
   }
 
   @Get()
@@ -88,8 +94,11 @@ export class ChannelsController {
   @Get(':id/detail')
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ChannelEntity })
-  async findOneInDetail(@Param('id', ParsePositiveIntPipe) id: number) {
-    return await this.channelsService.findOneInDetail(id);
+  async findOneInDetail(
+    @CurrentUser(UserPropertyString.NICKNAME) userName: string,
+    @Param('id', ParsePositiveIntPipe) channelId: number,
+  ) {
+    return await this.channelsService.findOneInDetail(userName, channelId);
   }
 
   @Get(':id/participants')
