@@ -16,9 +16,12 @@ export class AuthController {
   @Get('redirect')
   @UseGuards(FourtyTwoAuthGuard)
   async redirect(@Req() req, @Res() res: Response) {
-    res.cookie('JsonWebToken', this.authService.issueJwt(req.user), {
+    const user = req.user;
+
+    res.cookie('JsonWebToken', this.authService.issueJwt(user), {
       maxAge: 24 * 60 * 60 * 1000,
     });
-    res.redirect('http://localhost:8080/');
+    if (user.newbie) res.redirect('http://localhost:8080/signup');
+    else res.redirect('http://localhost:8080/');
   }
 }

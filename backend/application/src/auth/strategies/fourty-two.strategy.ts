@@ -40,7 +40,7 @@ export class FourtyTwoStrategy extends PassportStrategy(Strategy, '42') {
         fourtyTwoId: info.id,
         avatar: info.image.link,
       });
-      return cb(null, newUser);
+      return cb(null, { ...newUser, newbie: true });
     }
   }
 }
