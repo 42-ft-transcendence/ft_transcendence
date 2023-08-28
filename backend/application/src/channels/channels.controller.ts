@@ -101,11 +101,14 @@ export class ChannelsController {
     return await this.channelsService.findOneInDetail(userName, channelId);
   }
 
-  @Get(':id/participants')
+  @Get(':channelId/contents')
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ChannelEntity })
-  async findParticipantsById(@Param('id', ParsePositiveIntPipe) id: number) {
-    return await this.channelsService.findParticipantsById(id);
+  async findContents(
+    @CurrentUser(UserPropertyString.ID) userId: number,
+    @Param('channelId', ParsePositiveIntPipe) channelId: number,
+  ) {
+    return await this.channelsService.findContents(userId, channelId);
   }
 
   @Patch(':id')

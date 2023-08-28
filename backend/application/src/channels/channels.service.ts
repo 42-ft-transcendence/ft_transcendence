@@ -98,13 +98,22 @@ export class ChannelsService {
     return result;
   }
 
-  async findParticipantsById(id: number) {
-    return (
-      await this.prisma.participant.findMany({
-        where: { channelId: id },
-        select: { user: { select: { nickname: true, avatar: true } } },
-      })
-    ).map((p) => p.user);
+  async findContents(userId: number, channelId: number) {
+    const contents = await this.prisma.channel.findUnique({
+      where: { id: channelId },
+      select: {
+        ownerId: true,
+        participants: {
+          select: { user: { select: { nickname: true, avatar: true } } },
+        },
+        administrators: {
+          select: { user: { select: { nickname: true, avatar: true } } },
+        },
+      },
+    });
+    contents['isOwner'] = contents.ownerId === userId;
+    delete contents.ownerId;
+    return contents;
   }
 
   async findByName(name: string) {
