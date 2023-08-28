@@ -104,10 +104,14 @@ export class ChannelsService {
       select: {
         ownerId: true,
         participants: {
-          select: { user: { select: { nickname: true, avatar: true } } },
+          select: {
+            user: { select: { id: true, nickname: true, avatar: true } },
+          },
         },
         administrators: {
-          select: { user: { select: { nickname: true, avatar: true } } },
+          select: {
+            user: { select: { id: true, nickname: true, avatar: true } },
+          },
         },
       },
     });

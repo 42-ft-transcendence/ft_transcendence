@@ -38,6 +38,16 @@ export class ParticipantsController {
     return await this.participantsService.findAll();
   }
 
+  @Delete('/channelId/:channelId/userId/:userId')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: ParticipantEntity })
+  async removeOne(
+    @Param('channelId', ParsePositiveIntPipe) channelId: number,
+    @Param('userId', ParsePositiveIntPipe) userId: number,
+  ) {
+    return await this.participantsService.removeOne(channelId, userId);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ParticipantEntity })
