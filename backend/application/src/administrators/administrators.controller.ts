@@ -11,7 +11,7 @@ import {
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AdministratorsService } from './administrators.service';
 import { CreateAdministratorDto, UpdateAdministratorDto } from './dto';
-import { ParsePositiveIntPipe } from 'src/common';
+import { AdminGuard, ParsePositiveIntPipe } from 'src/common';
 import { AdministratorEntity } from './entities';
 import { JwtAuthGuard } from 'src/auth';
 
@@ -21,7 +21,7 @@ export class AdministratorsController {
   constructor(private readonly administratorsService: AdministratorsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiCreatedResponse({ type: AdministratorEntity })
   async create(@Body() createAdministratorDto: CreateAdministratorDto) {
     return await this.administratorsService.create(createAdministratorDto);
@@ -35,7 +35,7 @@ export class AdministratorsController {
   }
 
   @Delete('/channelId/:channelId/userId/:userId')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiOkResponse({ type: AdministratorEntity })
   async removeOne(
     @Param('channelId', ParsePositiveIntPipe) channelId: number,
@@ -51,20 +51,20 @@ export class AdministratorsController {
     return await this.administratorsService.findOne(id);
   }
 
-  @Patch(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiCreatedResponse({ type: AdministratorEntity })
-  async update(
-    @Param('id', ParsePositiveIntPipe) id: number,
-    @Body() updateAdministratorDto: UpdateAdministratorDto,
-  ) {
-    return await this.administratorsService.update(id, updateAdministratorDto);
-  }
+  // @Patch(':id')
+  // @UseGuards(JwtAuthGuard)
+  // @ApiCreatedResponse({ type: AdministratorEntity })
+  // async update(
+  //   @Param('id', ParsePositiveIntPipe) id: number,
+  //   @Body() updateAdministratorDto: UpdateAdministratorDto,
+  // ) {
+  //   return await this.administratorsService.update(id, updateAdministratorDto);
+  // }
 
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiOkResponse({ type: AdministratorEntity })
-  async remove(@Param('id', ParsePositiveIntPipe) id: number) {
-    return await this.administratorsService.remove(id);
-  }
+  // @Delete(':id')
+  // @UseGuards(JwtAuthGuard)
+  // @ApiOkResponse({ type: AdministratorEntity })
+  // async remove(@Param('id', ParsePositiveIntPipe) id: number) {
+  //   return await this.administratorsService.remove(id);
+  // }
 }
