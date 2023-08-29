@@ -4,13 +4,17 @@ import { PrismaService } from 'src/common';
 
 @Injectable()
 export class AdministratorsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createAdministratorDto: CreateAdministratorDto) {
-    return await this.prisma.administrator.create({
-      data: createAdministratorDto,
-      select: { user: { select: { id: true, nickname: true, avatar: true } } }
-    }).user;
+    return (
+      await this.prisma.administrator.create({
+        data: createAdministratorDto,
+        select: {
+          user: { select: { id: true, nickname: true, avatar: true } },
+        },
+      })
+    ).user;
   }
 
   async findAll() {
@@ -33,9 +37,13 @@ export class AdministratorsService {
   }
 
   async removeOne(channelId: number, userId: number) {
-    return await this.prisma.administrator.delete({
-      where: { channelId_userId: { channelId: channelId, userId: userId } },
-      select: { user: { select: { id: true, nickname: true, avatar: true } } }
-    }).user;
+    return (
+      await this.prisma.administrator.delete({
+        where: { channelId_userId: { channelId: channelId, userId: userId } },
+        select: {
+          user: { select: { id: true, nickname: true, avatar: true } },
+        },
+      })
+    ).user;
   }
 }

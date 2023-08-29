@@ -18,7 +18,7 @@ import { JwtAuthGuard } from 'src/auth';
 @Controller('administrators')
 @ApiTags('administrators')
 export class AdministratorsController {
-  constructor(private readonly administratorsService: AdministratorsService) { }
+  constructor(private readonly administratorsService: AdministratorsService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
