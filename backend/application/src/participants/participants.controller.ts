@@ -19,7 +19,7 @@ import { CurrentUser } from 'src/common/decorator';
 @Controller('participants')
 @ApiTags('participants')
 export class ParticipantsController {
-  constructor(private readonly participantsService: ParticipantsService) {}
+  constructor(private readonly participantsService: ParticipantsService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -36,16 +36,6 @@ export class ParticipantsController {
   @ApiOkResponse({ type: ParticipantEntity, isArray: true })
   async findAll() {
     return await this.participantsService.findAll();
-  }
-
-  @Delete('/channelId/:channelId/userId/:userId')
-  @UseGuards(JwtAuthGuard)
-  @ApiOkResponse({ type: ParticipantEntity })
-  async removeOne(
-    @Param('channelId', ParsePositiveIntPipe) channelId: number,
-    @Param('userId', ParsePositiveIntPipe) userId: number,
-  ) {
-    return await this.participantsService.removeOne(channelId, userId);
   }
 
   @Get(':id')

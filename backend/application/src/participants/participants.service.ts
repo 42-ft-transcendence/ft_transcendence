@@ -4,7 +4,7 @@ import { PrismaService } from 'src/common';
 
 @Injectable()
 export class ParticipantsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(userId: number, createParticipantDto: CreateParticipantDto) {
     const result = await this.prisma.participant.create({
@@ -31,11 +31,5 @@ export class ParticipantsService {
 
   async remove(id: number) {
     return await this.prisma.participant.delete({ where: { id } });
-  }
-
-  async removeOne(channelId: number, userId: number) {
-    return await this.prisma.participant.delete({
-      where: { channelId_userId: { channelId: channelId, userId: userId } },
-    });
   }
 }

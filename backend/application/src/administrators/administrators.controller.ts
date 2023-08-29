@@ -18,7 +18,7 @@ import { JwtAuthGuard } from 'src/auth';
 @Controller('administrators')
 @ApiTags('administrators')
 export class AdministratorsController {
-  constructor(private readonly administratorsService: AdministratorsService) {}
+  constructor(private readonly administratorsService: AdministratorsService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -32,6 +32,16 @@ export class AdministratorsController {
   @ApiOkResponse({ type: AdministratorEntity, isArray: true })
   async findAll() {
     return await this.administratorsService.findAll();
+  }
+
+  @Delete('/channelId/:channelId/userId/:userId')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: AdministratorEntity })
+  async removeOne(
+    @Param('channelId', ParsePositiveIntPipe) channelId: number,
+    @Param('userId', ParsePositiveIntPipe) userId: number,
+  ) {
+    return await this.administratorsService.removeOne(channelId, userId);
   }
 
   @Get(':id')
