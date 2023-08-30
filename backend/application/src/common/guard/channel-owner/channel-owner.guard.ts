@@ -18,11 +18,23 @@ export class ChannelOwnerGuard implements CanActivate {
 		const channelId = parseInt(
 			request.header('transcendence-authorization-channel-id'),
 		);
+		const targetId = parseInt(
+			request.header('transcendence-authorization-user-id'),
+		);
 		const channel = await this.prisma.channel.findUnique({
 			where: { id: channelId },
-			select: { ownerId: true, type: true },
+			select: {
+				ownerId: true,
+				type: true,
+				participants: { select: { userId: true } },
+			},
 		});
-		if (channel.type === ChannelType.ONETOONE) return false;
+		if (
+			!channel ||
+			channel.type === ChannelType.ONETOONE ||
+			!channel.participants.find((p) => p.userId === targetId)
+		)
+			return false;
 		return channel.ownerId === userId;
 	}
 }
