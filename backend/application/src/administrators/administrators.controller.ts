@@ -11,17 +11,17 @@ import {
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AdministratorsService } from './administrators.service';
 import { CreateAdministratorDto, UpdateAdministratorDto } from './dto';
-import { AdminGuard, ParsePositiveIntPipe } from 'src/common';
+import { ChannelOwnerGuard, ParsePositiveIntPipe } from 'src/common';
 import { AdministratorEntity } from './entities';
 import { JwtAuthGuard } from 'src/auth';
 
 @Controller('administrators')
 @ApiTags('administrators')
 export class AdministratorsController {
-  constructor(private readonly administratorsService: AdministratorsService) {}
+  constructor(private readonly administratorsService: AdministratorsService) { }
 
   @Post()
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, ChannelOwnerGuard)
   @ApiCreatedResponse({ type: AdministratorEntity })
   async create(@Body() createAdministratorDto: CreateAdministratorDto) {
     return await this.administratorsService.create(createAdministratorDto);
@@ -35,7 +35,7 @@ export class AdministratorsController {
   }
 
   @Delete('/channelId/:channelId/userId/:userId')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, ChannelOwnerGuard)
   @ApiOkResponse({ type: AdministratorEntity })
   async removeOne(
     @Param('channelId', ParsePositiveIntPipe) channelId: number,
