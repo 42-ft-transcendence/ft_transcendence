@@ -131,6 +131,9 @@ export class ChannelsService {
 		});
 		contents['isOwner'] = contents.ownerId === userId;
 		delete contents.ownerId;
+		contents['isAdmin'] = contents.administrators.some(
+			(a) => a.user.id === userId,
+		);
 		return contents;
 	}
 
