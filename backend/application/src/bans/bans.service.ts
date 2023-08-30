@@ -4,25 +4,32 @@ import { PrismaService } from 'src/common';
 
 @Injectable()
 export class BansService {
-  constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService) {}
 
-  async create(createBanDto: CreateBanDto) {
-    return await this.prisma.ban.create({ data: createBanDto });
-  }
+	async create(createBanDto: CreateBanDto) {
+		return await this.prisma.ban.create({ data: createBanDto });
+	}
 
-  async findAll() {
-    return await this.prisma.ban.findMany();
-  }
+	async findAll() {
+		return await this.prisma.ban.findMany();
+	}
 
-  async findOne(id: number) {
-    return await this.prisma.ban.findUniqueOrThrow({ where: { id } });
-  }
+	async findOne(id: number) {
+		return await this.prisma.ban.findUniqueOrThrow({ where: { id } });
+	}
 
-  async update(id: number, updateBanDto: UpdateBanDto) {
-    return await this.prisma.ban.update({ where: { id }, data: updateBanDto });
-  }
+	async update(id: number, updateBanDto: UpdateBanDto) {
+		return await this.prisma.ban.update({ where: { id }, data: updateBanDto });
+	}
 
-  async remove(id: number) {
-    return await this.prisma.ban.delete({ where: { id } });
-  }
+	async remove(userId: number, channelId: number) {
+		return (
+			await this.prisma.ban.delete({
+				where: { channelId_userId: { channelId: channelId, userId: userId } },
+				select: {
+					user: { select: { id: true, nickname: true, avatar: true } },
+				},
+			})
+		).user;
+	}
 }

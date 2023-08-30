@@ -122,6 +122,11 @@ export class ChannelsService {
 						user: { select: { id: true, nickname: true, avatar: true } },
 					},
 				},
+				bans: {
+					select: {
+						user: { select: { id: true, nickname: true, avatar: true } },
+					},
+				},
 			},
 		});
 		contents['isOwner'] = contents.ownerId === userId;
