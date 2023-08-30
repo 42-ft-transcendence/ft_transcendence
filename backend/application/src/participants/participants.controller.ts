@@ -15,6 +15,7 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ParticipantEntity } from './entities';
 import { JwtAuthGuard } from 'src/auth';
 import { CurrentUser } from 'src/common/decorator';
+import { CheckBanGuard } from 'src/common/guard/check-ban/check-ban.guard';
 
 @Controller('participants')
 @ApiTags('participants')
@@ -22,7 +23,7 @@ export class ParticipantsController {
 	constructor(private readonly participantsService: ParticipantsService) {}
 
 	@Post()
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, CheckBanGuard)
 	@ApiCreatedResponse({ type: ParticipantEntity })
 	async create(
 		@CurrentUser(UserPropertyString.ID) userId: number,
