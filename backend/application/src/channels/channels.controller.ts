@@ -15,7 +15,6 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
 import {
 	AddUserIdToBodyInterceptor,
-	ChannelAdminGuard,
 	ParsePositiveIntPipe,
 	ProcessChannelTypePipe,
 	UserPropertyString,
@@ -30,7 +29,7 @@ import { CreateDirectChannelDto } from './dto/create-direct-channel.dto';
 @Controller('channels')
 @ApiTags('channels')
 export class ChannelsController {
-	constructor(private readonly channelsService: ChannelsService) { }
+	constructor(private readonly channelsService: ChannelsService) {}
 
 	@Post()
 	@UseInterceptors(new AddUserIdToBodyInterceptor('ownerId')) //TODO: @CurrentUser 데코레이터로 교체할까?
@@ -83,16 +82,6 @@ export class ChannelsController {
 	@ApiOkResponse({ type: ChannelEntity })
 	async findDirectsUserIn(@CurrentUser(UserPropertyString.ID) id: number) {
 		return await this.channelsService.findDirectsUserIn(id);
-	}
-
-	@Patch('ban/channelId/:channelId/userId/:userId')
-	@UseGuards(JwtAuthGuard, ChannelAdminGuard)
-	@ApiOkResponse({ type: ChannelEntity })
-	async ban(
-		@Param('channelId', ParsePositiveIntPipe) channelId: number,
-		@Param('userId', ParsePositiveIntPipe) userId: number,
-	) {
-		return await this.channelsService.ban(channelId, userId);
 	}
 
 	@Get(':id')

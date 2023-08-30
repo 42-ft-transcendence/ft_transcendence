@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ParticipantsService } from './participants.service';
 import { CreateParticipantDto, UpdateParticipantDto } from './dto';
-import { ChannelAdminGuard, ParsePositiveIntPipe, UserPropertyString } from 'src/common';
+import { ParsePositiveIntPipe, UserPropertyString } from 'src/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ParticipantEntity } from './entities';
 import { JwtAuthGuard } from 'src/auth';
@@ -19,7 +19,7 @@ import { CurrentUser } from 'src/common/decorator';
 @Controller('participants')
 @ApiTags('participants')
 export class ParticipantsController {
-	constructor(private readonly participantsService: ParticipantsService) { }
+	constructor(private readonly participantsService: ParticipantsService) {}
 
 	@Post()
 	@UseGuards(JwtAuthGuard)
@@ -36,16 +36,6 @@ export class ParticipantsController {
 	@ApiOkResponse({ type: ParticipantEntity, isArray: true })
 	async findAll() {
 		return await this.participantsService.findAll();
-	}
-
-	@Patch('kick/channelId/:channelId/userId/:userId')
-	@UseGuards(JwtAuthGuard, ChannelAdminGuard)
-	@ApiOkResponse({ type: ParticipantEntity })
-	async kick(
-		@Param('channelId', ParsePositiveIntPipe) channelId: number,
-		@Param('userId', ParsePositiveIntPipe) userId: number,
-	) {
-		return await this.participantsService.remove(channelId, userId);
 	}
 
 	@Get(':id')
@@ -65,10 +55,10 @@ export class ParticipantsController {
 		return await this.participantsService.update(id, updateParticipantDto);
 	}
 
-	// @Delete(':id')
-	// @UseGuards(JwtAuthGuard)
-	// @ApiOkResponse({ type: ParticipantEntity })
-	// async remove(@Param('id', ParsePositiveIntPipe) id: number) {
-	// 	return await this.participantsService.remove(id);
-	// }
+	@Delete(':id')
+	@UseGuards(JwtAuthGuard)
+	@ApiOkResponse({ type: ParticipantEntity })
+	async remove(@Param('id', ParsePositiveIntPipe) id: number) {
+		return await this.participantsService.remove(id);
+	}
 }

@@ -7,7 +7,7 @@ import { CreateDirectChannelDto } from './dto/create-direct-channel.dto';
 
 @Injectable()
 export class ChannelsService {
-	constructor(private prisma: PrismaService) { }
+	constructor(private prisma: PrismaService) {}
 
 	async create(createChannelDto: CreateChannelDto) {
 		//TODO: custom validator를 활용함으로써 type이 'PROTECTED'면 비밀번호 속성에 값이 들어온 것이 확실하다. 따라서 hash를 적용하는 transformer를 만들어서 적용하고 if문을 제거하자.
@@ -43,8 +43,11 @@ export class ChannelsService {
 					create: [{ userId: ownerId }, { userId: interlocatorId }],
 				},
 				messages: {
-					create: [{ content: '안녕하세요!', senderId: ownerId }, { content: '안녕하세요!', senderId: interlocatorId }]
-				}
+					create: [
+						{ content: 'INIT', senderId: ownerId },
+						{ content: 'INIT', senderId: interlocatorId },
+					],
+				},
 			},
 			select: {
 				id: true,
@@ -94,6 +97,9 @@ export class ChannelsService {
 				owner: { select: { nickname: true } },
 			},
 		});
+		if (result.type === ChannelType.ONETOONE)
+			//TODO: id  순서대로 정렬되어있는지, createAt으로 정렬하지 않아도 되는지 확인하기
+			result.messages.splice(0, 2);
 		result.messages = result.messages.map((message) => ({
 			...message,
 			isMine: userName === message.sender.nickname,
@@ -178,22 +184,6 @@ export class ChannelsService {
 		return await this.prisma.channel.update({
 			where: { id },
 			data: updateChannelObject,
-		});
-	}
-	//TODO: 존재하는 channel id, user id인지는 데이터베이스 자체적으로 체크할 수 있다.
-	async ban(channelId: number, userId: number) {
-		return await this.prisma.channel.update({
-			where: { id: channelId },
-			data: {
-				bans: { create: { userId: userId } },
-				participants: { delete: { channelId_userId: { channelId: channelId, userId: userId } } }
-			},
-			select: {
-				participants: {
-					where: { AND: [{ channelId: channelId }, { userId: userId }] },
-					select: { user: { select: { id: true, nickname: true, avatar: true } } }
-				}
-			}
 		});
 	}
 
