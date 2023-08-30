@@ -29,7 +29,7 @@ export class ParticipantsService {
     });
   }
 
-  async remove(id: number) {
-    return await this.prisma.participant.delete({ where: { id } });
+  async remove(channelId: number, userId: number) {
+    return await this.prisma.participant.delete({ where: { channelId_userId: { channelId: channelId, userId: userId } } });
   }
 }
