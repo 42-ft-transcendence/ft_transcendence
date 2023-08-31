@@ -165,12 +165,15 @@ export class ChannelsService {
 					id: true,
 					participants: {
 						where: { userId: { not: id } },
-						select: { user: { select: { nickname: true, avatar: true } } },
+						select: {
+							user: { select: { id: true, nickname: true, avatar: true } },
+						},
 					},
 				},
 			})
 		).map((result) => ({
 			channelId: result.id,
+			userId: result.participants[0].user.id,
 			avatar: result.participants[0].user.avatar,
 			userName: result.participants[0].user.nickname,
 		}));

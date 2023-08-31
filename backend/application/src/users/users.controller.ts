@@ -46,6 +46,13 @@ export class UsersController {
 		return await this.usersService.findAll(id);
 	}
 
+	@Get('oneself')
+	@UseGuards(JwtAuthGuard)
+	@ApiOkResponse({ type: UserEntity })
+	async findOneSelf(@CurrentUser(UserPropertyString.ID) id: number) {
+		return await this.usersService.findOneSelf(id);
+	}
+
 	@Get('name')
 	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: UserEntity, isArray: true })

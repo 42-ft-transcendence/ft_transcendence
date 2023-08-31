@@ -17,6 +17,10 @@ export class UsersService {
 		});
 	}
 
+	async findOneSelf(id: number) {
+		return await this.prisma.user.findUniqueOrThrow({ where: { id } });
+	}
+
 	async findByName(id: number, name: string) {
 		return await this.prisma.user.findMany({
 			where: { id: { not: id }, nickname: { contains: name } },
