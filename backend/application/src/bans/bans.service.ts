@@ -7,7 +7,20 @@ export class BansService {
 	constructor(private prisma: PrismaService) {}
 
 	async create(createBanDto: CreateBanDto) {
-		return await this.prisma.ban.create({ data: createBanDto });
+		const { userId, channelId } = createBanDto;
+
+		return await this.prisma.user.update({
+			where: { id: userId },
+			data: {
+				bans: { create: { channelId: channelId } },
+				participants: {
+					delete: {
+						channelId_userId: { channelId: channelId, userId: userId },
+					},
+				},
+			},
+			select: { id: true, nickname: true, avatar: true },
+		});
 	}
 
 	async findAll() {

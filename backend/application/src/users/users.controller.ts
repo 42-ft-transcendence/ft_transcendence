@@ -84,25 +84,25 @@ export class UsersController {
 		});
 	}
 
-	@Patch('ban/userId/:userId/channelId/:channelId')
-	@UseGuards(JwtAuthGuard, ChannelAdminGuard, TargetRoleGuard)
-	@ApiOkResponse({ type: UserEntity })
-	async ban(
-		@Param('userId', ParsePositiveIntPipe) userId: number,
-		@Param('channelId', ParsePositiveIntPipe) channelId: number,
-	) {
-		return await this.usersService.ban(userId, channelId);
-	}
+	// @Patch('ban/userId/:userId/channelId/:channelId')
+	// @UseGuards(JwtAuthGuard, ChannelAdminGuard, TargetRoleGuard)
+	// @ApiOkResponse({ type: UserEntity })
+	// async ban(
+	// 	@Param('userId', ParsePositiveIntPipe) userId: number,
+	// 	@Param('channelId', ParsePositiveIntPipe) channelId: number,
+	// ) {
+	// 	return await this.usersService.ban(userId, channelId);
+	// }
 
-	@Patch('kick/userId/:userId/channelId/:channelId')
-	@UseGuards(JwtAuthGuard, ChannelAdminGuard, TargetRoleGuard)
-	@ApiOkResponse({ type: UserEntity })
-	async kick(
-		@Param('userId', ParsePositiveIntPipe) userId: number,
-		@Param('channelId', ParsePositiveIntPipe) channelId: number,
-	) {
-		return await this.usersService.kick(userId, channelId);
-	}
+	// @Patch('kick/userId/:userId/channelId/:channelId')
+	// @UseGuards(JwtAuthGuard, ChannelAdminGuard, TargetRoleGuard)
+	// @ApiOkResponse({ type: UserEntity })
+	// async kick(
+	// 	@Param('userId', ParsePositiveIntPipe) userId: number,
+	// 	@Param('channelId', ParsePositiveIntPipe) channelId: number,
+	// ) {
+	// 	return await this.usersService.kick(userId, channelId);
+	// }
 
 	@Get(':id')
 	@UseGuards(JwtAuthGuard)

@@ -8,10 +8,14 @@ import {
 	Delete,
 	UseGuards,
 } from '@nestjs/common';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { BansService } from './bans.service';
 import { CreateBanDto, UpdateBanDto } from './dto';
-import { ChannelAdminGuard, ParsePositiveIntPipe } from 'src/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+	ChannelAdminGuard,
+	ParsePositiveIntPipe,
+	TargetRoleGuard,
+} from 'src/common';
 import { BanEntity } from './entities';
 import { JwtAuthGuard } from 'src/auth';
 
@@ -21,7 +25,7 @@ export class BansController {
 	constructor(private readonly bansService: BansService) {}
 
 	@Post()
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, ChannelAdminGuard, TargetRoleGuard)
 	@ApiCreatedResponse({ type: BanEntity })
 	async create(@Body() createBanDto: CreateBanDto) {
 		return await this.bansService.create(createBanDto);
@@ -51,7 +55,7 @@ export class BansController {
 		return await this.bansService.update(id, updateBanDto);
 	}
 
-	@Delete('unban/userId/:userId/channelId/:channelId')
+	@Delete('userId/:userId/channelId/:channelId')
 	@UseGuards(JwtAuthGuard, ChannelAdminGuard)
 	@ApiOkResponse({ type: BanEntity })
 	async remove(

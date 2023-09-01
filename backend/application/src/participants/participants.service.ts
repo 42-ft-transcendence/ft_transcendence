@@ -29,9 +29,16 @@ export class ParticipantsService {
 		});
 	}
 
-	async remove(id: number) {
-		return await this.prisma.participant.delete({
-			where: { id },
-		});
+	async remove(userId: number, channelId: number) {
+		return (
+			await this.prisma.participant.delete({
+				where: { channelId_userId: { channelId: channelId, userId: userId } },
+				select: {
+					user: {
+						select: { id: true, nickname: true, avatar: true },
+					},
+				},
+			})
+		).user;
 	}
 }

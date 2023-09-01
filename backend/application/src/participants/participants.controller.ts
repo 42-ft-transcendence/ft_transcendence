@@ -56,10 +56,13 @@ export class ParticipantsController {
 		return await this.participantsService.update(id, updateParticipantDto);
 	}
 
-	@Delete(':id')
+	@Delete('userId/:userId/channelId/:channelId')
 	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: ParticipantEntity })
-	async remove(@Param('id', ParsePositiveIntPipe) id: number) {
-		return await this.participantsService.remove(id);
+	async remove(
+		@Param('userId', ParsePositiveIntPipe) userId: number,
+		@Param('channelId', ParsePositiveIntPipe) channelId: number,
+	) {
+		return await this.participantsService.remove(userId, channelId);
 	}
 }

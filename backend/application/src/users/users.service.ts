@@ -37,34 +37,34 @@ export class UsersService {
 		});
 	}
 	//TODO: 존재하는 channel id, user id인지는 데이터베이스 자체적으로 체크할 수 있다.
-	async ban(userId: number, channelId: number) {
-		return await this.prisma.user.update({
-			where: { id: userId },
-			data: {
-				bans: { create: { channelId: channelId } },
-				participants: {
-					delete: {
-						channelId_userId: { channelId: channelId, userId: userId },
-					},
-				},
-			},
-			select: { id: true, nickname: true, avatar: true },
-		});
-	}
+	// async ban(userId: number, channelId: number) {
+	// 	return await this.prisma.user.update({
+	// 		where: { id: userId },
+	// 		data: {
+	// 			bans: { create: { channelId: channelId } },
+	// 			participants: {
+	// 				delete: {
+	// 					channelId_userId: { channelId: channelId, userId: userId },
+	// 				},
+	// 			},
+	// 		},
+	// 		select: { id: true, nickname: true, avatar: true },
+	// 	});
+	// }
 
-	async kick(userId: number, channelId: number) {
-		return await this.prisma.user.update({
-			where: { id: userId },
-			data: {
-				participants: {
-					delete: {
-						channelId_userId: { channelId: channelId, userId: userId },
-					},
-				},
-			},
-			select: { id: true, nickname: true, avatar: true },
-		});
-	}
+	// async kick(userId: number, channelId: number) {
+	// 	return await this.prisma.user.update({
+	// 		where: { id: userId },
+	// 		data: {
+	// 			participants: {
+	// 				delete: {
+	// 					channelId_userId: { channelId: channelId, userId: userId },
+	// 				},
+	// 			},
+	// 		},
+	// 		select: { id: true, nickname: true, avatar: true },
+	// 	});
+	// }
 
 	async update(id: number, updateUserDto: UpdateUserDto) {
 		return await this.prisma.user.update({
