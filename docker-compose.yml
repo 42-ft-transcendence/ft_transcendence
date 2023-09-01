@@ -24,7 +24,8 @@ services:
     networks:
       - ft_transcendence
     restart: always
-
+    volumes:
+      - vbackend:/application
   frontend:
     build: ./frontend/
     ports:
@@ -37,6 +38,11 @@ services:
     networks:
       - ft_transcendence
     restart: always
-
+    volumes:
+      - vfrontend:/application
 networks:
   ft_transcendence:
+
+volumes:
+  vbackend:
+  vfrontend:
