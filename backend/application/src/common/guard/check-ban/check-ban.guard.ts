@@ -15,9 +15,9 @@ export class CheckBanGuard implements CanActivate {
 		const request = context.switchToHttp().getRequest<Request>();
 		const userId = request.user['id'];
 		const channelId = request.body.channelId;
-		const isbanned = await this.prisma.ban.findUnique({
+		const isBanned = await this.prisma.ban.findUnique({
 			where: { channelId_userId: { channelId: channelId, userId: userId } },
 		});
-		return !isbanned;
+		return !isBanned;
 	}
 }
