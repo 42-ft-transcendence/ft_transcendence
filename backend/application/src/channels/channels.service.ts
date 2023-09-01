@@ -28,11 +28,11 @@ export class ChannelsService {
 	}
 
 	async createDirectChannel(
+		ownerId: number,
 		userName: string,
 		createDirectChannelDto: CreateDirectChannelDto,
 	) {
-		const { ownerId, interlocatorId, interlocatorName } =
-			createDirectChannelDto;
+		const { interlocatorId, interlocatorName } = createDirectChannelDto;
 		const result = await this.prisma.channel.create({
 			data: {
 				name: `${userName}, ${interlocatorName}`,

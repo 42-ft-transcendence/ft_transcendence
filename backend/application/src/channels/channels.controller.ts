@@ -40,14 +40,16 @@ export class ChannelsController {
 	}
 
 	@Post('directChannel')
-	@UseInterceptors(new AddUserIdToBodyInterceptor('ownerId'))
+	// @UseInterceptors(new AddUserIdToBodyInterceptor('ownerId'))
 	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: ChannelEntity })
 	async createDirectChannel(
+		@CurrentUser(UserPropertyString.ID) ownerId: number,
 		@CurrentUser(UserPropertyString.NICKNAME) userName: string,
 		@Body() createDirectChannelDto: CreateDirectChannelDto,
 	) {
 		return await this.channelsService.createDirectChannel(
+			ownerId,
 			userName,
 			createDirectChannelDto,
 		);
