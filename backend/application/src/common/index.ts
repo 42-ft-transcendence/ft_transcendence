@@ -6,3 +6,4 @@ export * from './prisma';
 export * from './utils';
 export * from './validator';
 export * from './guard';
+export * from './decorator';
