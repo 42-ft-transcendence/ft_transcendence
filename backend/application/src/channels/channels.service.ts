@@ -14,19 +14,13 @@ export class ChannelsService {
 	constructor(private prisma: PrismaService) {}
 
 	async create(createChannelDto: CreateChannelDto) {
-		//TODO: custom validator를 활용함으로써 type이 'PROTECTED'면 비밀번호 속성에 값이 들어온 것이 확실하다. 따라서 hash를 적용하는 transformer를 만들어서 적용하고 if문을 제거하자.
-		const { name, type, ownerId, password } = createChannelDto;
-		const createChannelObject = { name: name, type: type, ownerId: ownerId };
-		if (type === ChannelType.PROTECTED) {
-			createChannelObject['password'] = {
-				create: { password: await hash(password) },
-			};
-		}
+		const { password, ...essential } = createChannelDto;
 		return await this.prisma.channel.create({
 			data: {
-				...createChannelObject,
-				administrators: { create: [{ userId: ownerId }] },
-				participants: { create: [{ userId: ownerId }] },
+				...essential,
+				password: password ? { create: { password: password } } : undefined,
+				administrators: { create: [{ userId: essential.ownerId }] },
+				participants: { create: [{ userId: essential.ownerId }] },
 			},
 		});
 	}

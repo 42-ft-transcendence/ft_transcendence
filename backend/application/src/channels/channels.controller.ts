@@ -17,6 +17,7 @@ import {
 	AddUserIdToBodyInterceptor,
 	CheckBlockGuard,
 	CurrentUser,
+	HashPasswordPipe,
 	ParsePositiveIntPipe,
 	ProcessChannelTypePipe,
 	UserPropertyString,
@@ -40,7 +41,7 @@ export class ChannelsController {
 	@UseInterceptors(new AddUserIdToBodyInterceptor('ownerId')) //TODO: @CurrentUser 데코레이터로 교체할까?
 	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: ChannelEntity })
-	async create(@Body() createChannelDto: CreateChannelDto) {
+	async create(@Body(HashPasswordPipe) createChannelDto: CreateChannelDto) {
 		return await this.channelsService.create(createChannelDto);
 	}
 
