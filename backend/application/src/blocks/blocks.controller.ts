@@ -11,10 +11,13 @@ import {
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { BlocksService } from './blocks.service';
 import { CreateBlockDto, UpdateBlockDto } from './dto';
-import { ParsePositiveIntPipe, UserPropertyString } from 'src/common';
+import {
+	CurrentUser,
+	ParsePositiveIntPipe,
+	UserPropertyString,
+} from 'src/common';
 import { BlockEntity } from './entities';
 import { JwtAuthGuard } from 'src/auth';
-import { CurrentUser } from 'src/common/decorator';
 
 @Controller('blocks')
 @ApiTags('blocks')

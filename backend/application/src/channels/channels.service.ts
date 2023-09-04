@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ChannelType } from '@prisma/client';
 import { PrismaService, hash } from 'src/common';
-import { CreateChannelDto, QueryChannelDto, UpdateChannelDto } from './dto';
-import { QueryNameChannelDto } from './dto/query-name-channel.dto';
-import { CreateDirectChannelDto } from './dto/create-direct-channel.dto';
+import {
+	CreateChannelDto,
+	CreateDirectChannelDto,
+	QueryChannelDto,
+	QueryNameChannelDto,
+	UpdateChannelDto,
+} from './dto';
 
 @Injectable()
 export class ChannelsService {
@@ -27,41 +31,69 @@ export class ChannelsService {
 		});
 	}
 
-	async createDirectChannel(
+	async findOrCreateDirectChannel(
 		ownerId: number,
 		userName: string,
 		createDirectChannelDto: CreateDirectChannelDto,
 	) {
 		const { interlocatorId, interlocatorName } = createDirectChannelDto;
-		const result = await this.prisma.channel.create({
-			data: {
-				name: `${userName}, ${interlocatorName}`,
-				type: ChannelType.ONETOONE,
-				ownerId: ownerId,
-				administrators: { create: [{ userId: ownerId }] },
-				participants: {
-					create: [{ userId: ownerId }, { userId: interlocatorId }],
-				},
-				messages: {
-					create: [
-						{ content: 'INIT', senderId: ownerId },
-						{ content: 'INIT', senderId: interlocatorId },
+
+		const selectArg = {
+			id: true,
+			participants: {
+				where: { userId: interlocatorId },
+				select: { user: { select: { nickname: true, avatar: true } } },
+			},
+		};
+
+		return await this.prisma.$transaction(async (tx) => {
+			const oldChannel = await tx.channel.findFirst({
+				where: {
+					AND: [
+						{ type: ChannelType.ONETOONE },
+						{ messages: { some: { senderId: { equals: ownerId } } } },
+						{ messages: { some: { senderId: { equals: interlocatorId } } } },
 					],
 				},
-			},
-			select: {
-				id: true,
-				participants: {
-					where: { userId: interlocatorId },
-					select: { user: { select: { nickname: true, avatar: true } } },
-				},
-			},
+				select: { id: true },
+			});
+
+			let result: any;
+
+			if (oldChannel) {
+				result = await tx.channel.update({
+					where: { id: oldChannel.id },
+					data: {
+						participants: { create: { userId: ownerId } },
+					},
+					select: selectArg,
+				});
+			} else {
+				result = await tx.channel.create({
+					data: {
+						name: `${userName}, ${interlocatorName}`,
+						type: ChannelType.ONETOONE,
+						ownerId: ownerId,
+						administrators: { create: [{ userId: ownerId }] },
+						participants: {
+							create: [{ userId: ownerId }, { userId: interlocatorId }],
+						},
+						messages: {
+							create: [
+								{ content: 'INIT', senderId: ownerId },
+								{ content: 'INIT', senderId: interlocatorId },
+							],
+						},
+					},
+					select: selectArg,
+				});
+			}
+			return {
+				id: result.id,
+				userName: result.participants[0].user.nickname,
+				avatar: result.participants[0].user.avatar,
+			};
 		});
-		return {
-			id: result.id,
-			userName: result.participants[0].user.nickname,
-			avatar: result.participants[0].user.avatar,
-		};
 	}
 
 	async findAll(queryChannelDto: QueryChannelDto) {

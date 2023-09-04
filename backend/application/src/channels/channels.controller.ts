@@ -15,16 +15,21 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
 import {
 	AddUserIdToBodyInterceptor,
+	CheckBlockGuard,
+	CurrentUser,
 	ParsePositiveIntPipe,
 	ProcessChannelTypePipe,
 	UserPropertyString,
 } from 'src/common';
 import { ChannelEntity } from './entities';
-import { CreateChannelDto, QueryChannelDto, UpdateChannelDto } from './dto';
+import {
+	CreateChannelDto,
+	CreateDirectChannelDto,
+	QueryChannelDto,
+	QueryNameChannelDto,
+	UpdateChannelDto,
+} from './dto';
 import { JwtAuthGuard } from 'src/auth';
-import { CurrentUser } from 'src/common/decorator';
-import { QueryNameChannelDto } from './dto/query-name-channel.dto';
-import { CreateDirectChannelDto } from './dto/create-direct-channel.dto';
 
 @Controller('channels')
 @ApiTags('channels')
@@ -40,15 +45,15 @@ export class ChannelsController {
 	}
 
 	@Post('directChannel')
-	// @UseInterceptors(new AddUserIdToBodyInterceptor('ownerId'))
-	@UseGuards(JwtAuthGuard)
+	// @UseInterceptors(new AddUserIdToBodyIntersceptor('ownerId'))
+	@UseGuards(JwtAuthGuard, CheckBlockGuard)
 	@ApiCreatedResponse({ type: ChannelEntity })
-	async createDirectChannel(
+	async findOrCreateDirectChannel(
 		@CurrentUser(UserPropertyString.ID) ownerId: number,
 		@CurrentUser(UserPropertyString.NICKNAME) userName: string,
 		@Body() createDirectChannelDto: CreateDirectChannelDto,
 	) {
-		return await this.channelsService.createDirectChannel(
+		return await this.channelsService.findOrCreateDirectChannel(
 			ownerId,
 			userName,
 			createDirectChannelDto,
