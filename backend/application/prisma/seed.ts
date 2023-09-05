@@ -47,6 +47,7 @@ async function seed() {
 			type: faker.helpers.enumValue(ChannelType),
 			ownerId: faker.helpers.arrayElement(userIds),
 		})),
+		skipDuplicates: true,
 	});
 
 	const protectedChannelIds = (
@@ -109,6 +110,7 @@ async function seed() {
 					),
 				},
 			],
+			skipDuplicates: true,
 		});
 	});
 
@@ -179,6 +181,7 @@ async function seed() {
 
 			await prisma.message.createMany({
 				data: messages,
+				skipDuplicates: true,
 			});
 		}
 	});
@@ -197,6 +200,7 @@ async function seed() {
 	// create match
 	await prisma.match.createMany({
 		data: matches,
+		skipDuplicates: true,
 	});
 
 	const followes = Array.from({ length: 20000 }).map(() => {
