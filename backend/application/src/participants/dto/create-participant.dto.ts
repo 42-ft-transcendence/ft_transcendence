@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
 	IsByteLength,
 	IsNotEmpty,
+	IsOptional,
 	IsPositive,
 	IsString,
 	Length,
@@ -18,7 +19,7 @@ export class CreateParticipantDto {
 	@Length(4, 20)
 	@IsString()
 	@IsNotEmpty()
-	@Optional()
+	@IsOptional()
 	@ApiProperty({ minLength: 4, maxLength: 20 })
 	channelPassword?: string;
 }
