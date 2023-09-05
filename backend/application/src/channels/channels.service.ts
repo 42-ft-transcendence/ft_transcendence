@@ -116,7 +116,7 @@ export class ChannelsService {
 					select: {
 						content: true,
 						createdAt: true,
-						sender: { select: { nickname: true, avatar: true } },
+						sender: { select: { id: true, nickname: true, avatar: true } },
 					},
 				},
 				_count: { select: { participants: true } },
