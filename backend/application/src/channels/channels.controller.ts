@@ -100,12 +100,12 @@ export class ChannelsController {
 		return await this.channelsService.findOne(id);
 	}
 
-	@Get(':id/detail')
+	@Get(':channelId/detail')
 	@UseGuards(JwtAuthGuard, CheckUserInGuard)
 	@ApiOkResponse({ type: ChannelEntity })
 	async findOneInDetail(
 		@CurrentUser(UserPropertyString.NICKNAME) userName: string,
-		@Param('id', ParsePositiveIntPipe) channelId: number,
+		@Param('channelId', ParsePositiveIntPipe) channelId: number,
 	) {
 		return await this.channelsService.findOneInDetail(userName, channelId);
 	}

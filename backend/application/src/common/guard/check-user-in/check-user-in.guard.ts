@@ -14,7 +14,7 @@ export class CheckUserInGuard implements CanActivate {
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest<Request>();
 		const userId = request.user['id'];
-		const channelId = parseInt(request.params['id']);
+		const channelId = parseInt(request.params['channelId']);
 		return !!(await this.prisma.participant.findUnique({
 			where: { channelId_userId: { channelId: channelId, userId: userId } },
 		}));
