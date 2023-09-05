@@ -108,7 +108,7 @@ export class ChannelsService {
 		return await this.prisma.channel.findUniqueOrThrow({ where: { id } });
 	}
 
-	async findOneInDetail(userName: string, channelId: number) {
+	async findOneInDetail(userId: number, channelId: number) {
 		const result = await this.prisma.channel.findUniqueOrThrow({
 			where: { id: channelId },
 			include: {
@@ -128,7 +128,7 @@ export class ChannelsService {
 			result.messages.splice(0, 2);
 		result.messages = result.messages.map((message) => ({
 			...message,
-			isMine: userName === message.sender.nickname,
+			isMine: userId === message.sender.id,
 		}));
 		return result;
 	}
