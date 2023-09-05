@@ -16,6 +16,7 @@ import { ChannelsService } from './channels.service';
 import {
 	AddUserIdToBodyInterceptor,
 	CheckBlockGuard,
+	CheckUserInGuard,
 	CurrentUser,
 	HashPasswordPipe,
 	ParsePositiveIntPipe,
@@ -100,7 +101,7 @@ export class ChannelsController {
 	}
 
 	@Get(':id/detail')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, CheckUserInGuard)
 	@ApiOkResponse({ type: ChannelEntity })
 	async findOneInDetail(
 		@CurrentUser(UserPropertyString.NICKNAME) userName: string,
@@ -110,7 +111,7 @@ export class ChannelsController {
 	}
 
 	@Get(':channelId/contents')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, CheckUserInGuard)
 	@ApiOkResponse({ type: ChannelEntity })
 	async findContents(
 		@CurrentUser(UserPropertyString.ID) userId: number,
