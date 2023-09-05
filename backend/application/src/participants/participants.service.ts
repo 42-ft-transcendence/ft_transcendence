@@ -8,7 +8,7 @@ export class ParticipantsService {
 
 	async create(userId: number, createParticipantDto: CreateParticipantDto) {
 		const result = await this.prisma.participant.create({
-			data: { userId: userId, ...createParticipantDto },
+			data: { userId: userId, channelId: createParticipantDto.channelId },
 			select: { channel: true },
 		});
 		return result.channel;
