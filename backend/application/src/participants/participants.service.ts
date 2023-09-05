@@ -42,10 +42,10 @@ export class ParticipantsService {
 		).user;
 	}
 
-	async exit(userId: number, channelName: string) {
+	async exit(userId: number, channelId: number) {
 		return this.prisma.$transaction(async (tx) => {
 			const channel = await tx.channel.findUniqueOrThrow({
-				where: { name: channelName },
+				where: { id: channelId },
 				select: {
 					id: true,
 					name: true,
@@ -75,7 +75,7 @@ export class ParticipantsService {
 					},
 				});
 
-			if (channel.ownerId !== userId) return { name: channel.name };
+			if (channel.ownerId !== userId) return { id: channel.id };
 
 			// 관리자가 있다면 관리자 중 가장 먼저 관리자가 된 사람에게 소유권을 넘긴다. 관리자가 없다면 일반 참여자 중 가장 먼저 참여한 사람에게 소유권을 넘긴다. 참여자가 아예 없다면 채널을 제거한다.
 			const firstAdministrator = channel.administrators.at(0);
@@ -96,7 +96,7 @@ export class ParticipantsService {
 				});
 			} else await tx.channel.delete({ where: { id: channel.id } });
 
-			return { name: channel.name };
+			return { id: channel.id };
 		});
 	}
 }
