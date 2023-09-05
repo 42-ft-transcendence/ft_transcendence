@@ -60,6 +60,16 @@ export class ParticipantsController {
 		return await this.participantsService.update(id, updateParticipantDto);
 	}
 
+	@Delete('channelName/:channelName')
+	@UseGuards(JwtAuthGuard)
+	@ApiOkResponse({ type: ParticipantEntity })
+	async exit(
+		@CurrentUser(UserPropertyString.ID) userId: number,
+		@Param('channelName') channelName: string,
+	) {
+		return await this.participantsService.exit(userId, channelName);
+	}
+
 	@Delete('userId/:userId/channelId/:channelId')
 	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: ParticipantEntity })
