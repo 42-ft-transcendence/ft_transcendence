@@ -68,7 +68,7 @@ export class ChannelsService {
 						name: `${userName}, ${interlocatorName}`,
 						type: ChannelType.ONETOONE,
 						ownerId: ownerId,
-						administrators: { create: [{ userId: ownerId }] },
+						// administrators: { create: [{ userId: ownerId }] }, //TODO: 다이렉트 메시지 채널은 관리자를 지정하지 않는다.
 						participants: {
 							create: [{ userId: ownerId }, { userId: interlocatorId }],
 						},
@@ -189,19 +189,19 @@ export class ChannelsService {
 				where: { type: 'ONETOONE', participants: { some: { userId: id } } },
 				select: {
 					id: true,
-					participants: {
-						where: { userId: { not: id } },
+					messages: {
+						where: { senderId: { not: id } },
 						select: {
-							user: { select: { id: true, nickname: true, avatar: true } },
+							sender: { select: { id: true, nickname: true, avatar: true } },
 						},
 					},
 				},
 			})
 		).map((result) => ({
 			channelId: result.id,
-			userId: result.participants[0].user.id,
-			avatar: result.participants[0].user.avatar,
-			userName: result.participants[0].user.nickname,
+			userId: result.messages[0]?.sender?.id,
+			avatar: result.messages[0]?.sender?.avatar,
+			userName: result.messages[0]?.sender?.nickname,
 		}));
 	}
 
