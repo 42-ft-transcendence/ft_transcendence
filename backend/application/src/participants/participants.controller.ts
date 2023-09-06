@@ -70,6 +70,16 @@ export class ParticipantsController {
 		return await this.participantsService.exit(userId, channelId);
 	}
 
+	@Delete('directChannelId/:channelId')
+	@UseGuards(JwtAuthGuard)
+	@ApiOkResponse({ type: ParticipantEntity })
+	async exitDirect(
+		@CurrentUser(UserPropertyString.ID) userId: number,
+		@Param('channelId', ParsePositiveIntPipe) channelId: number,
+	) {
+		return await this.participantsService.exitDirect(userId, channelId);
+	}
+
 	@Delete('userId/:userId/channelId/:channelId')
 	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: ParticipantEntity })

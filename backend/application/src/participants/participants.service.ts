@@ -98,4 +98,41 @@ export class ParticipantsService {
 			return { id: channel.id };
 		});
 	}
+
+	async exitDirect(userId: number, channelId: number) {
+		return await this.prisma.$transaction(async (tx) => {
+			/**
+			 * 대상 사용자와 다이렉트 메시지 채널에 대한 participant 정보를 제거한다.
+			 * 만약, 대상 사용자가 소유자라면 대상 다이렉트 메시지 채널의 메시지 중 대상 사용자가 아닌 senderId의 값을 확인해 다음을 처리한다.
+			 * 	이 값이 NULL이라면 채널, 관리자, 참여자, 메시지 정보 모두 삭제 ← 채널을 삭제하면 된다
+			 * 	NULL이 아니라면 senderId 사용자를 소유자로 만들기 // 다이렉트 메시지 채널에선 관리자는 다루지 않는다.
+			 * 적절한 JSON 오브젝트를 반환한다.
+			 */
+			const channel = await tx.channel.findUniqueOrThrow({
+				where: { id: channelId },
+				include: {
+					messages: {
+						where: { senderId: { not: userId } },
+						select: { senderId: true },
+					},
+				},
+			});
+
+			await tx.participant.delete({
+				where: { channelId_userId: { channelId: channelId, userId: userId } },
+			});
+
+			if (channel.ownerId !== userId) return { id: channel.id };
+
+			if (channel.messages.at(0)?.senderId) {
+				// channel.messages.at(0)은 무조건 존재할 수 밖에 없음. 다이렉트 메시지 채널 생성 시 내부적으로 생성하는 메시지가 존재하기 때문이다. 따라서 else if로 undefined일 때를 걸러줄 필요가 없음
+				await tx.channel.update({
+					where: { id: channelId },
+					data: { ownerId: channel.messages.at(0).senderId },
+				});
+			} else await tx.channel.delete({ where: { id: channelId } });
+
+			return { id: channel.id };
+		});
+	}
 }
