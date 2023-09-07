@@ -17,7 +17,7 @@ import path from 'path';
       storage: diskStorage({
         destination(req, file, callback) {
           const dest = configService.get<string>('MULTER_DEST');
-          if (!dest) callback(null, './upload');
+          if (!dest) callback(null, './avatar-upload');
           else callback(null, dest);
         },
         filename(req, file, callback) {

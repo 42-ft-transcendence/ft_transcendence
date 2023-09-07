@@ -1,14 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { CreateUserDto, UpdateUserDto } from './dto';
-import { PrismaService } from 'src/common';
+import { UpdateUserDto } from './dto';
+import { FourtyTwoUser, PrismaService } from 'src/common';
 
 @Injectable()
 export class UsersService {
 	constructor(private prisma: PrismaService) {}
 
-	async create(createUserDto: CreateUserDto) {
-		return await this.prisma.user.create({ data: createUserDto });
+	// async create(createUserDto: CreateUserDto) {
+	// 	return await this.prisma.user.create({ data: createUserDto });
+	// }
+	async createDefault(userInfo: FourtyTwoUser, customNickname: string) {
+		console.log(userInfo);
+		console.log(customNickname);
+		return await this.prisma.user.create({
+			data: {
+				fourtyTwoId: userInfo.fourtyTwoId,
+				nickname: customNickname ? customNickname : userInfo.nickname,
+				avatar: userInfo.avatar,
+			},
+		});
+	}
+
+	async createCustom(
+		userInfo: FourtyTwoUser,
+		customNickname: string,
+		file: Express.Multer.File,
+	) {
+		console.log(userInfo);
+		console.log(customNickname);
+		console.log(file);
+		return await this.prisma.user.create({
+			data: {
+				fourtyTwoId: userInfo.fourtyTwoId,
+				nickname: customNickname ? customNickname : userInfo.nickname,
+				avatar: file.path ? file.path : userInfo.avatar,
+			},
+		});
 	}
 
 	async findAll(id: number): Promise<User[]> {
