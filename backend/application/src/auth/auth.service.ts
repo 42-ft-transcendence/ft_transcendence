@@ -30,6 +30,6 @@ export class AuthService {
 			sub: this.configService.get<string>('JWT_OAUTH_SUB'),
 			user: user,
 		};
-		return this.jwtService.sign(payload);
+		return this.jwtService.sign(payload, { expiresIn: '15m' });
 	}
 }

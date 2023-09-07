@@ -19,14 +19,10 @@ export class AuthController {
 		const user = req.user;
 
 		if (user.isNewUser) {
-			res.cookie('JWTOAuth', this.authService.signOauth(user), {
-				maxAge: 30 * 60 * 1000,
-			});
+			res.cookie('JWTOAuth', this.authService.signOauth(user));
 			res.redirect('http://localhost:8080/signup');
 		} else {
-			res.cookie('JWTDatabase', this.authService.signDatabase(user), {
-				maxAge: 24 * 60 * 60 * 1000,
-			});
+			res.cookie('JWTDatabase', this.authService.signDatabase(user));
 			res.redirect('http://localhost:8080/');
 		}
 	}
