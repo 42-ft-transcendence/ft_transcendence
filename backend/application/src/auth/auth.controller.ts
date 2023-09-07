@@ -18,13 +18,16 @@ export class AuthController {
 	async redirect(@Req() req: any, @Res() res: Response) {
 		const user = req.user;
 
-		res.cookie('JsonWebToken', this.authService.issueJwt(user), {
-			maxAge: 24 * 60 * 60 * 1000,
-		});
-		res.redirect(
-			user.isNewUser
-				? 'http://localhost:8080/signup'
-				: 'http://localhost:8080/',
-		);
+		if (user.isNewUser) {
+			res.cookie('JWTOAuth', this.authService.signOauth(user), {
+				maxAge: 30 * 60 * 1000,
+			});
+			res.redirect('http://localhost:8080/signup');
+		} else {
+			res.cookie('JWTDatabase', this.authService.signDatabase(user), {
+				maxAge: 24 * 60 * 60 * 1000,
+			});
+			res.redirect('http://localhost:8080/');
+		}
 	}
 }
