@@ -5,23 +5,26 @@ import { Response } from 'express';
 
 @Controller('oauth/42')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+	constructor(private authService: AuthService) {}
 
-  @Get()
-  @UseGuards(FourtyTwoAuthGuard)
-  oauth() {
-    // initiates the 42 OAuth2 login flow
-  }
+	@Get()
+	@UseGuards(FourtyTwoAuthGuard)
+	oauth() {
+		// initiates the 42 OAuth2 login flow
+	}
 
-  @Get('redirect')
-  @UseGuards(FourtyTwoAuthGuard)
-  async redirect(@Req() req, @Res() res: Response) {
-    const user = req.user;
+	@Get('redirect')
+	@UseGuards(FourtyTwoAuthGuard)
+	async redirect(@Req() req: any, @Res() res: Response) {
+		const user = req.user;
 
-    res.cookie('JsonWebToken', this.authService.issueJwt(user), {
-      maxAge: 24 * 60 * 60 * 1000,
-    });
-    if (user.newbie) res.redirect('http://localhost:8080/signup');
-    else res.redirect('http://localhost:8080/');
-  }
+		res.cookie('JsonWebToken', this.authService.issueJwt(user), {
+			maxAge: 24 * 60 * 60 * 1000,
+		});
+		res.redirect(
+			user.isNewUser
+				? 'http://localhost:8080/signup'
+				: 'http://localhost:8080/',
+		);
+	}
 }
