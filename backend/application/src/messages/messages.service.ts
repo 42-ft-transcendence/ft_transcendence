@@ -14,7 +14,7 @@ export class MessagesService {
 				content: true,
 				createdAt: true,
 				senderId: true,
-				sender: { select: { nickname: true } },
+				sender: { select: { nickname: true, avatar: true } },
 			},
 		});
 	}
