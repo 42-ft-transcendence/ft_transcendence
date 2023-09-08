@@ -25,16 +25,13 @@ export class UsersService {
 	async createCustom(
 		userInfo: FourtyTwoUser,
 		customNickname: string,
-		file: Express.Multer.File,
+		avatar: Express.Multer.File,
 	) {
-		console.log(userInfo);
-		console.log(customNickname);
-		console.log(file);
 		return await this.prisma.user.create({
 			data: {
 				fourtyTwoId: userInfo.fourtyTwoId,
 				nickname: customNickname ? customNickname : userInfo.nickname,
-				avatar: file.path ? file.path : userInfo.avatar,
+				avatar: avatar.path ? avatar.path : userInfo.avatar,
 			},
 		});
 	}

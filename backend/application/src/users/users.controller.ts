@@ -54,6 +54,7 @@ export class UsersController {
 	}
 
 	@Post('customAvatar')
+	@UseInterceptors(FileInterceptor('avatar'), ChangeJwtInterceptor)
 	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: UserEntity })
 	async createCustom(
@@ -65,12 +66,12 @@ export class UsersController {
 				.addFileTypeValidator({ fileType: new RegExp('image/(jp|pn|jpe)g') }) //TODO: 단순히 파일의 확장자를 확인할 뿐, 파일의 내용을 확인하진 않으므로 직접 magic number 등을 확인하게 구현해서 사용하자. 파일 타입도 image/png 등 추가하기
 				.build(),
 		)
-		file: Express.Multer.File,
+		avatar: Express.Multer.File,
 	) {
 		return await this.usersService.createCustom(
 			userInfo,
 			createCustomUserDto.nickname,
-			file,
+			avatar,
 		);
 	}
 
