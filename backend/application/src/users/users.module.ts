@@ -1,24 +1,18 @@
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
-import { ChangeJwtInterceptor, PrismaModule } from 'src/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { diskStorage } from 'multer';
-import { JwtModule } from '@nestjs/jwt';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
+import { PrismaModule } from 'src/common';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
 	controllers: [UsersController],
-	providers: [UsersService, ChangeJwtInterceptor],
+	providers: [UsersService],
 	imports: [
 		PrismaModule,
-		JwtModule.registerAsync({
-			useFactory: async (configService: ConfigService) => ({
-				secret: configService.get<string>('JWT_SECRET_KEY'),
-				signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') },
-			}),
-			inject: [ConfigService],
-		}),
+		AuthModule,
 		MulterModule.registerAsync({
 			imports: [ConfigModule],
 			useFactory: async (configService: ConfigService) => ({
@@ -38,6 +32,5 @@ import { JwtModule } from '@nestjs/jwt';
 			inject: [ConfigService],
 		}),
 	],
-	exports: [UsersService],
 })
 export class UsersModule {}
