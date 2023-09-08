@@ -6,12 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelPasswordsService } from './channel-passwords.service';
 import { CreateChannelPasswordDto, UpdateChannelPasswordDto } from './dto';
 import { ParsePositiveIntPipe } from 'src/common';
 import { ChannelPasswordEntity } from './entities';
+import { JwtAuthGuard } from 'src/auth';
 
 @Controller('channel-passwords')
 @ApiTags('channel-passwords')
@@ -21,6 +23,7 @@ export class ChannelPasswordsController {
   ) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: ChannelPasswordEntity })
   async create(@Body() createChannelPasswordDto: CreateChannelPasswordDto) {
     return new ChannelPasswordEntity(
@@ -29,6 +32,7 @@ export class ChannelPasswordsController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ChannelPasswordEntity, isArray: true })
   async findAll() {
     const passwords = await this.channelPasswordsService.findAll();
@@ -36,6 +40,7 @@ export class ChannelPasswordsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ChannelPasswordEntity })
   async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
     return new ChannelPasswordEntity(
@@ -44,6 +49,7 @@ export class ChannelPasswordsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: ChannelPasswordEntity })
   async update(
     @Param('id', ParsePositiveIntPipe) id: number,
@@ -55,6 +61,7 @@ export class ChannelPasswordsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: ChannelPasswordEntity })
   async remove(@Param('id', ParsePositiveIntPipe) id: number) {
     return new ChannelPasswordEntity(

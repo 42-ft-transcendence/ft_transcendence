@@ -24,11 +24,13 @@ services:
     networks:
       - ft_transcendence
     restart: always
-
+    volumes:
+      - vbackend:/application
   frontend:
     build: ./frontend/
     ports:
-      - 8080:80
+      # - 8080:80
+      - 8080:8080
     environment:
       - NODE_ENV=development # 완성 시 production으로 변경
     depends_on:
@@ -36,6 +38,11 @@ services:
     networks:
       - ft_transcendence
     restart: always
-
+    volumes:
+      - vfrontend:/application
 networks:
   ft_transcendence:
+
+volumes:
+  vbackend:
+  vfrontend:

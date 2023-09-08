@@ -11,6 +11,8 @@ import { AdministratorsModule } from './administrators/administrators.module';
 import { BansModule } from './bans/bans.module';
 import { BlocksModule } from './blocks/blocks.module';
 import { MatchesModule } from './matches/matches.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -24,6 +26,11 @@ import { MatchesModule } from './matches/matches.module';
     BansModule,
     BlocksModule,
     MatchesModule,
+    AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

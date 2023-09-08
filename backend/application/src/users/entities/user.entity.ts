@@ -6,6 +6,9 @@ export class UserEntity implements User {
   id: number;
 
   @ApiProperty()
+  fourtyTwoId: number;
+
+  @ApiProperty()
   avatar: string;
 
   @ApiProperty({ maxLength: 10 })

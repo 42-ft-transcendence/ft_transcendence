@@ -4,8 +4,8 @@ import { ChannelsController } from './channels.controller';
 import { PrismaModule } from 'src/common';
 
 @Module({
-  controllers: [ChannelsController],
-  providers: [ChannelsService],
-  imports: [PrismaModule],
+	controllers: [ChannelsController],
+	providers: [ChannelsService],
+	imports: [PrismaModule],
 })
-export class ChannelsModule {}
+export class ChannelsModule { }

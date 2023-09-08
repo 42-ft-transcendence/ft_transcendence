@@ -9,6 +9,7 @@ datasource db {
 
 model User {
   id             Int             @id @default(autoincrement())
+  fourtyTwoId    Int             @unique @map("fourty_two_id")
   avatar         String          @unique
   nickname       String          @unique @db.VarChar(10)
   winCount       Int             @default(0) @map("win_count")
@@ -17,7 +18,7 @@ model User {
   createdAt      DateTime        @default(now()) @map("created_at")
   updatedAt      DateTime        @updatedAt @map("updated_at")
   administrators Administrator[]
-  banneds        Ban[]
+  bans           Ban[]
   channels       Channel[]
   blockees       Block[]         @relation("blockee_to_account")
   blockers       Block[]         @relation("blocker_to_account")
@@ -72,11 +73,11 @@ model Channel {
   ownerId        Int              @map("owner_id")
   createdAt      DateTime         @default(now()) @map("created_at")
   administrators Administrator[]
-  banned         Ban[]
+  bans           Ban[]
   owner          User             @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   password       ChannelPassword?
-  message        Message[]
-  participant    Participant[]
+  messages       Message[]
+  participants   Participant[]
 
   @@map("channel")
 }
@@ -94,8 +95,8 @@ model Follow {
   id         Int  @id @default(autoincrement())
   followerId Int  @map("follower_id")
   followeeId Int  @map("followee_id")
-  follower   User @relation("follower_to_account", fields: [followeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  followee   User @relation("followee_to_account", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  follower   User @relation("follower_to_account", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  followee   User @relation("followee_to_account", fields: [followeeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([followerId, followeeId])
   @@map("follow")
