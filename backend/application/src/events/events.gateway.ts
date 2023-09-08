@@ -25,7 +25,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit, OnGate
         if (this.usersService.findOne(payload.sub))
           socket.userID = payload.sub;
       } catch (err) {
-        console.log(err);
+        console.log(err); //TODO: remove
         next(new Error('Invalid credentials.'));
       }
       next();
@@ -33,15 +33,30 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit, OnGate
   }
   @SubscribeMessage('new Message')
   async handleMessage(client: any, payload: MessageEntity) {
-    // TODO:  payload 검증하기
-      const newMesage = await this.messagesService.create(payload);
-      this.server.emit('new Message', newMesage);
-      return newMesage;
-    }
+    payload.senderId = client.userID;
+    const newMesage = await this.messagesService.create(payload);
+    this.server.to('/channel/'+payload.channelId).emit('new Message', newMesage);
+    return newMesage;
+  }
+
+  @SubscribeMessage('join Room')
+  handleJoinRoom(client: any, payload: any){
+    console.log("join room");
+    console.log(payload);
+    client.join(payload);
+  }
+
+  @SubscribeMessage('leave Room')
+  handleLeaveRoom(client: any, payload: any){
+    console.log('leave Room');
+    console.log(payload);
+    client.leave(payload);
+  }
+
   handleConnection(client: any, ...args: any) {
-    console.log("connection");
+    console.log("connection " + client.userID);
   }
   handleDisconnect(client): any{
-    console.log("disconnect")
+    console.log("disconnect " + client.userID);
   }
 }
