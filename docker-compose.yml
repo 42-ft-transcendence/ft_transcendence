@@ -25,7 +25,9 @@ services:
       - ft_transcendence
     restart: always
     volumes:
+      - upload:/application/avatar-upload
       - vbackend:/application
+
   frontend:
     build: ./frontend/
     ports:
@@ -39,10 +41,13 @@ services:
       - ft_transcendence
     restart: always
     volumes:
+      - upload:/application/avatar-upload
       - vfrontend:/application
+
 networks:
   ft_transcendence:
 
 volumes:
+  upload:
   vbackend:
   vfrontend:
