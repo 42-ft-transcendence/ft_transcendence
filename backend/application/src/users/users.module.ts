@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { diskStorage } from 'multer';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { FourtyTwoUser, PrismaModule } from 'src/common';
+import { PrismaModule } from 'src/common';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
@@ -27,8 +27,9 @@ import { AuthModule } from 'src/auth/auth.module';
 						// id 속성이 존재하지 않는다면, 이는 JWT가 유효하지 않다는 말이므로 애초에 JwtAuthGuard에서 예외를 던져 이 코드가 실행되지 않는다.
 						callback(
 							null,
-							`/${req.user['nickname']}_avatar.
-							${file.mimetype.split('image/').at(1)}`,
+							`${req.user['nickname']}_avatar.${file.mimetype
+								.split('image/')
+								.at(1)}`,
 						); //TODO: 파일 확장자 추가?
 					},
 				}),

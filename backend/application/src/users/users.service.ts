@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto';
 import { FourtyTwoUser, PrismaService } from 'src/common';
+import axios from 'axios';
+import * as fs from 'fs';
+import multer, { Multer } from 'multer';
+import { ExpressAdapter } from '@nestjs/platform-express';
 
 @Injectable()
 export class UsersService {
@@ -11,13 +15,21 @@ export class UsersService {
 	// 	return await this.prisma.user.create({ data: createUserDto });
 	// }
 	async createDefault(userInfo: FourtyTwoUser, customNickname: string) {
-		console.log(userInfo);
-		console.log(customNickname);
+		const response = await axios.get(userInfo.avatar, {
+			responseType: 'arraybuffer',
+		});
+		fs.writeFile(
+			`./avatar-upload/${userInfo.nickname}_avatar.jpg`,
+			response.data,
+			(err) => {
+				if (err) throw err;
+			},
+		);
 		return await this.prisma.user.create({
 			data: {
 				fourtyTwoId: userInfo.fourtyTwoId,
 				nickname: customNickname ? customNickname : userInfo.nickname,
-				avatar: userInfo.avatar,
+				avatar: `avatar-upload/${userInfo.nickname}_avatar.jpg`,
 			},
 		});
 	}
@@ -27,6 +39,7 @@ export class UsersService {
 		customNickname: string,
 		avatar: Express.Multer.File,
 	) {
+		console.log(avatar);
 		return await this.prisma.user.create({
 			data: {
 				fourtyTwoId: userInfo.fourtyTwoId,
