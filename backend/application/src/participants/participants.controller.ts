@@ -19,15 +19,16 @@ import {
 	UserPropertyString,
 } from 'src/common';
 import { ParticipantEntity } from './entities';
-import { JwtAuthGuard } from 'src/auth';
+import { JwtTwoFactorAuthGuard } from 'src/auth';
 
 @Controller('participants')
+@UseGuards(JwtTwoFactorAuthGuard)
 @ApiTags('participants')
 export class ParticipantsController {
 	constructor(private readonly participantsService: ParticipantsService) {}
 
 	@Post()
-	@UseGuards(JwtAuthGuard, CheckBanGuard, CheckPasswordGuard)
+	@UseGuards(CheckBanGuard, CheckPasswordGuard)
 	@ApiCreatedResponse({ type: ParticipantEntity })
 	async create(
 		@CurrentUser(UserPropertyString.ID) userId: number,
@@ -37,21 +38,18 @@ export class ParticipantsController {
 	}
 
 	@Get()
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: ParticipantEntity, isArray: true })
 	async findAll() {
 		return await this.participantsService.findAll();
 	}
 
 	@Get(':id')
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: ParticipantEntity })
 	async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
 		return await this.participantsService.findOne(id);
 	}
 
 	@Patch(':id')
-	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: ParticipantEntity })
 	async update(
 		@Param('id', ParsePositiveIntPipe) id: number,
@@ -61,7 +59,6 @@ export class ParticipantsController {
 	}
 
 	@Delete('channelId/:channelId')
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: ParticipantEntity })
 	async exit(
 		@CurrentUser(UserPropertyString.ID) userId: number,
@@ -71,7 +68,6 @@ export class ParticipantsController {
 	}
 
 	@Delete('directChannelId/:channelId')
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: ParticipantEntity })
 	async exitDirect(
 		@CurrentUser(UserPropertyString.ID) userId: number,
@@ -81,7 +77,6 @@ export class ParticipantsController {
 	}
 
 	@Delete('userId/:userId/channelId/:channelId')
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: ParticipantEntity })
 	async remove(
 		@Param('userId', ParsePositiveIntPipe) userId: number,

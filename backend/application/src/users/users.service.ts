@@ -1,11 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto';
 import { FourtyTwoUser, PrismaService } from 'src/common';
 import axios from 'axios';
 import * as fs from 'fs';
-import multer, { Multer } from 'multer';
-import { ExpressAdapter } from '@nestjs/platform-express';
 
 @Injectable()
 export class UsersService {
@@ -39,7 +37,6 @@ export class UsersService {
 		customNickname: string,
 		avatar: Express.Multer.File,
 	) {
-		console.log(avatar);
 		return await this.prisma.user.create({
 			data: {
 				fourtyTwoId: userInfo.fourtyTwoId,
@@ -72,6 +69,20 @@ export class UsersService {
 	async findOneByFourtyTwoId(fourtyTwoId: number): Promise<User> {
 		return await this.prisma.user.findUnique({
 			where: { fourtyTwoId: fourtyTwoId },
+		});
+	}
+
+	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+		return this.prisma.user.update({
+			where: { id: userId },
+			data: { twoFactorAuthenticationSecret: secret },
+		});
+	}
+
+	async switchTwoFactorAuthentication(userId: number, flag: boolean) {
+		return this.prisma.user.update({
+			where: { id: userId },
+			data: { isTwoFactorAuthenticationEnabled: flag },
 		});
 	}
 	//TODO: 존재하는 channel id, user id인지는 데이터베이스 자체적으로 체크할 수 있다.

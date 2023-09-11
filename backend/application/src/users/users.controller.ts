@@ -22,7 +22,7 @@ import {
 	ParsePositiveIntPipe,
 	UserPropertyString,
 } from 'src/common';
-import { JwtAuthGuard } from 'src/auth';
+import { JwtAuthGuard, JwtTwoFactorAuthGuard } from 'src/auth';
 import { CurrentUser } from 'src/common/decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
@@ -40,8 +40,8 @@ export class UsersController {
 	// }
 
 	@Post('defaultAvatar')
-	@UseInterceptors(ChangeJwtInterceptor)
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(ChangeJwtInterceptor)
 	@ApiCreatedResponse({ type: UserEntity })
 	async createDefault(
 		@CurrentUser() userInfo: FourtyTwoUser,
@@ -54,8 +54,8 @@ export class UsersController {
 	}
 
 	@Post('customAvatar')
-	@UseInterceptors(FileInterceptor('avatar'), ChangeJwtInterceptor)
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(FileInterceptor('avatar'), ChangeJwtInterceptor)
 	@ApiCreatedResponse({ type: UserEntity })
 	async createCustom(
 		@CurrentUser() userInfo: FourtyTwoUser,
@@ -76,21 +76,21 @@ export class UsersController {
 	}
 
 	@Get()
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtTwoFactorAuthGuard)
 	@ApiOkResponse({ type: UserEntity, isArray: true })
 	async findAll(@CurrentUser(UserPropertyString.ID) id: number) {
 		return await this.usersService.findAll(id);
 	}
 
 	@Get('oneself')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtTwoFactorAuthGuard)
 	@ApiOkResponse({ type: UserEntity })
 	async findOneSelf(@CurrentUser(UserPropertyString.ID) id: number) {
 		return await this.usersService.findOneSelf(id);
 	}
 
 	@Get('name')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtTwoFactorAuthGuard)
 	@ApiOkResponse({ type: UserEntity, isArray: true })
 	async findByName(
 		@CurrentUser(UserPropertyString.ID) id: number,
@@ -100,8 +100,8 @@ export class UsersController {
 	}
 
 	@Patch('update')
+	@UseGuards(JwtTwoFactorAuthGuard)
 	@UseInterceptors(FileInterceptor('file'))
-	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: UserEntity })
 	async updateProfile(
 		@CurrentUser(UserPropertyString.ID) id: number,
@@ -141,14 +141,14 @@ export class UsersController {
 	// }
 
 	@Get(':id')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtTwoFactorAuthGuard)
 	@ApiOkResponse({ type: UserEntity })
 	async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
 		return await this.usersService.findOne(id);
 	}
 
 	@Patch(':id')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtTwoFactorAuthGuard)
 	@ApiCreatedResponse({ type: UserEntity })
 	async update(
 		@Param('id', ParsePositiveIntPipe) id: number,
@@ -158,7 +158,7 @@ export class UsersController {
 	}
 
 	@Delete(':id')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtTwoFactorAuthGuard)
 	@ApiOkResponse({ type: UserEntity })
 	async remove(@Param('id', ParsePositiveIntPipe) id: number) {
 		return await this.usersService.remove(id);

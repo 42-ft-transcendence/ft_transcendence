@@ -17,9 +17,10 @@ import {
 } from 'src/common';
 import { CreateFollowDto, UpdateFollowDto } from './dto';
 import { FollowEntity } from './entities';
-import { JwtAuthGuard } from 'src/auth';
+import { JwtTwoFactorAuthGuard } from 'src/auth';
 
 @Controller('follows')
+@UseGuards(JwtTwoFactorAuthGuard)
 @ApiTags('follows')
 export class FollowsController {
 	constructor(private readonly followsService: FollowsService) {}
@@ -27,7 +28,6 @@ export class FollowsController {
 	//TODO: followerId와 followeeId가 서로 다른지 확인하기 -> check 제약조건 적용으로 해결
 	//TODO: 데이터베이스 테이블에 이미 동일한 행이 존재하는지 먼저 확인하기 -> unique 제약조건 적용으로 해결
 	@Post()
-	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: FollowEntity })
 	async create(
 		@CurrentUser(UserPropertyString.ID) id: number,
@@ -37,21 +37,18 @@ export class FollowsController {
 	}
 
 	@Get()
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: FollowEntity, isArray: true })
 	async findAll(@CurrentUser(UserPropertyString.ID) id: number) {
 		return await this.followsService.findAll(id);
 	}
 
 	@Get(':id')
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: FollowEntity })
 	async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
 		return await this.followsService.findOne(id);
 	}
 
 	@Patch(':id')
-	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: FollowEntity })
 	async update(
 		@Param('id', ParsePositiveIntPipe) id: number,
@@ -61,7 +58,6 @@ export class FollowsController {
 	}
 
 	@Delete(':followeeId')
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: FollowEntity })
 	async remove(
 		@CurrentUser(UserPropertyString.ID) followerId: number,
@@ -74,7 +70,6 @@ export class FollowsController {
 	//TODO: pagination 적용하기
 	//TODO: 이 핸들러 쓰는지 확인하고 안쓰면 제거
 	@Get(':followerId')
-	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: FollowEntity, isArray: true })
 	async findMany(
 		@Param('followerId', ParsePositiveIntPipe) followerId: number,
@@ -85,7 +80,6 @@ export class FollowsController {
 	//TODO: followerId와 followeeId가 서로 다른지 확인하기
 	//TODO: 이 핸들러 쓰는지 확인하고 안쓰면 제거
 	@Delete('/:followerId/:followeeId')
-	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: FollowEntity })
 	async removeByIds(
 		@Param('followerId', ParsePositiveIntPipe) followerId: number,

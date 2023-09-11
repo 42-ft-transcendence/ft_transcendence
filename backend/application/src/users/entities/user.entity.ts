@@ -1,31 +1,37 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Ladder, User } from '@prisma/client';
+import { Ladder } from '@prisma/client';
 
-export class UserEntity implements User {
-  @ApiProperty()
-  id: number;
+export class UserEntity {
+	@ApiProperty()
+	id: number;
 
-  @ApiProperty()
-  fourtyTwoId: number;
+	@ApiProperty()
+	fourtyTwoId: number;
 
-  @ApiProperty()
-  avatar: string;
+	@ApiProperty()
+	twoFactorAuthenticationSecret?: string;
 
-  @ApiProperty({ maxLength: 10 })
-  nickname: string;
+	@ApiProperty()
+	isTwoFactorAuthenticationEnabled: boolean;
 
-  @ApiProperty({ default: 0 })
-  winCount: number;
+	@ApiProperty()
+	avatar: string;
 
-  @ApiProperty({ default: 0 })
-  loseCount: number;
+	@ApiProperty({ maxLength: 10 })
+	nickname: string;
 
-  @ApiProperty({ enum: Ladder, default: Ladder.BRONZE })
-  ladder: Ladder;
+	@ApiProperty({ default: 0 })
+	winCount: number;
 
-  @ApiProperty()
-  createdAt: Date;
+	@ApiProperty({ default: 0 })
+	loseCount: number;
 
-  @ApiProperty()
-  updatedAt: Date;
+	@ApiProperty({ enum: Ladder, default: Ladder.BRONZE })
+	ladder: Ladder;
+
+	@ApiProperty()
+	createdAt: Date;
+
+	@ApiProperty()
+	updatedAt: Date;
 }

@@ -1,70 +1,68 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
+	Controller,
+	Get,
+	Post,
+	Body,
+	Param,
+	Delete,
+	UseGuards,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AdministratorsService } from './administrators.service';
-import { CreateAdministratorDto, UpdateAdministratorDto } from './dto';
+import { CreateAdministratorDto } from './dto';
 import { ChannelOwnerGuard, ParsePositiveIntPipe } from 'src/common';
 import { AdministratorEntity } from './entities';
-import { JwtAuthGuard } from 'src/auth';
+import { JwtTwoFactorAuthGuard } from 'src/auth';
 
 @Controller('administrators')
+@UseGuards(JwtTwoFactorAuthGuard)
 @ApiTags('administrators')
 export class AdministratorsController {
-  constructor(private readonly administratorsService: AdministratorsService) { }
+	constructor(private readonly administratorsService: AdministratorsService) {}
 
-  @Post()
-  @UseGuards(JwtAuthGuard, ChannelOwnerGuard)
-  @ApiCreatedResponse({ type: AdministratorEntity })
-  async create(@Body() createAdministratorDto: CreateAdministratorDto) {
-    return await this.administratorsService.create(createAdministratorDto);
-  }
+	@Post()
+	@UseGuards(ChannelOwnerGuard)
+	@ApiCreatedResponse({ type: AdministratorEntity })
+	async create(@Body() createAdministratorDto: CreateAdministratorDto) {
+		return await this.administratorsService.create(createAdministratorDto);
+	}
 
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiOkResponse({ type: AdministratorEntity, isArray: true })
-  async findAll() {
-    return await this.administratorsService.findAll();
-  }
+	@Get()
+	@ApiOkResponse({ type: AdministratorEntity, isArray: true })
+	async findAll() {
+		return await this.administratorsService.findAll();
+	}
 
-  @Delete('/channelId/:channelId/userId/:userId')
-  @UseGuards(JwtAuthGuard, ChannelOwnerGuard)
-  @ApiOkResponse({ type: AdministratorEntity })
-  async removeOne(
-    @Param('channelId', ParsePositiveIntPipe) channelId: number,
-    @Param('userId', ParsePositiveIntPipe) userId: number,
-  ) {
-    return await this.administratorsService.removeOne(channelId, userId);
-  }
+	@Delete('/channelId/:channelId/userId/:userId')
+	@UseGuards(ChannelOwnerGuard)
+	@ApiOkResponse({ type: AdministratorEntity })
+	async removeOne(
+		@Param('channelId', ParsePositiveIntPipe) channelId: number,
+		@Param('userId', ParsePositiveIntPipe) userId: number,
+	) {
+		return await this.administratorsService.removeOne(channelId, userId);
+	}
 
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiOkResponse({ type: AdministratorEntity })
-  async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
-    return await this.administratorsService.findOne(id);
-  }
+	@Get(':id')
+	@ApiOkResponse({ type: AdministratorEntity })
+	async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
+		return await this.administratorsService.findOne(id);
+	}
 
-  // @Patch(':id')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiCreatedResponse({ type: AdministratorEntity })
-  // async update(
-  //   @Param('id', ParsePositiveIntPipe) id: number,
-  //   @Body() updateAdministratorDto: UpdateAdministratorDto,
-  // ) {
-  //   return await this.administratorsService.update(id, updateAdministratorDto);
-  // }
+	// @Patch(':id')
+	// @UseGuards(JwtAuthGuard)
+	// @ApiCreatedResponse({ type: AdministratorEntity })
+	// async update(
+	//   @Param('id', ParsePositiveIntPipe) id: number,
+	//   @Body() updateAdministratorDto: UpdateAdministratorDto,
+	// ) {
+	//   return await this.administratorsService.update(id, updateAdministratorDto);
+	// }
 
-  // @Delete(':id')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiOkResponse({ type: AdministratorEntity })
-  // async remove(@Param('id', ParsePositiveIntPipe) id: number) {
-  //   return await this.administratorsService.remove(id);
-  // }
+	// @Delete(':id')
+	// @UseGuards(JwtAuthGuard)
+	// @ApiOkResponse({ type: AdministratorEntity })
+	// async remove(@Param('id', ParsePositiveIntPipe) id: number) {
+	//   return await this.administratorsService.remove(id);
+	// }
 }
