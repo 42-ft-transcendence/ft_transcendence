@@ -37,7 +37,7 @@ export class AuthController {
 			res.cookie('JWTDatabase', this.authService.signDatabase(user), {
 				expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
 			});
-			res.redirect('http://localhost:8080/login');
+			res.redirect('http://localhost:8080/');
 		}
 	}
 

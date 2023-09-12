@@ -11,6 +11,7 @@ import {
 	UseInterceptors,
 	UploadedFile,
 	ParseFilePipeBuilder,
+	UseFilters,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -20,6 +21,7 @@ import {
 	ChangeJwtInterceptor,
 	FourtyTwoUser,
 	ParsePositiveIntPipe,
+	TwoFactorExceptionFilter,
 	UserPropertyString,
 } from 'src/common';
 import { JwtAuthGuard, JwtTwoFactorAuthGuard } from 'src/auth';
@@ -83,7 +85,8 @@ export class UsersController {
 	}
 
 	@Get('twoFactorSetting')
-	@UseGuards(JwtTwoFactorAuthGuard, TwoFactorInterceptor)
+	@UseFilters(TwoFactorExceptionFilter)
+	@UseGuards(JwtTwoFactorAuthGuard)
 	@ApiOkResponse({ type: UserEntity })
 	async findTwoFactorInfo() {
 		return { refresh: false };
