@@ -1,6 +1,6 @@
 import { ConsoleLogger, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { WsChannelAdminGuard } from 'src/common/guard/ws-channel-admin/ws-channel-admin.guard';
 import { WsTargetRoleGuard } from 'src/common/guard/ws-target-role/ws-target-role.guard';
@@ -36,7 +36,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit, OnGate
   }
   
   @SubscribeMessage('new Message')
-  async handleMessage(client: any, payload: MessageEntity) {
+  async handleMessage(client: any, payload: any) {
     payload.senderId = client.userId;
     if (this.mutedUser.has(client.userId)){
       const rooms = this.mutedUser.get(client.userId);
@@ -63,6 +63,13 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit, OnGate
     console.log('leave Room');
     console.log(payload);
     client.leave(payload);
+  }
+
+  @SubscribeMessage('kick User')
+  @UseGuards(WsChannelAdminGuard, WsTargetRoleGuard)
+  handleKickUser(@MessageBody('channelId') channelId: number, @MessageBody('targetId') targetId: number, @MessageBody('channelName') channelName: string){
+    this.server.to('private/' + targetId).emit('kick User', {channelId: channelId, targetId: targetId, channelName: channelName});
+    this.server.to('/channel/' + channelId).emit('leave Channel', {channelId: channelId, targetId: targetId});
   }
 
   @SubscribeMessage('mute User')
