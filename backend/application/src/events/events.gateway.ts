@@ -1,6 +1,9 @@
+import { ConsoleLogger, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { WsChannelAdminGuard } from 'src/common/guard/ws-channel-admin/ws-channel-admin.guard';
+import { WsTargetRoleGuard } from 'src/common/guard/ws-target-role/ws-target-role.guard';
 import { MessageEntity } from 'src/messages/entities';
 import { MessagesService } from 'src/messages/messages.service';
 import { UsersService } from 'src/users/users.service';
@@ -11,7 +14,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit, OnGate
     private configService: ConfigService,
     private usersService: UsersService,
     private readonly messagesService: MessagesService,
-  ){}
+    ){}
+    private mutedUser = new Map<number, Map<string, Date>>();
   @WebSocketServer()
     server: Server;
   
@@ -23,19 +27,27 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit, OnGate
       try {
         const payload = jwt.verify(token, secretOrKey);
         if (this.usersService.findOne(payload.sub))
-          socket.userID = payload.sub;
+          socket.userId = payload.sub;
       } catch (err) {
-        console.log(err); //TODO: remove
         next(new Error('Invalid credentials.'));
       }
       next();
     });
   }
+  
   @SubscribeMessage('new Message')
   async handleMessage(client: any, payload: MessageEntity) {
-    payload.senderId = client.userID;
+    payload.senderId = client.userId;
+    if (this.mutedUser.has(client.userId)){
+      const rooms = this.mutedUser.get(client.userId);
+      if (rooms.has('/channel/' + payload.channelId)){
+        const cuurentTime = new Date();
+        if (rooms.get('/channel/' + payload.channelId) > cuurentTime)
+          return {errorMessage:'관리자에 의해 메시지가 차단되었습니다. 잠시 후 다시 시도해주세요.'};
+      }
+    }
     const newMesage = await this.messagesService.create(payload);
-    this.server.to('/channel/'+payload.channelId).emit('new Message', newMesage);
+    this.server.to('/channel/' + payload.channelId).emit('new Message', newMesage);
     return newMesage;
   }
 
@@ -53,10 +65,30 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit, OnGate
     client.leave(payload);
   }
 
-  handleConnection(client: any, ...args: any) {
-    console.log("connection " + client.userID);
+  @SubscribeMessage('mute User')
+  @UseGuards(WsChannelAdminGuard, WsTargetRoleGuard)
+  handleMuteUser(client: any, payload: any){
+    this.server.to('private/' + payload.targetId).emit('mute User', payload);
+    if (!this.mutedUser.has(payload.targetId))
+      this.mutedUser.set(payload.targetId, new Map<string, Date>());
+    const rooms = this.mutedUser.get(payload.targetId);
+    const currentTime = new Date()
+    rooms.set('/channel/' + payload.channelId, new Date(currentTime.getTime() + 3 * 60 * 1000));
   }
-  handleDisconnect(client): any{
-    console.log("disconnect " + client.userID);
+
+  handleConnection(client: any, ...args: any) {
+    console.log("connection " + client.userId);
+    client.join('private/' + client.userId);
+  }
+
+  handleDisconnect(client: any): any{
+    console.log("disconnect " + client.userId);
+    const _this = this;
+    if (this.mutedUser.has(client.userId) && !client.adapter.rooms.has('private/' + client.userId)){
+      setTimeout(()=>{
+        if (!client.adapter.rooms.has('private/' + client.userId))
+          _this.mutedUser.delete(client.userId);
+      }, 3 * 60 * 1000)
+    }
   }
 }
