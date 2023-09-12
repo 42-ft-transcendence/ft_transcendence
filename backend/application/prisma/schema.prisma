@@ -10,8 +10,8 @@ datasource db {
 model User {
   id                               Int             @id @default(autoincrement())
   fourtyTwoId                      Int             @unique @map("fourty_two_id")
-  twoFactorAuthenticationSecret    String?         @map("two_factor_authentication_secret")
-  isTwoFactorAuthenticationEnabled Boolean         @default(false) @map("is_two_factor_authentication_enabled")
+  otpSecret    										 String?         @map("otp_secret")
+  is2FAEnabled 										 Boolean         @default(false) @map("is_2fa_enabled")
   avatar                           String          @unique
   nickname                         String          @unique @db.VarChar(10)
   winCount                         Int             @default(0) @map("win_count")

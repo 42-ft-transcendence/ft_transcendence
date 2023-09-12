@@ -9,10 +9,10 @@ export class UserEntity {
 	fourtyTwoId: number;
 
 	@ApiProperty()
-	twoFactorAuthenticationSecret?: string;
+	otpSecret?: string;
 
 	@ApiProperty()
-	isTwoFactorAuthenticationEnabled: boolean;
+	is2FAEnabled: boolean;
 
 	@ApiProperty()
 	avatar: string;

@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { Response } from 'express';
 import { authenticator } from 'otplib';
-import { toFileStream } from 'qrcode';
 import { FourtyTwoUser } from 'src/common';
 import { UsersService } from 'src/users/users.service';
 
@@ -46,37 +44,26 @@ export class AuthService {
 		return this.jwtService.sign(payload, { expiresIn: '15m' });
 	}
 
-	isTwoFactorAuthenticationCodeValid(
-		twoFactorAuthenticationCode: string,
-		user: User,
-	) {
+	isOtpValid(otp: string, user: User) {
 		return authenticator.verify({
-			token: twoFactorAuthenticationCode,
-			secret: user.twoFactorAuthenticationSecret,
+			token: otp,
+			secret: user.otpSecret,
 		});
 	}
 
-	async generateTwoFactorAuthenticationSecret(
-		userId: number,
-		nickname: string,
-	) {
+	async generateOtpSecret(userId: number, nickname: string) {
 		const secret = authenticator.generateSecret();
-
 		const otpauthUrl = authenticator.keyuri(
 			nickname,
 			this.configService.get<string>('TWO_FACTOR_AUTHENTICATION_APP_NAME'),
 			secret,
 		);
 
-		await this.usersService.setTwoFactorAuthenticationSecret(secret, userId);
-
-		return {
-			secret,
-			otpauthUrl,
-		};
+		await this.usersService.setOtpSecret(secret, userId);
+		return { secret, otpauthUrl };
 	}
 
-	async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
-		return await toFileStream(stream, otpauthUrl);
-	}
+	// async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
+	// 	return await toFileStream(stream, otpauthUrl);
+	// }
 }

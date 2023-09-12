@@ -1,1 +1,1 @@
-export * from './two-factor-authentication-code.dto';
+export * from './otp-code.dto';

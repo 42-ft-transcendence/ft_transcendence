@@ -72,17 +72,17 @@ export class UsersService {
 		});
 	}
 
-	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+	async setOtpSecret(secret: string, userId: number) {
 		return this.prisma.user.update({
 			where: { id: userId },
-			data: { twoFactorAuthenticationSecret: secret },
+			data: { otpSecret: secret },
 		});
 	}
 
 	async switchTwoFactorAuthentication(userId: number, flag: boolean) {
 		return this.prisma.user.update({
 			where: { id: userId },
-			data: { isTwoFactorAuthenticationEnabled: flag },
+			data: { is2FAEnabled: flag },
 		});
 	}
 	//TODO: 존재하는 channel id, user id인지는 데이터베이스 자체적으로 체크할 수 있다.

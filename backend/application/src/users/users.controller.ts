@@ -82,6 +82,13 @@ export class UsersController {
 		return await this.usersService.findAll(id);
 	}
 
+	@Get('twoFactorSetting')
+	@UseGuards(JwtTwoFactorAuthGuard, TwoFactorInterceptor)
+	@ApiOkResponse({ type: UserEntity })
+	async findTwoFactorInfo() {
+		return { refresh: false };
+	}
+
 	@Get('oneself')
 	@UseGuards(JwtTwoFactorAuthGuard)
 	@ApiOkResponse({ type: UserEntity })
