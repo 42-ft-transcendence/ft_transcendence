@@ -4,7 +4,6 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Server } from 'socket.io';
 import { WsChannelAdminGuard } from 'src/common/guard/ws-channel-admin/ws-channel-admin.guard';
 import { WsTargetRoleGuard } from 'src/common/guard/ws-target-role/ws-target-role.guard';
-import { MessageEntity } from 'src/messages/entities';
 import { MessagesService } from 'src/messages/messages.service';
 import { UsersService } from 'src/users/users.service';
 
@@ -33,6 +32,12 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit, OnGate
       }
       next();
     });
+  }
+
+  @SubscribeMessage('leave Channel')
+  handleLeaveChannel(@ConnectedSocket() client, @MessageBody('channelId') channelId: number){
+    this.server.to('/channel/' + channelId).emit('someone has left', {channelId: channelId, targetId: client.userId});
+    this.server.to('private/' + client.userId).emit('leave Channel', {channelId: channelId});
   }
   
   @SubscribeMessage('new Message')
@@ -69,7 +74,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit, OnGate
   @UseGuards(WsChannelAdminGuard, WsTargetRoleGuard)
   handleKickUser(@MessageBody('channelId') channelId: number, @MessageBody('targetId') targetId: number, @MessageBody('channelName') channelName: string){
     this.server.to('private/' + targetId).emit('kick User', {channelId: channelId, targetId: targetId, channelName: channelName});
-    this.server.to('/channel/' + channelId).emit('leave Channel', {channelId: channelId, targetId: targetId});
+    this.server.to('/channel/' + channelId).emit('someone has left', {channelId: channelId, targetId: targetId});
   }
 
   @SubscribeMessage('mute User')
