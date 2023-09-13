@@ -27,7 +27,7 @@ export class UsersService {
 			data: {
 				fourtyTwoId: userInfo.fourtyTwoId,
 				nickname: customNickname ? customNickname : userInfo.nickname,
-				avatar: `avatar-upload/${userInfo.nickname}_avatar.jpg`,
+				avatar: `/avatar-upload/${userInfo.nickname}_avatar.jpg`,
 			},
 		});
 	}
@@ -41,7 +41,7 @@ export class UsersService {
 			data: {
 				fourtyTwoId: userInfo.fourtyTwoId,
 				nickname: customNickname ? customNickname : userInfo.nickname,
-				avatar: avatar.path ? avatar.path : userInfo.avatar,
+				avatar: `/${avatar.path ? avatar.path : userInfo.avatar}`,
 			},
 		});
 	}
