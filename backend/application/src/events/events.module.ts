@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { EventsGateway } from './events.gateway';
-import { UsersModule } from 'src/users/users.module';
 import { MessagesService } from 'src/messages/messages.service';
-import { PrismaModule } from 'src/common';
+import { PrismaService } from 'src/common';
+import { UsersService } from 'src/users/users.service';
 
 @Module({
-  providers: [EventsGateway, MessagesService],
-  imports: [UsersModule, PrismaModule]
+	providers: [EventsGateway, MessagesService, PrismaService, UsersService],
 })
 export class EventsModule {}
