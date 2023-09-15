@@ -8,26 +8,28 @@ datasource db {
 }
 
 model User {
-  id             Int             @id @default(autoincrement())
-  fourtyTwoId    Int             @unique @map("fourty_two_id")
-  avatar         String          @unique
-  nickname       String          @unique @db.VarChar(10)
-  winCount       Int             @default(0) @map("win_count")
-  loseCount      Int             @default(0) @map("lose_count")
-  ladder         Ladder          @default(BRONZE)
-  createdAt      DateTime        @default(now()) @map("created_at")
-  updatedAt      DateTime        @updatedAt @map("updated_at")
-  administrators Administrator[]
-  bans           Ban[]
-  channels       Channel[]
-  blockees       Block[]         @relation("blockee_to_account")
-  blockers       Block[]         @relation("blocker_to_account")
-  followers      Follow[]        @relation("follower_to_account")
-  followees      Follow[]        @relation("followee_to_account")
-  losers         Match[]         @relation("loser_to_account")
-  winners        Match[]         @relation("winner_to_account")
-  messages       Message[]
-  participants   Participant[]
+  id                               Int             @id @default(autoincrement())
+  fourtyTwoId                      Int             @unique @map("fourty_two_id")
+  otpSecret    										 String?         @map("otp_secret")
+  is2FAEnabled 										 Boolean         @default(false) @map("is_2fa_enabled")
+  avatar                           String          @unique
+  nickname                         String          @unique @db.VarChar(10)
+  winCount                         Int             @default(0) @map("win_count")
+  loseCount                        Int             @default(0) @map("lose_count")
+  ladder                           Ladder          @default(BRONZE)
+  createdAt                        DateTime        @default(now()) @map("created_at")
+  updatedAt                        DateTime        @updatedAt @map("updated_at")
+  administrators                   Administrator[]
+  bans                             Ban[]
+  channels                         Channel[]
+  blockees                         Block[]         @relation("blockee_to_account")
+  blockers                         Block[]         @relation("blocker_to_account")
+  followers                        Follow[]        @relation("follower_to_account")
+  followees                        Follow[]        @relation("followee_to_account")
+  losers                           Match[]         @relation("loser_to_account")
+  winners                          Match[]         @relation("winner_to_account")
+  messages                         Message[]
+  participants                     Participant[]
 
   @@map("account")
 }

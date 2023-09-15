@@ -17,36 +17,34 @@ import {
 	TargetRoleGuard,
 } from 'src/common';
 import { BanEntity } from './entities';
-import { JwtAuthGuard } from 'src/auth';
+import { JwtAuthGuard, JwtTwoFactorAuthGuard } from 'src/auth';
 
 @Controller('bans')
+@UseGuards(JwtTwoFactorAuthGuard)
 @ApiTags('bans')
 export class BansController {
 	constructor(private readonly bansService: BansService) {}
 
 	@Post()
-	@UseGuards(JwtAuthGuard, ChannelAdminGuard, TargetRoleGuard)
+	@UseGuards(ChannelAdminGuard, TargetRoleGuard)
 	@ApiCreatedResponse({ type: BanEntity })
 	async create(@Body() createBanDto: CreateBanDto) {
 		return await this.bansService.create(createBanDto);
 	}
 
 	@Get()
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: BanEntity, isArray: true })
 	async findAll() {
 		return await this.bansService.findAll();
 	}
 
 	@Get(':id')
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: BanEntity })
 	async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
 		return await this.bansService.findOne(id);
 	}
 
 	@Patch(':id')
-	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: BanEntity })
 	async update(
 		@Param('id', ParsePositiveIntPipe) id: number,
@@ -56,7 +54,7 @@ export class BansController {
 	}
 
 	@Delete('userId/:userId/channelId/:channelId')
-	@UseGuards(JwtAuthGuard, ChannelAdminGuard)
+	@UseGuards(ChannelAdminGuard)
 	@ApiOkResponse({ type: BanEntity })
 	async remove(
 		@Param('userId', ParsePositiveIntPipe) userId: number,

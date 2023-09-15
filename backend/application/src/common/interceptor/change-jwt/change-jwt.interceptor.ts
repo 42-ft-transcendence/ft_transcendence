@@ -26,7 +26,9 @@ export class ChangeJwtInterceptor implements NestInterceptor {
 						user: value,
 					};
 					response.clearCookie('JWTOAuth');
-					response.cookie('JWTDatabase', this.jwtService.sign(payload));
+					response.cookie('JWTDatabase', this.jwtService.sign(payload), {
+						expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+					});
 				},
 			}),
 		);

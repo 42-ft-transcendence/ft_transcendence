@@ -13,6 +13,7 @@ import { BlocksModule } from './blocks/blocks.module';
 import { MatchesModule } from './matches/matches.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
       cache: true,
     }),
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

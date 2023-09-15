@@ -9,6 +9,8 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { FourtyTwoStrategy } from './strategies/fourty-two.strategy';
 import { UsersService } from 'src/users/users.service';
 import { PrismaService } from 'src/common';
+import { JwtTwoFactorAuthGuard } from './guards';
+import { JwtTwoFactorStrategy } from './strategies/jwt-two-factor.strategy';
 
 @Module({
 	controllers: [AuthController],
@@ -19,6 +21,8 @@ import { PrismaService } from 'src/common';
 		FourtyTwoStrategy,
 		JwtStrategy,
 		JwtAuthGuard,
+		JwtTwoFactorStrategy,
+		JwtTwoFactorAuthGuard,
 	],
 	imports: [
 		PassportModule,

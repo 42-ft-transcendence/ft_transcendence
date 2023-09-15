@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto';
 import { FourtyTwoUser, PrismaService } from 'src/common';
+import axios from 'axios';
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -11,13 +13,21 @@ export class UsersService {
 	// 	return await this.prisma.user.create({ data: createUserDto });
 	// }
 	async createDefault(userInfo: FourtyTwoUser, customNickname: string) {
-		console.log(userInfo);
-		console.log(customNickname);
+		const response = await axios.get(userInfo.avatar, {
+			responseType: 'arraybuffer',
+		});
+		fs.writeFile(
+			`./avatar-upload/${userInfo.nickname}_avatar.jpg`,
+			response.data,
+			(err) => {
+				if (err) throw err;
+			},
+		);
 		return await this.prisma.user.create({
 			data: {
 				fourtyTwoId: userInfo.fourtyTwoId,
 				nickname: customNickname ? customNickname : userInfo.nickname,
-				avatar: userInfo.avatar,
+				avatar: `/avatar-upload/${userInfo.nickname}_avatar.jpg`,
 			},
 		});
 	}
@@ -25,16 +35,13 @@ export class UsersService {
 	async createCustom(
 		userInfo: FourtyTwoUser,
 		customNickname: string,
-		file: Express.Multer.File,
+		avatar: Express.Multer.File,
 	) {
-		console.log(userInfo);
-		console.log(customNickname);
-		console.log(file);
 		return await this.prisma.user.create({
 			data: {
 				fourtyTwoId: userInfo.fourtyTwoId,
 				nickname: customNickname ? customNickname : userInfo.nickname,
-				avatar: file.path ? file.path : userInfo.avatar,
+				avatar: `/${avatar.path ? avatar.path : userInfo.avatar}`,
 			},
 		});
 	}
@@ -62,6 +69,20 @@ export class UsersService {
 	async findOneByFourtyTwoId(fourtyTwoId: number): Promise<User> {
 		return await this.prisma.user.findUnique({
 			where: { fourtyTwoId: fourtyTwoId },
+		});
+	}
+
+	async setOtpSecret(secret: string, userId: number) {
+		return this.prisma.user.update({
+			where: { id: userId },
+			data: { otpSecret: secret },
+		});
+	}
+
+	async switchTwoFactorAuthentication(userId: number, flag: boolean) {
+		return this.prisma.user.update({
+			where: { id: userId },
+			data: { is2FAEnabled: flag },
 		});
 	}
 	//TODO: 존재하는 channel id, user id인지는 데이터베이스 자체적으로 체크할 수 있다.
