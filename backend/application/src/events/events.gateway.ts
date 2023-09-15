@@ -39,6 +39,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit, OnGate
     this.server.to('private/' + client.userId).emit('join Channel', payload);
   }
 
+  @SubscribeMessage('join DMChannel')
+  handleJoinDMChannel(@ConnectedSocket() client, @MessageBody() payload: any){
+    this.server.to('private/' + client.userId).emit('join DMChannel', payload);
+  }
+
   @SubscribeMessage('leave Channel')
   handleLeaveChannel(@ConnectedSocket() client, @MessageBody('channelId') channelId: number){
     // TODO: 악성 유저가 leave channel event를 보내는 경우 연결되어 있는 유저에게는 음수까지 떨어질 수 있음. 새로고침하면 다시 문제 없음.
