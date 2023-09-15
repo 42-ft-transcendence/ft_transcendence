@@ -13,26 +13,28 @@ import { BlocksModule } from './blocks/blocks.module';
 import { MatchesModule } from './matches/matches.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { EventsModule } from './events/events.module';
 
 @Module({
-	imports: [
-		UsersModule,
-		FollowsModule,
-		ChannelsModule,
-		ChannelPasswordsModule,
-		MessagesModule,
-		ParticipantsModule,
-		AdministratorsModule,
-		BansModule,
-		BlocksModule,
-		MatchesModule,
-		AuthModule,
-		ConfigModule.forRoot({
-			isGlobal: true,
-			cache: true,
-		}),
-	],
-	controllers: [AppController],
-	providers: [AppService],
+  imports: [
+    UsersModule,
+    FollowsModule,
+    ChannelsModule,
+    ChannelPasswordsModule,
+    MessagesModule,
+    ParticipantsModule,
+    AdministratorsModule,
+    BansModule,
+    BlocksModule,
+    MatchesModule,
+    AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+    }),
+    EventsModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
