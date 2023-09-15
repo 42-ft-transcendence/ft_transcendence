@@ -51,6 +51,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayInit, OnGate
     this.server.to('private/' + client.userId).emit('leave Channel', {channelId: channelId});
   }
   
+  @SubscribeMessage('leave DMChannel')
+  handleLeaveDMChannel(@ConnectedSocket() client, @MessageBody('channelId') channelId: number){
+    this.server.to('private/' + client.userId).emit('leave DMChannel', {channelId: channelId});
+  }
+  
   @SubscribeMessage('new Message')
   async handleMessage(client: any, payload: any) {
     payload.senderId = client.userId;
