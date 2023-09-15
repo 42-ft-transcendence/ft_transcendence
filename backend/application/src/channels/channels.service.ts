@@ -26,12 +26,11 @@ export class ChannelsService {
 	}
 
 	async findOrCreateDirectChannel(
-		ownerId: number,
+		userId: number,
 		userName: string,
 		createDirectChannelDto: CreateDirectChannelDto,
 	) {
 		const { interlocatorId, interlocatorName } = createDirectChannelDto;
-
 		const selectArg = {
 			id: true,
 			participants: {
@@ -41,40 +40,51 @@ export class ChannelsService {
 		};
 
 		return await this.prisma.$transaction(async (tx) => {
-			const oldChannel = await tx.channel.findFirst({
+			let activeDirectMessageChannel: any = await tx.channel.findFirst({
 				where: {
+					type: ChannelType.ONETOONE,
 					AND: [
-						{ type: ChannelType.ONETOONE },
-						{ messages: { some: { senderId: { equals: ownerId } } } },
-						{ messages: { some: { senderId: { equals: interlocatorId } } } },
+						{ messages: { some: { senderId: userId } } },
+						{ messages: { some: { senderId: interlocatorId } } },
 					],
 				},
-				select: { id: true },
 			});
 
-			let result: any;
-
-			if (oldChannel) {
-				result = await tx.channel.update({
-					where: { id: oldChannel.id },
-					data: {
-						participants: { create: { userId: ownerId } },
+			if (activeDirectMessageChannel) {
+				// 둘 다 탈퇴하지 않았고, 둘 사이에 대화를 나눴던 채널이 존재할 때. ( 둘 다 채널을 나간 건 상관 없음 )
+				const channelId = activeDirectMessageChannel.id;
+				await tx.participant.upsert({
+					where: {
+						channelId_userId: { channelId: channelId, userId: userId },
 					},
-					select: selectArg,
+					update: {},
+					create: { channelId: channelId, userId: userId },
 				});
+				const participantInterlocator = await tx.participant.upsert({
+					where: {
+						channelId_userId: { channelId: channelId, userId: interlocatorId },
+					},
+					update: {},
+					create: { channelId: channelId, userId: interlocatorId },
+					select: { user: { select: { nickname: true, avatar: true } } },
+				});
+				activeDirectMessageChannel = {
+					...activeDirectMessageChannel,
+					participants: [participantInterlocator],
+				};
 			} else {
-				result = await tx.channel.create({
+				// 둘 사이에 대화를 나눴던 채널이 존재하지 않을 때
+				activeDirectMessageChannel = await tx.channel.create({
 					data: {
 						name: `${userName}, ${interlocatorName}`,
 						type: ChannelType.ONETOONE,
-						ownerId: ownerId,
-						// administrators: { create: [{ userId: ownerId }] }, //TODO: 다이렉트 메시지 채널은 관리자를 지정하지 않는다.
+						ownerId: userId,
 						participants: {
-							create: [{ userId: ownerId }, { userId: interlocatorId }],
+							create: [{ userId: userId }, { userId: interlocatorId }],
 						},
 						messages: {
 							create: [
-								{ content: 'INIT', senderId: ownerId },
+								{ content: 'INIT', senderId: userId },
 								{ content: 'INIT', senderId: interlocatorId },
 							],
 						},
@@ -83,9 +93,9 @@ export class ChannelsService {
 				});
 			}
 			return {
-				id: result.id,
-				userName: result.participants[0].user.nickname,
-				avatar: result.participants[0].user.avatar,
+				id: activeDirectMessageChannel.id,
+				userName: activeDirectMessageChannel.participants[0].user.nickname,
+				avatar: activeDirectMessageChannel.participants[0].user.avatar,
 			};
 		});
 	}
@@ -109,10 +119,11 @@ export class ChannelsService {
 	}
 
 	async findOneInDetail(userId: number, channelId: number) {
-		const result = await this.prisma.channel.findUniqueOrThrow({
+		return await this.prisma.channel.findUniqueOrThrow({
 			where: { id: channelId },
 			include: {
 				messages: {
+					skip: 2,
 					select: {
 						content: true,
 						createdAt: true,
@@ -123,14 +134,7 @@ export class ChannelsService {
 				owner: { select: { nickname: true } },
 			},
 		});
-		if (result.type === ChannelType.ONETOONE)
-			//TODO: id  순서대로 정렬되어있는지, createAt으로 정렬하지 않아도 되는지 확인하기
-			result.messages.splice(0, 2);
-		result.messages = result.messages.map((message) => ({
-			...message,
-			isMine: userId === message.sender.id,
-		}));
-		return result;
+		//TODO: id  순서대로 정렬되어있는지, createAt으로 정렬하지 않아도 되는지 확인하기
 	}
 
 	async findContents(userId: number, channelId: number) {

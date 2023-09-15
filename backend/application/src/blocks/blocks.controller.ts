@@ -17,15 +17,15 @@ import {
 	UserPropertyString,
 } from 'src/common';
 import { BlockEntity } from './entities';
-import { JwtAuthGuard } from 'src/auth';
+import { JwtTwoFactorAuthGuard } from 'src/auth';
 
 @Controller('blocks')
+@UseGuards(JwtTwoFactorAuthGuard)
 @ApiTags('blocks')
 export class BlocksController {
 	constructor(private readonly blocksService: BlocksService) {}
 
 	@Post()
-	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: BlockEntity })
 	async create(
 		@CurrentUser(UserPropertyString.ID) id: number,
@@ -35,21 +35,18 @@ export class BlocksController {
 	}
 
 	@Get()
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: BlockEntity, isArray: true })
 	async findAll(@CurrentUser(UserPropertyString.ID) id: number) {
 		return await this.blocksService.findAll(id);
 	}
 
 	@Get(':id')
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: BlockEntity })
 	async findOne(@Param('id', ParsePositiveIntPipe) id: number) {
 		return await this.blocksService.findOne(id);
 	}
 
 	@Patch(':id')
-	@UseGuards(JwtAuthGuard)
 	@ApiCreatedResponse({ type: BlockEntity })
 	async update(
 		@Param('id', ParsePositiveIntPipe) id: number,
@@ -59,7 +56,6 @@ export class BlocksController {
 	}
 
 	@Delete(':blockeeId')
-	@UseGuards(JwtAuthGuard)
 	@ApiOkResponse({ type: BlockEntity })
 	async remove(
 		@CurrentUser(UserPropertyString.ID) blockerId: number,
