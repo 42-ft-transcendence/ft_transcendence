@@ -46,39 +46,39 @@ export class EventsGateway
 		});
 	}
 
-	@SubscribeMessage('join Channel')
-	handleJoinChannel(@ConnectedSocket() client, @MessageBody() payload: any) {
-		this.server.to('private/' + client.userId).emit('join Channel', payload);
+	@SubscribeMessage('create Channel')
+	handleCreateChannel(@ConnectedSocket() client, @MessageBody() payload: any) {
+		this.server.to('private/' + client.userId).emit('create Channel', payload);
 	}
 
-	@SubscribeMessage('join DMChannel')
-	handleJoinDMChannel(@ConnectedSocket() client, @MessageBody() payload: any) {
-		this.server.to('private/' + client.userId).emit('join DMChannel', payload);
+	@SubscribeMessage('create DMChannel')
+	handleCreateDMChannel(@ConnectedSocket() client, @MessageBody() payload: any) {
+		this.server.to('private/' + client.userId).emit('create DMChannel', payload);
 	}
 
-	@SubscribeMessage('leave Channel')
-	handleLeaveChannel(
+	@SubscribeMessage('remove Channel')
+	handleRemoveChannel(
 		@ConnectedSocket() client,
 		@MessageBody('channelId') channelId: number,
 	) {
-		// TODO: 악성 유저가 leave channel event를 보내는 경우 연결되어 있는 유저에게는 음수까지 떨어질 수 있음. 새로고침하면 다시 문제 없음.
+		// TODO: 악성 유저가 remove channel event를 보내는 경우 연결되어 있는 유저에게는 음수까지 떨어질 수 있음. 새로고침하면 다시 문제 없음.
 		this.server.to('/channel/' + channelId).emit('someone has left', {
 			channelId: channelId,
 			targetId: client.userId,
 		});
 		this.server
 			.to('private/' + client.userId)
-			.emit('leave Channel', { channelId: channelId });
+			.emit('remove Channel', { channelId: channelId });
 	}
 
-	@SubscribeMessage('leave DMChannel')
-	handleLeaveDMChannel(
+	@SubscribeMessage('remove DMChannel')
+	handleRemoveDMChannel(
 		@ConnectedSocket() client,
 		@MessageBody('channelId') channelId: number,
 	) {
 		this.server
 			.to('private/' + client.userId)
-			.emit('leave DMChannel', { channelId: channelId });
+			.emit('remove DMChannel', { channelId: channelId });
 	}
 
 	@SubscribeMessage('new Message')
