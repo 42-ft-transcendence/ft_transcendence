@@ -13,6 +13,7 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { WsChannelAdminGuard } from 'src/common/guard/ws-channel-admin/ws-channel-admin.guard';
+import { WsCheckUserInGuard } from 'src/common/guard/ws-check-user-in/ws-check-user-in.guard';
 import { WsTargetRoleGuard } from 'src/common/guard/ws-target-role/ws-target-role.guard';
 import { MessagesService } from 'src/messages/messages.service';
 import { UsersService } from 'src/users/users.service';
@@ -107,6 +108,14 @@ export class EventsGateway
 		console.log('join room');
 		console.log(payload);
 		client.join(payload);
+	}
+
+	@SubscribeMessage('join Channel')
+	@UseGuards(WsCheckUserInGuard)
+	handleJoinChannel(@ConnectedSocket() client, @MessageBody('channelId') channelId: string) {
+		console.log('join room');
+		console.log('/channel/' + channelId);
+		client.join('/channel/' + channelId);
 	}
 
 	@SubscribeMessage('leave Room')
