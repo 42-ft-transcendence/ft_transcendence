@@ -11,7 +11,9 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
+import { ChannelType } from '@prisma/client';
 import { Server } from 'socket.io';
+import { PrismaService } from 'src/common';
 import { WsChannelAdminGuard } from 'src/common/guard/ws-channel-admin/ws-channel-admin.guard';
 import { WsCheckUserInGuard } from 'src/common/guard/ws-check-user-in/ws-check-user-in.guard';
 import { WsTargetRoleGuard } from 'src/common/guard/ws-target-role/ws-target-role.guard';
@@ -26,6 +28,7 @@ export class EventsGateway
 		private configService: ConfigService,
 		private jwtService: JwtService,
 		private usersService: UsersService,
+		private prisma: PrismaService,
 		private readonly messagesService: MessagesService,
 	) {}
 	private mutedUser = new Map<number, Map<string, Date>>();
@@ -104,18 +107,29 @@ export class EventsGateway
 	}
 
 	@SubscribeMessage('join Room')
-	handleJoinRoom(client: any, payload: any) {
+	handleJoinRoom(client: any, payload: string) {
 		console.log('join room');
 		console.log(payload);
+		if (payload.includes('/channel/'))
+			return { errorMessage: '유효하지 않은 접근.' };
 		client.join(payload);
 	}
 
 	@SubscribeMessage('join Channel')
 	@UseGuards(WsCheckUserInGuard)
-	handleJoinChannel(@ConnectedSocket() client, @MessageBody('channelId') channelId: string) {
+	async handleJoinChannel(@ConnectedSocket() client, @MessageBody('channelId') channelId: string) {
 		console.log('join room');
 		console.log('/channel/' + channelId);
-		client.join('/channel/' + channelId);
+		const channel = await this.prisma.channel.findUnique({
+			where: { id: Number(channelId) },
+			select: {type: true},
+		});
+		if (channel === null)
+			return { errorMessage: '유효하지 않은 채널.' };
+		if (channel.type !== ChannelType.ONETOONE)
+			client.join('/channel/' + channelId);
+		else
+			client.join('/channel/directChannel/' + channelId);
 	}
 
 	@SubscribeMessage('leave Room')
