@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+	Controller,
+	Get,
+	HttpStatus,
+	Post,
+	Req,
+	Res,
+	UseGuards,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -56,7 +64,7 @@ export class AuthController {
 		response.cookie('JWTDatabase', this.authService.signTwoFactor(user), {
 			expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
 		});
-		response.status(201).send({ authenticated: true });
+		response.status(HttpStatus.CREATED).send({ authenticated: true });
 	}
 
 	@Post('auth/otp/enable') //TODO: 2단계 인증이 허용되었고, 인증이 되어있는 상태에서만 해당 핸들러에 접근할 수 있게 하기?
@@ -72,7 +80,7 @@ export class AuthController {
 		response.cookie('JWTDatabase', this.authService.signTwoFactor(processed), {
 			expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
 		});
-		response.status(201).send({ authenticated: true });
+		response.status(HttpStatus.CREATED).send({ authenticated: true });
 	}
 
 	@Post('auth/otp/disable') //TODO: 2단계 인증이 허용되었고, 인증이 되어있는 상태에서만 해당 핸들러에 접근할 수 있게 하기?
@@ -88,6 +96,6 @@ export class AuthController {
 		response.cookie('JWTDatabase', this.authService.signDatabase(processed), {
 			expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
 		});
-		response.status(201).send({ authenticated: false });
+		response.status(HttpStatus.CREATED).send({ authenticated: false });
 	}
 }
