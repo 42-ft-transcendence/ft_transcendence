@@ -138,7 +138,7 @@ export class ChannelsService {
 	}
 
 	async findContents(userId: number, channelId: number) {
-		const contents = await this.prisma.channel.findUnique({
+		const contents = await this.prisma.channel.findUniqueOrThrow({
 			where: { id: channelId },
 			select: {
 				ownerId: true,

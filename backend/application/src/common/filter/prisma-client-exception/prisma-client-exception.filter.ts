@@ -24,7 +24,12 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 				});
 				break;
 			default:
-				super.catch(exception, host);
+				// super.catch(exception, host);
+				response.status(HttpStatus.BAD_REQUEST).json({
+					message: exception.message,
+					error: 'Bad Request',
+					statusCode: HttpStatus.BAD_REQUEST,
+				});
 				break;
 		}
 	}
