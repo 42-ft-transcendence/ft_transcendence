@@ -19,18 +19,20 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 					statusCode: HttpStatus.CONFLICT,
 				});
 				break;
+			case 'P2003': // foreign key constraints
 			case 'P2025': // not found
 				console.error(exception);
 				response.status(HttpStatus.NOT_FOUND).json({
-					message: '존재하지 않는 자원에 대한 요청입니다.',
+					// message: '존재하지 않는 자원에 대한 요청입니다.',
 					error: 'Not Found',
 					statusCode: HttpStatus.NOT_FOUND,
 				});
 				break;
 			default:
 				// super.catch(exception, host);
+				console.error(exception);
 				response.status(HttpStatus.BAD_REQUEST).json({
-					message: '유효하지 않은 요청입니다.',
+					// message: '유효하지 않은 요청입니다.',
 					error: 'Bad Request',
 					statusCode: HttpStatus.BAD_REQUEST,
 				});

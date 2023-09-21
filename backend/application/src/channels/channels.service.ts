@@ -35,7 +35,9 @@ export class ChannelsService {
 			id: true,
 			participants: {
 				where: { userId: interlocatorId },
-				select: { user: { select: { nickname: true, avatar: true } } },
+				select: {
+					user: { select: { id: true, nickname: true, avatar: true } },
+				},
 			},
 		};
 
@@ -94,6 +96,7 @@ export class ChannelsService {
 			}
 			return {
 				id: activeDirectMessageChannel.id,
+				userId: activeDirectMessageChannel.participants[0].user.id,
 				userName: activeDirectMessageChannel.participants[0].user.nickname,
 				avatar: activeDirectMessageChannel.participants[0].user.avatar,
 			};
