@@ -19,7 +19,9 @@ export class PrismaInterceptor implements NestInterceptor {
 							throw err;
 							break;
 						case 'fourty_two_id':
-							err.code = 'MakeThis500Error'; //TODO: invalid prisma error code to make this error as 500 error
+							err.meta.target = '42 계정';
+							throw err;
+							break;
 						default:
 							throw err;
 							break;

@@ -10,23 +10,27 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 
 		switch (exception.code) {
 			case 'P2002': // unique constraints
+				console.error(exception);
 				response.status(HttpStatus.CONFLICT).json({
-					message: `중복된 ${exception.meta.target}을 사용할 수 없습니다.`,
+					message: `중복된 ${
+						exception.meta?.target ? exception.meta.target : '값'
+					}을 사용할 수 없습니다.`,
 					error: 'Conflict',
 					statusCode: HttpStatus.CONFLICT,
 				});
 				break;
 			case 'P2025': // not found
+				console.error(exception);
 				response.status(HttpStatus.NOT_FOUND).json({
-					message: exception.message, //TODO: exception.meta.target을 활용해 ~를 찾을 수 없습니다. 라는 메시지를 출력하게 구현하기
-					error: exception.name,
+					message: '존재하지 않는 자원에 대한 요청입니다.',
+					error: 'Not Found',
 					statusCode: HttpStatus.NOT_FOUND,
 				});
 				break;
 			default:
 				// super.catch(exception, host);
 				response.status(HttpStatus.BAD_REQUEST).json({
-					message: exception.message,
+					message: '유효하지 않은 요청입니다.',
 					error: 'Bad Request',
 					statusCode: HttpStatus.BAD_REQUEST,
 				});
