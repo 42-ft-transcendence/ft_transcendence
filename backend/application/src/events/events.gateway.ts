@@ -15,6 +15,7 @@ import { ChannelType } from '@prisma/client';
 import { Server } from 'socket.io';
 import { PrismaService } from 'src/common';
 import { WsChannelAdminGuard } from 'src/common/guard/ws-channel-admin/ws-channel-admin.guard';
+import { WsCheckBlockGuard } from 'src/common/guard/ws-check-block/ws-check-block.guard';
 import { WsCheckUserInGuard } from 'src/common/guard/ws-check-user-in/ws-check-user-in.guard';
 import { WsTargetRoleGuard } from 'src/common/guard/ws-target-role/ws-target-role.guard';
 import { MessagesService } from 'src/messages/messages.service';
@@ -106,6 +107,37 @@ export class EventsGateway
 		return newMesage;
 	}
 
+	@SubscribeMessage('new Direct Message')
+	@UseGuards(WsCheckBlockGuard)
+	async handleNewDirectMessage(@ConnectedSocket() client, @MessageBody() payload) {
+		const newMesage = await this.messagesService.create({
+			content: payload.content,
+			channelId: payload.channelId,
+			senderId: client.userId,
+		});
+		const channel = await this.prisma.participant.findUnique({
+			where: {
+				channelId_userId: { channelId: payload.channelId, userId: payload.interlocatorId },
+			},
+		});
+		if (channel === null){
+				const result = await this.prisma.participant.create({
+					data: { userId: payload.interlocatorId, channelId: payload.channelId },
+				});
+				this.server
+				.to('private/' + payload.interlocatorId)
+				.emit('create DMChannel', {
+					id: newMesage.sender.id,
+					userName: newMesage.sender.nickname,
+					avatar: newMesage.sender.avatar,
+				});
+		}
+		this.server
+			.to('/channel/directChannel/' + payload.channelId)
+			.emit('new Message', newMesage);
+		return newMesage;
+	}
+
 	@SubscribeMessage('join Room')
 	handleJoinRoom(client: any, payload: string) {
 		console.log('join room');
@@ -118,25 +150,38 @@ export class EventsGateway
 	@SubscribeMessage('join Channel')
 	@UseGuards(WsCheckUserInGuard)
 	async handleJoinChannel(@ConnectedSocket() client, @MessageBody('channelId') channelId: string) {
-		console.log('join room');
-		console.log('/channel/' + channelId);
 		const channel = await this.prisma.channel.findUnique({
 			where: { id: Number(channelId) },
 			select: {type: true},
 		});
 		if (channel === null)
-			return { errorMessage: '유효하지 않은 채널.' };
-		if (channel.type !== ChannelType.ONETOONE)
+		return { errorMessage: '유효하지 않은 채널.' };
+		if (channel.type !== ChannelType.ONETOONE){
+			console.log('join room: /channel/' + channelId);
 			client.join('/channel/' + channelId);
-		else
+		}
+		else {
+			console.log('join room: /channel/directChannel/' + channelId);
 			client.join('/channel/directChannel/' + channelId);
+		}
 	}
 
 	@SubscribeMessage('leave Room')
-	handleLeaveRoom(client: any, payload: any) {
-		console.log('leave Room');
-		console.log(payload);
-		client.leave(payload);
+	async handleLeaveRoom(client: any, payload: string) {
+		console.log(`leave Room: ${payload}`);
+		if (payload.includes('/channel/')){
+			const id = payload.substring(9);
+			const channel = await this.prisma.channel.findUnique({
+				where: { id: Number(id) },
+				select: {type: true},
+			});
+			if (channel.type !== ChannelType.ONETOONE)
+				client.leave(payload)
+			else
+				client.leave('/channel/directChannel/' + id);
+		}
+		else
+			client.leave(payload);
 	}
 
 	@SubscribeMessage('kick User')
