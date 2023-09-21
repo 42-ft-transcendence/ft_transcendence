@@ -10,9 +10,8 @@ async function bootstrap() {
 	app.useGlobalPipes(
 		new ValidationPipe({
 			whitelist: true,
-			dismissDefaultMessages: true,
-			disableErrorMessages: true,
 			stopAtFirstError: true,
+			dismissDefaultMessages: true,
 		}),
 	);
 	const { httpAdapter } = app.get(HttpAdapterHost);

@@ -24,6 +24,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 				console.error(exception);
 				response.status(HttpStatus.NOT_FOUND).json({
 					// message: '존재하지 않는 자원에 대한 요청입니다.',
+					message: undefined,
 					error: 'Not Found',
 					statusCode: HttpStatus.NOT_FOUND,
 				});
@@ -33,6 +34,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 				console.error(exception);
 				response.status(HttpStatus.BAD_REQUEST).json({
 					// message: '유효하지 않은 요청입니다.',
+					message: undefined,
 					error: 'Bad Request',
 					statusCode: HttpStatus.BAD_REQUEST,
 				});
