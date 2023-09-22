@@ -12,7 +12,7 @@ export class ParsePositiveIntPipe implements PipeTransform {
 		const parsed = parseInt(value);
 
 		if (!isPositive(parsed)) {
-			throw new BadRequestException();
+			throw new BadRequestException({});
 		}
 		return parsed;
 	}

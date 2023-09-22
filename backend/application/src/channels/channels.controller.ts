@@ -32,6 +32,7 @@ import {
 	UpdateChannelDto,
 } from './dto';
 import { JwtTwoFactorAuthGuard } from 'src/auth';
+import { User } from '@prisma/client';
 
 @Controller('channels')
 @UseGuards(JwtTwoFactorAuthGuard)
@@ -40,10 +41,13 @@ export class ChannelsController {
 	constructor(private readonly channelsService: ChannelsService) {}
 
 	@Post()
-	@UseInterceptors(new AddUserIdToBodyInterceptor('ownerId')) //TODO: @CurrentUser 데코레이터로 교체할까?
+	// @UseInterceptors(new AddUserIdToBodyInterceptor('ownerId')) //TODO: @CurrentUser 데코레이터로 교체할까?
 	@ApiCreatedResponse({ type: ChannelEntity })
-	async create(@Body(HashPasswordPipe) createChannelDto: CreateChannelDto) {
-		return await this.channelsService.create(createChannelDto);
+	async create(
+		@CurrentUser(UserPropertyString.ID) userId: number,
+		@Body(HashPasswordPipe) createChannelDto: CreateChannelDto,
+	) {
+		return await this.channelsService.create(userId, createChannelDto);
 	}
 
 	@Post('directChannel')
@@ -115,14 +119,14 @@ export class ChannelsController {
 		return await this.channelsService.findContents(userId, channelId);
 	}
 
-	@Patch(':id')
-	@ApiCreatedResponse({ type: ChannelEntity })
-	async update(
-		@Param('id', ParsePositiveIntPipe) id: number,
-		@Body() updateChannelDto: UpdateChannelDto,
-	) {
-		return await this.channelsService.update(id, updateChannelDto);
-	}
+	// @Patch(':id')
+	// @ApiCreatedResponse({ type: ChannelEntity })
+	// async update(
+	// 	@Param('id', ParsePositiveIntPipe) id: number,
+	// 	@Body() updateChannelDto: UpdateChannelDto,
+	// ) {
+	// 	return await this.channelsService.update(id, updateChannelDto);
+	// }
 
 	@Delete(':id')
 	@ApiOkResponse({ type: ChannelEntity })

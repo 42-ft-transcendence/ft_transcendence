@@ -13,14 +13,15 @@ import {
 export class ChannelsService {
 	constructor(private prisma: PrismaService) {}
 
-	async create(createChannelDto: CreateChannelDto) {
+	async create(ownerId: number, createChannelDto: CreateChannelDto) {
 		const { password, ...essential } = createChannelDto;
 		return await this.prisma.channel.create({
 			data: {
 				...essential,
+				ownerId: ownerId,
 				password: password ? { create: { password: password } } : undefined,
-				administrators: { create: [{ userId: essential.ownerId }] },
-				participants: { create: [{ userId: essential.ownerId }] },
+				administrators: { create: [{ userId: ownerId }] },
+				participants: { create: [{ userId: ownerId }] },
 			},
 		});
 	}
@@ -212,24 +213,24 @@ export class ChannelsService {
 		}));
 	}
 
-	async update(id: number, updateChannelDto: UpdateChannelDto) {
-		const { name, type, ownerId, password } = updateChannelDto;
-		const updateChannelObject = { name: name, type: type, ownerId: ownerId };
-		//TODO: password에 hash 적용하기
-		if (type === ChannelType.PROTECTED) {
-			const hashed = await hash(password);
-			updateChannelObject['password'] = {
-				upsert: {
-					create: { password: hashed },
-					update: { password: hashed },
-				},
-			};
-		}
-		return await this.prisma.channel.update({
-			where: { id },
-			data: updateChannelObject,
-		});
-	}
+	// async update(id: number, updateChannelDto: UpdateChannelDto) {
+	// 	const { name, type, ownerId, password } = updateChannelDto;
+	// 	const updateChannelObject = { name: name, type: type, ownerId: ownerId };
+	// 	//TODO: password에 hash 적용하기
+	// 	if (type === ChannelType.PROTECTED) {
+	// 		const hashed = await hash(password);
+	// 		updateChannelObject['password'] = {
+	// 			upsert: {
+	// 				create: { password: hashed },
+	// 				update: { password: hashed },
+	// 			},
+	// 		};
+	// 	}
+	// 	return await this.prisma.channel.update({
+	// 		where: { id },
+	// 		data: updateChannelObject,
+	// 	});
+	// }
 
 	async remove(id: number) {
 		return await this.prisma.channel.delete({ where: { id } });

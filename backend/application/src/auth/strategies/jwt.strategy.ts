@@ -22,9 +22,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 				return await this.usersService.findOne(payload.user.id);
 			else if (payload.sub === this.configService.get<string>('JWT_OAUTH_SUB'))
 				return payload.user;
-			else throw new UnauthorizedException();
+			else throw new UnauthorizedException({});
 		} catch (err) {
-			throw new UnauthorizedException();
+			throw new UnauthorizedException({});
 		}
 	}
 }

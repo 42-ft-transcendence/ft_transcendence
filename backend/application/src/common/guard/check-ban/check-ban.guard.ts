@@ -1,4 +1,5 @@
 import {
+	BadRequestException,
 	CanActivate,
 	ExecutionContext,
 	Inject,
@@ -18,6 +19,8 @@ export class CheckBanGuard implements CanActivate {
 		const isBanned = await this.prisma.ban.findUnique({
 			where: { channelId_userId: { channelId: channelId, userId: userId } },
 		});
-		return !isBanned;
+		if (isBanned)
+			throw new BadRequestException('밴 당한 채널입니다. 입장할 수 없습니다.');
+		return true;
 	}
 }

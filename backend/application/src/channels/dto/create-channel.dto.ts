@@ -33,10 +33,10 @@ export class CreateChannelDto {
 	@ApiProperty({ enum: ChannelType, default: ChannelType.PUBLIC })
 	type: ChannelType;
 
-	@IsPositive()
-	@IsNotEmpty()
-	@ApiProperty()
-	ownerId: number;
+	// @IsPositive()
+	// @IsNotEmpty()
+	// @ApiProperty()
+	// ownerId: number;
 
 	@IsByteLength(0, 72, { message: '비밀번호는 72 바이트를 넘길 수 없습니다.' })
 	@Length(4, 20, { message: '비밀번호는 최소 4글자, 최대 20글자여야 합니다.' })
