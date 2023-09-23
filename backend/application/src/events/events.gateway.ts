@@ -215,8 +215,19 @@ export class EventsGateway
 		);
 	}
 
+	@SubscribeMessage('subscribe userState')
+	handleSubscribeUserState(@ConnectedSocket() client, @MessageBody('targetId') targetId: number) {
+		client.join('follower/' + targetId);
+		if (client.adapter.rooms.has('private/' + targetId))
+			this.server.to('private/' + client.userId).emit('change followeeState', { userId: targetId, state: true });
+		else
+			this.server.to('private/' + client.userId).emit('change followeeState', { userId: targetId, state: false });
+	}
+
 	handleConnection(client: any, ...args: any) {
 		console.log('connection ' + client.userId);
+		if (!client.adapter.rooms.has('private/' + client.userId))
+			this.server.to('follower/' + client.userId).emit('change followeeState', { userId: client.userId, state: true });
 		client.join('private/' + client.userId);
 	}
 
@@ -232,5 +243,7 @@ export class EventsGateway
 					_this.mutedUser.delete(client.userId);
 			}, 3 * 60 * 1000);
 		}
+		if (!client.adapter.rooms.has('private/' + client.userId))
+			this.server.to('follower/' + client.userId).emit('change followeeState', { userId: client.userId, state: false });
 	}
 }
