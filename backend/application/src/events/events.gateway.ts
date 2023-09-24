@@ -91,6 +91,11 @@ export class EventsGateway
 			.emit('remove DMChannel', { channelId: channelId });
 	}
 
+	@SubscribeMessage('remove Followee')
+	handleRemoveFollowee(@ConnectedSocket() client, @MessageBody('followeeId') followeeId) {
+		this.server.to('private/' + client.userId).emit('remove Followee', { id: followeeId});
+	}
+
 	@SubscribeMessage('new Message')
 	async handleMessage(client: any, payload: any) {
 		payload.senderId = client.userId;
