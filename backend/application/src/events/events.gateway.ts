@@ -53,6 +53,10 @@ export class EventsGateway
 
 	@SubscribeMessage('create Channel')
 	handleCreateChannel(@ConnectedSocket() client, @MessageBody() payload: any) {
+		this.server.to('/channel/' + payload.id).emit('someone has joined', {
+			channelId: payload.id,
+			targetId: client.userId,
+		});
 		this.server.to('private/' + client.userId).emit('create Channel', payload);
 	}
 
