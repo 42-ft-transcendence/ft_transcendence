@@ -61,6 +61,11 @@ export class EventsGateway
 		this.server.to('private/' + client.userId).emit('create DMChannel', payload);
 	}
 
+	@SubscribeMessage('create Followee')
+	handleCreateFollowee(@ConnectedSocket() client, @MessageBody() payload: any) {
+		this.server.to('private/' + client.userId).emit('create Followee', payload);
+	}
+
 	@SubscribeMessage('remove Channel')
 	handleRemoveChannel(
 		@ConnectedSocket() client,
