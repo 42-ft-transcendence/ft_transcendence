@@ -13,14 +13,15 @@ import {
 export class ChannelsService {
 	constructor(private prisma: PrismaService) {}
 
-	async create(createChannelDto: CreateChannelDto) {
+	async create(ownerId: number, createChannelDto: CreateChannelDto) {
 		const { password, ...essential } = createChannelDto;
 		return await this.prisma.channel.create({
 			data: {
 				...essential,
+				ownerId: ownerId,
 				password: password ? { create: { password: password } } : undefined,
-				administrators: { create: [{ userId: essential.ownerId }] },
-				participants: { create: [{ userId: essential.ownerId }] },
+				administrators: { create: [{ userId: ownerId }] },
+				participants: { create: [{ userId: ownerId }] },
 			},
 		});
 	}
@@ -35,7 +36,9 @@ export class ChannelsService {
 			id: true,
 			participants: {
 				where: { userId: interlocatorId },
-				select: { user: { select: { nickname: true, avatar: true } } },
+				select: {
+					user: { select: { id: true, nickname: true, avatar: true } },
+				},
 			},
 		};
 
@@ -94,6 +97,7 @@ export class ChannelsService {
 			}
 			return {
 				id: activeDirectMessageChannel.id,
+				userId: activeDirectMessageChannel.participants[0].user.id,
 				userName: activeDirectMessageChannel.participants[0].user.nickname,
 				avatar: activeDirectMessageChannel.participants[0].user.avatar,
 			};
@@ -138,7 +142,7 @@ export class ChannelsService {
 	}
 
 	async findContents(userId: number, channelId: number) {
-		const contents = await this.prisma.channel.findUnique({
+		const contents = await this.prisma.channel.findUniqueOrThrow({
 			where: { id: channelId },
 			select: {
 				ownerId: true,
@@ -209,24 +213,24 @@ export class ChannelsService {
 		}));
 	}
 
-	async update(id: number, updateChannelDto: UpdateChannelDto) {
-		const { name, type, ownerId, password } = updateChannelDto;
-		const updateChannelObject = { name: name, type: type, ownerId: ownerId };
-		//TODO: password에 hash 적용하기
-		if (type === ChannelType.PROTECTED) {
-			const hashed = await hash(password);
-			updateChannelObject['password'] = {
-				upsert: {
-					create: { password: hashed },
-					update: { password: hashed },
-				},
-			};
-		}
-		return await this.prisma.channel.update({
-			where: { id },
-			data: updateChannelObject,
-		});
-	}
+	// async update(id: number, updateChannelDto: UpdateChannelDto) {
+	// 	const { name, type, ownerId, password } = updateChannelDto;
+	// 	const updateChannelObject = { name: name, type: type, ownerId: ownerId };
+	// 	//TODO: password에 hash 적용하기
+	// 	if (type === ChannelType.PROTECTED) {
+	// 		const hashed = await hash(password);
+	// 		updateChannelObject['password'] = {
+	// 			upsert: {
+	// 				create: { password: hashed },
+	// 				update: { password: hashed },
+	// 			},
+	// 		};
+	// 	}
+	// 	return await this.prisma.channel.update({
+	// 		where: { id },
+	// 		data: updateChannelObject,
+	// 	});
+	// }
 
 	async remove(id: number) {
 		return await this.prisma.channel.delete({ where: { id } });

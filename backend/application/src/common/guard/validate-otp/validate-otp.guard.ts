@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	CanActivate,
+	ExecutionContext,
+	Injectable,
+} from '@nestjs/common';
 import { authenticator } from 'otplib';
 import { UserExtendedRequest } from 'src/common/type';
 
@@ -9,6 +14,8 @@ export class ValidateOtpGuard implements CanActivate {
 		const user = request.user;
 		const { otpCode } = request.body;
 
-		return authenticator.check(otpCode, user.otpSecret);
+		if (!authenticator.check(otpCode, user.otpSecret))
+			throw new BadRequestException('유효하지 않은 코드입니다.');
+		return true;
 	}
 }

@@ -12,7 +12,7 @@ model User {
   fourtyTwoId                      Int             @unique @map("fourty_two_id")
   otpSecret    										 String?         @map("otp_secret")
   is2FAEnabled 										 Boolean         @default(false) @map("is_2fa_enabled")
-  avatar                           String          @unique
+  avatar                           String
   nickname                         String          @unique @db.VarChar(10)
   winCount                         Int             @default(0) @map("win_count")
   loseCount                        Int             @default(0) @map("lose_count")

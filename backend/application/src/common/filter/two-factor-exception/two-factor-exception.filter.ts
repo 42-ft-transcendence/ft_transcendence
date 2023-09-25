@@ -2,6 +2,7 @@ import {
 	ArgumentsHost,
 	Catch,
 	ExceptionFilter,
+	HttpStatus,
 	UnauthorizedException,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -12,7 +13,7 @@ export class TwoFactorExceptionFilter implements ExceptionFilter {
 		host
 			.switchToHttp()
 			.getResponse<Response>()
-			.status(200)
+			.status(HttpStatus.OK)
 			.json({ refresh: true });
 	}
 }

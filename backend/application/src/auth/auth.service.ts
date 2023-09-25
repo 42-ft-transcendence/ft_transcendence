@@ -23,7 +23,9 @@ export class AuthService {
 			sub: this.configService.get<string>('JWT_DB_SUB'),
 			user: user,
 		};
-		return this.jwtService.sign(payload);
+		return this.jwtService.sign(payload, {
+			expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
+		});
 	}
 
 	signOauth(user: FourtyTwoUser) {
@@ -41,7 +43,9 @@ export class AuthService {
 			user: user,
 			isSecondFactorAuthenticated: true,
 		};
-		return this.jwtService.sign(payload, { expiresIn: '15m' });
+		return this.jwtService.sign(payload, {
+			expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
+		});
 	}
 
 	isOtpValid(otp: string, user: User) {

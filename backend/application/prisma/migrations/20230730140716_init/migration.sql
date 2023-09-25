@@ -114,9 +114,6 @@ CREATE TABLE "participant" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "account_avatar_key" ON "account"("avatar");
-
--- CreateIndex
 CREATE UNIQUE INDEX "account_nickname_key" ON "account"("nickname");
 
 -- CreateIndex

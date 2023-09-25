@@ -24,9 +24,9 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
 		try {
 			if (!user.is2FAEnabled) return user;
 			if (payload.isSecondFactorAuthenticated) return user;
-			throw new UnauthorizedException();
+			throw new UnauthorizedException({});
 		} catch (err) {
-			throw new UnauthorizedException();
+			throw new UnauthorizedException({});
 		}
 	}
 }
