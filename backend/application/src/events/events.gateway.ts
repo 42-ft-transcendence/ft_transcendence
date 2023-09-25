@@ -61,8 +61,24 @@ export class EventsGateway
 	}
 
 	@SubscribeMessage('create DMChannel')
-	handleCreateDMChannel(@ConnectedSocket() client, @MessageBody() payload: any) {
+	async handleCreateDMChannel(@ConnectedSocket() client, @MessageBody() payload: { id:number, userName: string, avatar:string, userId: number }) {
 		this.server.to('private/' + client.userId).emit('create DMChannel', payload);
+		// 상대에 dm채널을 만들어줘야한다. 상대방이 해당 채널에 들어와 있는 지 확인 후 내정보를 채널 정보와 함께 같이 보내준다.
+		// 상대방이 이미 참여하고 있는 채널이였다면 채널날려줘도 상관없음.
+		if (!!(await this.prisma.participant.findUnique({ where: { channelId_userId: { channelId: payload.id, userId: payload.userId}}}))){
+			const participant = await this.prisma.participant.findUnique({
+				where: { channelId_userId: { channelId: payload.id, userId: client.userId}},
+				select: {
+					user: { select: { avatar:true, nickname:true } }
+				}
+			})
+			this.server.to('private/' + payload.userId).emit('create DMChannel', {
+				id: payload.id,
+				userName: participant.user.nickname,
+				avatar: participant.user.avatar,
+				userId: client.userId
+			})
+		}
 	}
 
 	@SubscribeMessage('create Followee')
@@ -141,7 +157,8 @@ export class EventsGateway
 				this.server
 				.to('private/' + payload.interlocatorId)
 				.emit('create DMChannel', {
-					id: newMesage.sender.id,
+					id: payload.channelId,
+					userId: newMesage.sender.id,
 					userName: newMesage.sender.nickname,
 					avatar: newMesage.sender.avatar,
 				});
