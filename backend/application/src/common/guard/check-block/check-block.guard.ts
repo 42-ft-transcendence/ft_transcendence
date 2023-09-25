@@ -1,8 +1,10 @@
 import {
 	CanActivate,
 	ExecutionContext,
+	ForbiddenException,
 	Inject,
 	Injectable,
+	UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma';
 import { UserExtendedRequest } from 'src/common/type';
@@ -28,6 +30,10 @@ export class CheckBlockGuard implements CanActivate {
 				],
 			},
 		});
+		if (isBlocked.length !== 0)
+			throw new ForbiddenException(
+				'상대방이 당신을 차단했습니다. 메시지를 보낼 수 없습니다.',
+			);
 		return isBlocked.length === 0;
 	}
 }
