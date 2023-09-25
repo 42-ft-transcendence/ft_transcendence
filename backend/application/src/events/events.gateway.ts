@@ -11,8 +11,12 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
+import { ChannelType } from '@prisma/client';
 import { Server } from 'socket.io';
+import { PrismaService } from 'src/common';
 import { WsChannelAdminGuard } from 'src/common/guard/ws-channel-admin/ws-channel-admin.guard';
+import { WsCheckBlockGuard } from 'src/common/guard/ws-check-block/ws-check-block.guard';
+import { WsCheckUserInGuard } from 'src/common/guard/ws-check-user-in/ws-check-user-in.guard';
 import { WsTargetRoleGuard } from 'src/common/guard/ws-target-role/ws-target-role.guard';
 import { MessagesService } from 'src/messages/messages.service';
 import { UsersService } from 'src/users/users.service';
@@ -25,6 +29,7 @@ export class EventsGateway
 		private configService: ConfigService,
 		private jwtService: JwtService,
 		private usersService: UsersService,
+		private prisma: PrismaService,
 		private readonly messagesService: MessagesService,
 	) {}
 	private mutedUser = new Map<number, Map<string, Date>>();
@@ -46,39 +51,69 @@ export class EventsGateway
 		});
 	}
 
-	@SubscribeMessage('join Channel')
-	handleJoinChannel(@ConnectedSocket() client, @MessageBody() payload: any) {
-		this.server.to('private/' + client.userId).emit('join Channel', payload);
+	@SubscribeMessage('create Channel')
+	handleCreateChannel(@ConnectedSocket() client, @MessageBody() payload: any) {
+		this.server.to('/channel/' + payload.id).emit('someone has joined', {
+			channelId: payload.id,
+			targetId: client.userId,
+		});
+		this.server.to('private/' + client.userId).emit('create Channel', payload);
 	}
 
-	@SubscribeMessage('join DMChannel')
-	handleJoinDMChannel(@ConnectedSocket() client, @MessageBody() payload: any) {
-		this.server.to('private/' + client.userId).emit('join DMChannel', payload);
+	@SubscribeMessage('create DMChannel')
+	async handleCreateDMChannel(@ConnectedSocket() client, @MessageBody() payload: { id:number, userName: string, avatar:string, userId: number }) {
+		this.server.to('private/' + client.userId).emit('create DMChannel', payload);
+		// 상대에 dm채널을 만들어줘야한다. 상대방이 해당 채널에 들어와 있는 지 확인 후 내정보를 채널 정보와 함께 같이 보내준다.
+		// 상대방이 이미 참여하고 있는 채널이였다면 채널날려줘도 상관없음.
+		if (!!(await this.prisma.participant.findUnique({ where: { channelId_userId: { channelId: payload.id, userId: payload.userId}}}))){
+			const participant = await this.prisma.participant.findUnique({
+				where: { channelId_userId: { channelId: payload.id, userId: client.userId}},
+				select: {
+					user: { select: { avatar:true, nickname:true } }
+				}
+			})
+			this.server.to('private/' + payload.userId).emit('create DMChannel', {
+				id: payload.id,
+				userName: participant.user.nickname,
+				avatar: participant.user.avatar,
+				userId: client.userId
+			})
+		}
 	}
 
-	@SubscribeMessage('leave Channel')
-	handleLeaveChannel(
+	@SubscribeMessage('create Followee')
+	handleCreateFollowee(@ConnectedSocket() client, @MessageBody() payload: any) {
+		this.server.to('private/' + client.userId).emit('create Followee', payload);
+	}
+
+	@SubscribeMessage('remove Channel')
+	handleRemoveChannel(
 		@ConnectedSocket() client,
 		@MessageBody('channelId') channelId: number,
 	) {
-		// TODO: 악성 유저가 leave channel event를 보내는 경우 연결되어 있는 유저에게는 음수까지 떨어질 수 있음. 새로고침하면 다시 문제 없음.
+		// TODO: 악성 유저가 remove channel event를 보내는 경우 연결되어 있는 유저에게는 음수까지 떨어질 수 있음. 새로고침하면 다시 문제 없음.
 		this.server.to('/channel/' + channelId).emit('someone has left', {
 			channelId: channelId,
 			targetId: client.userId,
 		});
 		this.server
 			.to('private/' + client.userId)
-			.emit('leave Channel', { channelId: channelId });
+			.emit('remove Channel', { channelId: channelId });
 	}
 
-	@SubscribeMessage('leave DMChannel')
-	handleLeaveDMChannel(
+	@SubscribeMessage('remove DMChannel')
+	handleRemoveDMChannel(
 		@ConnectedSocket() client,
 		@MessageBody('channelId') channelId: number,
 	) {
 		this.server
 			.to('private/' + client.userId)
-			.emit('leave DMChannel', { channelId: channelId });
+			.emit('remove DMChannel', { channelId: channelId });
+	}
+
+	@SubscribeMessage('remove Followee')
+	handleRemoveFollowee(@ConnectedSocket() client, @MessageBody('followeeId') followeeId) {
+		this.server.to('private/' + client.userId).emit('remove Followee', { id: followeeId});
 	}
 
 	@SubscribeMessage('new Message')
@@ -102,18 +137,82 @@ export class EventsGateway
 		return newMesage;
 	}
 
+	@SubscribeMessage('new Direct Message')
+	@UseGuards(WsCheckBlockGuard)
+	async handleNewDirectMessage(@ConnectedSocket() client, @MessageBody() payload) {
+		const newMesage = await this.messagesService.create({
+			content: payload.content,
+			channelId: payload.channelId,
+			senderId: client.userId,
+		});
+		const channel = await this.prisma.participant.findUnique({
+			where: {
+				channelId_userId: { channelId: payload.channelId, userId: payload.interlocatorId },
+			},
+		});
+		if (channel === null){
+				const result = await this.prisma.participant.create({
+					data: { userId: payload.interlocatorId, channelId: payload.channelId },
+				});
+				this.server
+				.to('private/' + payload.interlocatorId)
+				.emit('create DMChannel', {
+					id: payload.channelId,
+					userId: newMesage.sender.id,
+					userName: newMesage.sender.nickname,
+					avatar: newMesage.sender.avatar,
+				});
+		}
+		this.server
+			.to('/channel/directChannel/' + payload.channelId)
+			.emit('new Message', newMesage);
+		return newMesage;
+	}
+
 	@SubscribeMessage('join Room')
-	handleJoinRoom(client: any, payload: any) {
+	handleJoinRoom(client: any, payload: string) {
 		console.log('join room');
 		console.log(payload);
+		if (payload.includes('/channel/'))
+			return { errorMessage: '유효하지 않은 접근.' };
 		client.join(payload);
 	}
 
+	@SubscribeMessage('join Channel')
+	@UseGuards(WsCheckUserInGuard)
+	async handleJoinChannel(@ConnectedSocket() client, @MessageBody('channelId') channelId: string) {
+		const channel = await this.prisma.channel.findUnique({
+			where: { id: Number(channelId) },
+			select: {type: true},
+		});
+		if (channel === null)
+		return { errorMessage: '유효하지 않은 채널.' };
+		if (channel.type !== ChannelType.ONETOONE){
+			console.log('join room: /channel/' + channelId);
+			client.join('/channel/' + channelId);
+		}
+		else {
+			console.log('join room: /channel/directChannel/' + channelId);
+			client.join('/channel/directChannel/' + channelId);
+		}
+	}
+
 	@SubscribeMessage('leave Room')
-	handleLeaveRoom(client: any, payload: any) {
-		console.log('leave Room');
-		console.log(payload);
-		client.leave(payload);
+	async handleLeaveRoom(client: any, payload: string) {
+		console.log(`leave Room: ${payload}`);
+		if (payload.includes('/channel/')){
+			const id = payload.substring(9);
+			const channel = await this.prisma.channel.findUnique({
+				where: { id: Number(id) },
+				select: {type: true},
+			});
+			if (channel.type !== ChannelType.ONETOONE)
+				client.leave(payload)
+			else
+				client.leave('/channel/directChannel/' + id);
+		}
+		else
+			client.leave(payload);
 	}
 
 	@SubscribeMessage('kick User')
@@ -147,8 +246,19 @@ export class EventsGateway
 		);
 	}
 
+	@SubscribeMessage('subscribe userState')
+	handleSubscribeUserState(@ConnectedSocket() client, @MessageBody('targetId') targetId: number) {
+		client.join('follower/' + targetId);
+		if (client.adapter.rooms.has('private/' + targetId))
+			this.server.to('private/' + client.userId).emit('change followeeState', { userId: targetId, state: true });
+		else
+			this.server.to('private/' + client.userId).emit('change followeeState', { userId: targetId, state: false });
+	}
+
 	handleConnection(client: any, ...args: any) {
 		console.log('connection ' + client.userId);
+		if (!client.adapter.rooms.has('private/' + client.userId))
+			this.server.to('follower/' + client.userId).emit('change followeeState', { userId: client.userId, state: true });
 		client.join('private/' + client.userId);
 	}
 
@@ -164,5 +274,7 @@ export class EventsGateway
 					_this.mutedUser.delete(client.userId);
 			}, 3 * 60 * 1000);
 		}
+		if (!client.adapter.rooms.has('private/' + client.userId))
+			this.server.to('follower/' + client.userId).emit('change followeeState', { userId: client.userId, state: false });
 	}
 }

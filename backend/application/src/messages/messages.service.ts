@@ -13,8 +13,7 @@ export class MessagesService {
 			select: {
 				content: true,
 				createdAt: true,
-				senderId: true,
-				sender: { select: { nickname: true, avatar: true } },
+				sender: { select: { id: true, nickname: true, avatar: true } },
 			},
 		});
 	}
