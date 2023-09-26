@@ -314,9 +314,6 @@ export class EventsGateway
 			);
 		this.userState.add(payload.opponentId);
 		this.userState.add(client.userId);
-		// this.server
-		// 	.to('private/' + client.userId)
-		// 	.emit('remove Followee', { id: followeeId });
 		// 3. 어떤 맵에 대해 누가 초대했는지 대상 사용자에게 알림을 보내 수락/거절을 요청하기
 		try {
 			const response: { answer: boolean } = await this.server
@@ -329,10 +326,9 @@ export class EventsGateway
 			} else
 				throw new SocketException('Forbidden', '상대방이 초대를 거절했습니다');
 		} catch (e) {
-			throw new SocketException('Forbidden', '상대방이 초대를 거절했습니다');
-		} finally {
 			this.userState.delete(payload.opponentId);
 			this.userState.delete(client.userId);
+			throw new SocketException('Forbidden', '상대방이 초대를 거절했습니다');
 		}
 	}
 
