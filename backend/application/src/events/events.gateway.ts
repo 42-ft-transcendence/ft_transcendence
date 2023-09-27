@@ -13,14 +13,17 @@ import {
 } from '@nestjs/websockets';
 import { ChannelType } from '@prisma/client';
 import { Server } from 'socket.io';
-import { PrismaService, SocketException } from 'src/common';
-import { WsChannelAdminGuard } from 'src/common/guard/ws-channel-admin/ws-channel-admin.guard';
-import { WsCheckBlockGuard } from 'src/common/guard/ws-check-block/ws-check-block.guard';
-import { WsCheckUserInGuard } from 'src/common/guard/ws-check-user-in/ws-check-user-in.guard';
-import { WsTargetRoleGuard } from 'src/common/guard/ws-target-role/ws-target-role.guard';
+import {
+	PrismaService,
+	SocketException,
+	WsChannelAdminGuard,
+	WsCheckBlockGuard,
+	WsCheckUserInGuard,
+	WsTargetRoleGuard,
+} from 'src/common';
 import { MessagesService } from 'src/messages/messages.service';
 import { UsersService } from 'src/users/users.service';
-import { SocketExceptionFilter } from './filter/socket-exception/socket-exception.filter';
+import { SocketExceptionFilter } from './filter';
 
 @WebSocketGateway()
 export class EventsGateway
@@ -140,6 +143,7 @@ export class EventsGateway
 	}
 
 	@SubscribeMessage('new Message')
+	@UseGuards(WsCheckUserInGuard)
 	async handleMessage(client: any, payload: any) {
 		payload.senderId = client.userId;
 		if (this.mutedUser.has(client.userId)) {
@@ -154,6 +158,7 @@ export class EventsGateway
 			}
 		}
 		const newMesage = await this.messagesService.create(payload);
+		console.log(newMesage);
 		this.server
 			.to('/channel/' + payload.channelId)
 			.emit('new Message', newMesage);
@@ -266,10 +271,9 @@ export class EventsGateway
 			this.mutedUser.set(payload.targetId, new Map<string, Date>());
 		const rooms = this.mutedUser.get(payload.targetId);
 		const currentTime = new Date();
-		rooms.set(
-			'/channel/' + payload.channelId,
-			new Date(currentTime.getTime() + 3 * 60 * 1000),
-		);
+		const destTime = new Date(currentTime.getTime() + 3 * 60 * 1000);
+		rooms.set('/channel/' + payload.channelId, destTime);
+		return destTime;
 	}
 
 	@SubscribeMessage('subscribe userState')

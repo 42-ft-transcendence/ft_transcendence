@@ -6,3 +6,7 @@ export * from './check-block/check-block.guard';
 export * from './check-password/check-password.guard';
 export * from './check-user-in/check-user-in.guard';
 export * from './validate-otp/validate-otp.guard';
+export * from './ws-channel-admin/ws-channel-admin.guard';
+export * from './ws-check-block/ws-check-block.guard';
+export * from './ws-check-user-in/ws-check-user-in.guard';
+export * from './ws-target-role/ws-target-role.guard';

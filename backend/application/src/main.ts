@@ -2,7 +2,10 @@ import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
-import { PrismaClientExceptionFilter } from './common';
+import {
+	PrismaClientExceptionFilter,
+	PrismaInvalidExceptionFilter,
+} from './common';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -15,7 +18,10 @@ async function bootstrap() {
 		}),
 	);
 	const { httpAdapter } = app.get(HttpAdapterHost);
-	app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
+	app.useGlobalFilters(
+		new PrismaClientExceptionFilter(httpAdapter),
+		new PrismaInvalidExceptionFilter(),
+	);
 	app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
 	const document = SwaggerModule.createDocument(
