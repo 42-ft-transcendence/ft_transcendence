@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { ChannelType } from '@prisma/client';
 import { PrismaService } from 'src/common/prisma';
+import { SocketException } from 'src/common/type';
 
 @Injectable()
 export class WsChannelAdminGuard implements CanActivate {
@@ -21,6 +22,6 @@ export class WsChannelAdminGuard implements CanActivate {
 			select: { channel: { select: { type: true } } },
 		});
     if (result && result.channel.type !== ChannelType.ONETOONE) return true;
-		return false;
+		throw new SocketException('Forbidden', '해당 채널에 권한이 없습니다.');
   }
 }

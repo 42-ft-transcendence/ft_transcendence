@@ -5,6 +5,7 @@ import {
 	Injectable,
 } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma';
+import { SocketException } from 'src/common/type';
 
 @Injectable()
 export class WsCheckBlockGuard implements CanActivate {
@@ -35,6 +36,8 @@ export class WsCheckBlockGuard implements CanActivate {
 			},
 		});
 		payload.interlocatorId = interlocator.senderId;
-    return isBlocked.length === 0;
+    if(isBlocked.length === 0)
+			return true;
+		throw new SocketException('Forbidden', '상대방에 의해 차단되었습니다. 메시지를 보낼 수 없습니다.');
   }
 }

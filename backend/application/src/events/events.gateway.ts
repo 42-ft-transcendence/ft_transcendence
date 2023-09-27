@@ -143,6 +143,7 @@ export class EventsGateway
 	}
 
 	@SubscribeMessage('new Message')
+	@UseFilters(SocketExceptionFilter)
 	@UseGuards(WsCheckUserInGuard)
 	async handleMessage(client: any, payload: any) {
 		payload.senderId = client.userId;
@@ -166,6 +167,7 @@ export class EventsGateway
 	}
 
 	@SubscribeMessage('new Direct Message')
+	@UseFilters(SocketExceptionFilter)
 	@UseGuards(WsCheckBlockGuard)
 	async handleNewDirectMessage(
 		@ConnectedSocket() client,
@@ -213,6 +215,7 @@ export class EventsGateway
 	}
 
 	@SubscribeMessage('join Channel')
+	@UseFilters(SocketExceptionFilter)
 	@UseGuards(WsCheckUserInGuard)
 	async handleJoinChannel(
 		@ConnectedSocket() client,
@@ -247,6 +250,7 @@ export class EventsGateway
 	}
 
 	@SubscribeMessage('kick User')
+	@UseFilters(SocketExceptionFilter)
 	@UseGuards(WsChannelAdminGuard, WsTargetRoleGuard)
 	handleKickUser(
 		@MessageBody('channelId') channelId: number,
@@ -264,6 +268,7 @@ export class EventsGateway
 	}
 
 	@SubscribeMessage('mute User')
+	@UseFilters(SocketExceptionFilter)
 	@UseGuards(WsChannelAdminGuard, WsTargetRoleGuard)
 	handleMuteUser(client: any, payload: any) {
 		this.server.to('private/' + payload.targetId).emit('mute User', payload);

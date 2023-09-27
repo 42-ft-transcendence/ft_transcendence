@@ -5,6 +5,7 @@ import {
 	Injectable,
 } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma';
+import { SocketException } from 'src/common/type';
 
 @Injectable()
 export class WsTargetRoleGuard implements CanActivate {
@@ -18,6 +19,8 @@ export class WsTargetRoleGuard implements CanActivate {
 			where: { channelId_userId: { channelId: channelId, userId: targetId } },
 			select: { id: true },
 		});
-		return !result;
+		if(!result)
+			return true;
+		throw new SocketException('Forbidden', '관리자에 대해 해당 요청을 처리할 수 없습니다.');
   }
 }
