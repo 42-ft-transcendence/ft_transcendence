@@ -123,11 +123,11 @@ export class ChannelsService {
 	}
 
 	async findOneInDetail(userId: number, channelId: number) {
-		return await this.prisma.channel.findUniqueOrThrow({
+		const res = await this.prisma.channel.findUniqueOrThrow({
 			where: { id: channelId },
 			include: {
 				messages: {
-					skip: 2,
+					// skip: 2,
 					select: {
 						content: true,
 						createdAt: true,
@@ -138,6 +138,8 @@ export class ChannelsService {
 				owner: { select: { nickname: true } },
 			},
 		});
+		if (res.type === ChannelType.ONETOONE) res.messages = res.messages.slice(2);
+		return res;
 		//TODO: id  순서대로 정렬되어있는지, createAt으로 정렬하지 않아도 되는지 확인하기
 	}
 
