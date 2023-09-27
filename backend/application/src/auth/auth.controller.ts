@@ -17,12 +17,14 @@ import {
 } from './guards';
 import { CurrentUser, UserPropertyString, ValidateOtpGuard } from 'src/common';
 import { UsersService } from 'src/users/users.service';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('/')
 export class AuthController {
 	constructor(
 		private authService: AuthService,
 		private usersService: UsersService,
+		private configService: ConfigService,
 	) {}
 
 	@Get('oauth/42')
@@ -97,5 +99,11 @@ export class AuthController {
 			expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
 		});
 		response.status(HttpStatus.CREATED).send({ authenticated: false });
+	}
+
+	@Get('auth/logout')
+	@UseGuards(JwtTwoFactorAuthGuard)
+	logout(@Res() response: Response) {
+		response.clearCookie('JWTDatabase').send({ message: 'logged out' });
 	}
 }
