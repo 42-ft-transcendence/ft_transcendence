@@ -24,6 +24,7 @@ import {
 import { MessagesService } from 'src/messages/messages.service';
 import { UsersService } from 'src/users/users.service';
 import { SocketExceptionFilter } from './filter';
+import { SocketWithUserId } from './type';
 
 @WebSocketGateway()
 export class EventsGateway
@@ -38,6 +39,7 @@ export class EventsGateway
 	) {}
 
 	private mutedUser = new Map<number, Map<string, Date>>();
+	// private userState = new Map<number, Status>();
 	private userState = new Set<number>();
 
 	@WebSocketServer()
@@ -59,7 +61,10 @@ export class EventsGateway
 	}
 
 	@SubscribeMessage('create Channel')
-	handleCreateChannel(@ConnectedSocket() client, @MessageBody() payload: any) {
+	handleCreateChannel(
+		@ConnectedSocket() client: SocketWithUserId,
+		@MessageBody() payload: any,
+	) {
 		this.server.to('/channel/' + payload.id).emit('someone has joined', {
 			channelId: payload.id,
 			targetId: client.userId,
@@ -69,7 +74,7 @@ export class EventsGateway
 
 	@SubscribeMessage('create DMChannel')
 	async handleCreateDMChannel(
-		@ConnectedSocket() client,
+		@ConnectedSocket() client: SocketWithUserId,
 		@MessageBody()
 		payload: { id: number; userName: string; avatar: string; userId: number },
 	) {
@@ -103,13 +108,16 @@ export class EventsGateway
 	}
 
 	@SubscribeMessage('create Followee')
-	handleCreateFollowee(@ConnectedSocket() client, @MessageBody() payload: any) {
+	handleCreateFollowee(
+		@ConnectedSocket() client: SocketWithUserId,
+		@MessageBody() payload: any,
+	) {
 		this.server.to('private/' + client.userId).emit('create Followee', payload);
 	}
 
 	@SubscribeMessage('remove Channel')
 	handleRemoveChannel(
-		@ConnectedSocket() client,
+		@ConnectedSocket() client: SocketWithUserId,
 		@MessageBody('channelId') channelId: number,
 	) {
 		// TODO: 악성 유저가 remove channel event를 보내는 경우 연결되어 있는 유저에게는 음수까지 떨어질 수 있음. 새로고침하면 다시 문제 없음.
@@ -124,7 +132,7 @@ export class EventsGateway
 
 	@SubscribeMessage('remove DMChannel')
 	handleRemoveDMChannel(
-		@ConnectedSocket() client,
+		@ConnectedSocket() client: SocketWithUserId,
 		@MessageBody('channelId') channelId: number,
 	) {
 		this.server
@@ -134,7 +142,7 @@ export class EventsGateway
 
 	@SubscribeMessage('remove Followee')
 	handleRemoveFollowee(
-		@ConnectedSocket() client,
+		@ConnectedSocket() client: SocketWithUserId,
 		@MessageBody('followeeId') followeeId,
 	) {
 		this.server
@@ -170,7 +178,7 @@ export class EventsGateway
 	@UseFilters(SocketExceptionFilter)
 	@UseGuards(WsCheckBlockGuard)
 	async handleNewDirectMessage(
-		@ConnectedSocket() client,
+		@ConnectedSocket() client: SocketWithUserId,
 		@MessageBody() payload,
 	) {
 		const newMesage = await this.messagesService.create({
@@ -218,7 +226,7 @@ export class EventsGateway
 	@UseFilters(SocketExceptionFilter)
 	@UseGuards(WsCheckUserInGuard)
 	async handleJoinChannel(
-		@ConnectedSocket() client,
+		@ConnectedSocket() client: SocketWithUserId,
 		@MessageBody('channelId') channelId: string,
 	) {
 		const channel = await this.prisma.channel.findUnique({
@@ -283,11 +291,11 @@ export class EventsGateway
 
 	@SubscribeMessage('subscribe userState')
 	handleSubscribeUserState(
-		@ConnectedSocket() client,
+		@ConnectedSocket() client: SocketWithUserId,
 		@MessageBody('targetId') targetId: number,
 	) {
 		client.join('follower/' + targetId);
-		if (client.adapter.rooms.has('private/' + targetId))
+		if (this.server.sockets.adapter.rooms.has('private/' + targetId))
 			this.server
 				.to('private/' + client.userId)
 				.emit('change followeeState', { userId: targetId, state: true });
@@ -300,12 +308,14 @@ export class EventsGateway
 	@SubscribeMessage('invite')
 	@UseFilters(SocketExceptionFilter)
 	async handleInvitation(
-		@ConnectedSocket() client: any,
+		@ConnectedSocket() client: SocketWithUserId,
 		@MessageBody()
 		payload: { userName: string; mapType: string; opponentId: number },
 	) {
+		if (!this.server.sockets.adapter.rooms.has(`private/${payload.opponentId}`))
+			throw new SocketException('Forbidden', '상대방이 로그아웃 상태입니다.');
 		// 1. 상대방이 로그인 중인지 확인하고 로그인 중이 아니라면 취소
-		if (!client.adapter.rooms.has(`private/${payload.opponentId}`))
+		if (!this.server.sockets.adapter.rooms.has(`private/${payload.opponentId}`))
 			//상대방이 로그인 상태가 아니어서 게임을 진행할 수 없다고 사용자에게 알리기
 			throw new SocketException('Forbidden', '상대방이 로그아웃 상태입니다.');
 		// 2. 상대방과 자기 자신이 초대 가능 상태인지 확인하고 초대 가능 상태가 아니라면 취소
@@ -332,6 +342,9 @@ export class EventsGateway
 			console.log(response);
 			if (response[0].answer) {
 				//TODO: 게임 실행 로직 구현
+				// 두 사용자가 게임을 하기 위한 소켓 룸 생성
+				// 두 사용자가 모두 소켓 룸에 들어왔는지 확인하고 게임을 시작 -> 둘 중 한 명이라도 들어오지 않았다면 들어온 쪽에 상대를 기다리는 중입니다... 출력하기
+				// 게임을 시작하면 60fps로 공, 사용자 등에 대한 상태 정보를 사용자에게 보내기
 			} else
 				throw new SocketException('Forbidden', '상대방이 초대를 거절했습니다');
 		} catch (e) {
@@ -341,28 +354,28 @@ export class EventsGateway
 		}
 	}
 
-	handleConnection(client: any, ...args: any) {
+	handleConnection(client: SocketWithUserId, ...args: any) {
 		console.log('connection ' + client.userId);
-		if (!client.adapter.rooms.has('private/' + client.userId))
+		if (!this.server.sockets.adapter.rooms.has('private/' + client.userId))
 			this.server
 				.to('follower/' + client.userId)
 				.emit('change followeeState', { userId: client.userId, state: true });
 		client.join('private/' + client.userId);
 	}
 
-	handleDisconnect(client: any): any {
+	handleDisconnect(client: SocketWithUserId): any {
 		console.log('disconnect ' + client.userId);
 		const _this = this;
 		if (
 			this.mutedUser.has(client.userId) &&
-			!client.adapter.rooms.has('private/' + client.userId)
+			!this.server.sockets.adapter.rooms.has('private/' + client.userId)
 		) {
 			setTimeout(() => {
-				if (!client.adapter.rooms.has('private/' + client.userId))
+				if (!this.server.sockets.adapter.rooms.has('private/' + client.userId))
 					_this.mutedUser.delete(client.userId);
 			}, 3 * 60 * 1000);
 		}
-		if (!client.adapter.rooms.has('private/' + client.userId))
+		if (!this.server.sockets.adapter.rooms.has('private/' + client.userId))
 			this.server
 				.to('follower/' + client.userId)
 				.emit('change followeeState', { userId: client.userId, state: false });
