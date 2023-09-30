@@ -1,12 +1,6 @@
-import {
-	resolveWidth,
-	resolveHeight,
-	paddleBackSideMargin,
-	paddleHeight,
-	ballRadius,
-	ballSpeed,
-	paddleWidth,
-} from './constant.type';
+import { Constant } from './constant.type';
+
+let constant: Constant;
 
 export class Ball {
 	x: number;
@@ -15,20 +9,20 @@ export class Ball {
 	dy: number;
 
 	constructor() {
-		this.x = resolveWidth / 2;
-		this.y = resolveHeight / 2;
+		this.x = constant.getCanvasWidth() / 2;
+		this.y = constant.getCanvasHeight() / 2;
 		this.dx = 1;
 		this.dy = 0;
 	}
 
-	move = () => {
-		this.x += this.dx * ballSpeed;
-		this.y += this.dy * ballSpeed;
+	move = (booster?: number) => {
+		this.x += this.dx * (constant.getBallSpeed() + (booster ? booster : 0));
+		this.y += this.dy * (constant.getBallSpeed() + (booster ? booster : 0));
 	};
 
 	reset = () => {
-		this.x = resolveWidth / 2;
-		this.y = resolveHeight / 2;
+		this.x = constant.getCanvasWidth() / 2;
+		this.y = constant.getCanvasHeight() / 2;
 		this.dx = 1;
 		this.dy = 0;
 	};
@@ -43,19 +37,22 @@ export class Player {
 	constructor(uid: number, x: number) {
 		this.uid = uid;
 		this.x = x;
-		this.y = resolveHeight / 2;
+		this.y = constant.getCanvasHeight() / 2;
 		this.score = 0;
 	}
 
 	move = (dir: 'up' | 'down') => {
 		if (dir === 'up') {
 			const dest = this.y - 15;
-			this.y = dest < paddleHeight / 2 ? paddleHeight / 2 : dest;
+			this.y =
+				dest < constant.getPaddleHeight() / 2
+					? constant.getPaddleHeight() / 2
+					: dest;
 		} else {
 			const dest = this.y + 15;
 			this.y =
-				dest + paddleHeight / 2 > resolveHeight
-					? resolveHeight - paddleHeight / 2
+				dest + constant.getPaddleHeight() / 2 > constant.getCanvasHeight()
+					? constant.getCanvasHeight() - constant.getPaddleHeight() / 2
 					: dest;
 		}
 	};
@@ -66,34 +63,46 @@ export class Player {
 
 	reset = (x: number) => {
 		this.x = x;
-		this.y = resolveHeight / 2;
+		this.y = constant.getCanvasHeight() / 2;
 	};
 }
 
 export class GameStatus {
 	roomTitle: string;
-	ball: Ball;
-	player1: Player;
-	player2: Player;
+	private ball: Ball;
+	private player1: Player;
+	private player2: Player;
 
-	constructor(uid1: number, uid2: number, roomTitle: string) {
+	constructor(uid1: number, uid2: number, mapType: string, roomTitle: string) {
+		constant = new Constant(20, 150, 15, 10);
 		this.roomTitle = roomTitle;
 		this.ball = new Ball();
-		this.player1 = new Player(uid1, paddleBackSideMargin + paddleWidth / 2);
+		this.player1 = new Player(
+			uid1,
+			constant.getPaddleMargin() + constant.getPaddleWidth() / 2,
+		);
 		this.player2 = new Player(
 			uid2,
-			resolveWidth - paddleBackSideMargin - paddleWidth / 2,
+			constant.getCanvasWidth() -
+				constant.getPaddleMargin() -
+				constant.getPaddleWidth() / 2,
 		);
 	}
 
 	reset = () => {
 		this.ball.reset();
-		this.player1.reset(paddleBackSideMargin + paddleWidth / 2);
-		this.player2.reset(resolveWidth - paddleBackSideMargin - paddleWidth / 2);
+		this.player1.reset(
+			constant.getPaddleMargin() + constant.getPaddleWidth() / 2,
+		);
+		this.player2.reset(
+			constant.getCanvasWidth() -
+				constant.getPaddleMargin() -
+				constant.getPaddleWidth() / 2,
+		);
 	};
 
-	moveBall = () => {
-		this.ball.move();
+	moveBall = (booster?: number) => {
+		this.ball.move(booster);
 	};
 
 	movePlayer = (userId: number, key: string) => {
@@ -103,30 +112,32 @@ export class GameStatus {
 	};
 
 	leftWallHit = () => {
-		return this.ball.x - ballRadius < 0;
+		return this.ball.x - constant.getBallRadius() < 0;
 	};
 
 	rightWallHit = () => {
-		return this.ball.x + ballRadius > resolveWidth;
+		return this.ball.x + constant.getBallRadius() > constant.getCanvasWidth();
 	};
 
 	paddleOrUpDownWallHit = () => {
 		const player =
-			this.ball.x - ballRadius < resolveWidth / 2 ? this.player1 : this.player2;
+			this.ball.x - constant.getBallRadius() < constant.getCanvasWidth() / 2
+				? this.player1
+				: this.player2;
 
 		const playerPos = {
-			top: player.y - paddleHeight / 2,
-			bottom: player.y + paddleHeight / 2,
-			left: player.x - paddleWidth / 2,
-			right: player.x + paddleWidth / 2,
+			top: player.y - constant.getPaddleHeight() / 2,
+			bottom: player.y + constant.getPaddleHeight() / 2,
+			left: player.x - constant.getPaddleWidth() / 2,
+			right: player.x + constant.getPaddleWidth() / 2,
 			center: player.y,
 		};
 
 		const ballPos = {
-			top: this.ball.y - ballRadius,
-			bottom: this.ball.y + ballRadius,
-			left: this.ball.x - ballRadius,
-			right: this.ball.x + ballRadius,
+			top: this.ball.y - constant.getBallRadius(),
+			bottom: this.ball.y + constant.getBallRadius(),
+			left: this.ball.x - constant.getBallRadius(),
+			right: this.ball.x + constant.getBallRadius(),
 			center: this.ball.y,
 		};
 
@@ -137,14 +148,17 @@ export class GameStatus {
 			ballPos.top < playerPos.bottom
 		) {
 			const heightDiff = ballPos.center - playerPos.center;
-			const ratio = heightDiff / (paddleHeight / 2);
+			const ratio = heightDiff / (constant.getPaddleHeight() / 2);
 			const angle = (ratio * Math.PI) / 4;
-			const direction = this.ball.x < resolveWidth / 2 ? 1 : -1;
+			const direction = this.ball.x < constant.getCanvasWidth() / 2 ? 1 : -1;
 			this.ball.dx = direction * Math.cos(angle);
 			this.ball.dy = Math.sin(angle);
-		} else if (ballPos.top < 0 || ballPos.bottom > resolveHeight) {
+			return true;
+		}
+		if (ballPos.top < 0 || ballPos.bottom > constant.getCanvasHeight()) {
 			this.ball.dy = -this.ball.dy;
 		}
+		return false;
 	};
 
 	scoreP1 = () => {
@@ -156,11 +170,11 @@ export class GameStatus {
 	};
 
 	checkP1Win = () => {
-		return this.player1.score === 10;
+		return this.player1.score === constant.getWinningScore();
 	};
 
 	checkP2Win = () => {
-		return this.player2.score === 10;
+		return this.player2.score === constant.getWinningScore();
 	};
 
 	toJson = () => {

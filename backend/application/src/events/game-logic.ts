@@ -5,12 +5,15 @@ import { GameStatus } from './type';
 export function startGame(
 	gameStatus: GameStatus,
 	broadcastOp: BroadcastOperator<DefaultEventsMap, any>,
+	speedFlag: boolean,
 ) {
 	let playing = true;
+	let booster = 0;
 	const intervalId = setInterval(() => {
 		if (playing) {
-			gameStatus.moveBall();
-			gameStatus.paddleOrUpDownWallHit();
+			if (speedFlag) gameStatus.moveBall(booster);
+			else gameStatus.moveBall();
+			if (gameStatus.paddleOrUpDownWallHit() && booster < 20) booster++;
 			if (gameStatus.leftWallHit()) {
 				gameStatus.scoreP2();
 				gameStatus.reset();

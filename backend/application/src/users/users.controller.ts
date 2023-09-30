@@ -37,7 +37,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
-	constructor(private readonly usersService: UsersService) { }
+	constructor(private readonly usersService: UsersService) {}
 
 	// @Post()
 	// @UseGuards(JwtAuthGuard)
@@ -133,7 +133,9 @@ export class UsersController {
 		@CurrentUser(UserPropertyString.ID) id: number,
 		@Body() updateUserProfileDto: UpdateUserProfileDto,
 	) {
-		return await this.usersService.update(id, { ...updateUserProfileDto });
+		return await this.usersService.update(id, {
+			...updateUserProfileDto,
+		});
 	}
 
 	@Patch('updateProfile')

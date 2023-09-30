@@ -1,9 +1,53 @@
-export const paddleWidth = 20;
-export const paddleHeight = 150;
-export const paddleBackSideMargin = 100;
+export class Constant {
+	private paddleWidth: number;
+	private paddleHeight: number;
+	private paddleMargin: number;
+	private canvasWidth: number;
+	private canvasHeight: number;
+	private ballSpeed: number;
+	private ballRadius: number;
+	private winningScore: number;
 
-export const resolveWidth = 1920;
-export const resolveHeight = 1080;
+	constructor(pw: number, ph: number, br: number, ws: number) {
+		this.paddleWidth = pw;
+		this.paddleHeight = ph;
+		this.paddleMargin = 100;
+		this.canvasWidth = 1920;
+		this.canvasHeight = 1080;
+		this.ballSpeed = 10;
+		this.ballRadius = br;
+		this.winningScore = ws;
+	}
 
-export const ballSpeed = 5;
-export const ballRadius = 15;
+	getPaddleWidth = () => {
+		return this.paddleWidth;
+	};
+
+	getPaddleHeight = () => {
+		return this.paddleHeight;
+	};
+
+	getPaddleMargin = () => {
+		return this.paddleMargin;
+	};
+
+	getCanvasWidth = () => {
+		return this.canvasWidth;
+	};
+
+	getCanvasHeight = () => {
+		return this.canvasHeight;
+	};
+
+	getBallSpeed = () => {
+		return this.ballSpeed;
+	};
+
+	getBallRadius = () => {
+		return this.ballRadius;
+	};
+
+	getWinningScore = () => {
+		return this.winningScore;
+	};
+}

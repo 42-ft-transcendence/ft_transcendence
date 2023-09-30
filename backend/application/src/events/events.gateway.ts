@@ -11,7 +11,7 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
-import { ChannelType } from '@prisma/client';
+import { ChannelType, MapType } from '@prisma/client';
 import { Server } from 'socket.io';
 import {
 	PrismaService,
@@ -359,15 +359,25 @@ export class EventsGateway
 					.get(response[trueIndex].socketId)
 					.join(roomTitle);
 				// 두 사용자가 참여하는 게임 룸에 대한 정보 생성
-				const gameStatus = new GameStatus(userIds[0], userIds[1], roomTitle);
+				const gameStatus = new GameStatus(
+					userIds[0],
+					userIds[1],
+					payload.mapType,
+					roomTitle,
+				);
 				this.userState.set(payload.opponentId, gameStatus);
 				this.userState.set(client.userId, gameStatus);
 				setTimeout(() => {
-					startGame(gameStatus, this.server.to(roomTitle));
+					startGame(
+						gameStatus,
+						this.server.to(roomTitle),
+						payload.mapType === MapType.FAST,
+					);
 				}, 3000);
 			} else
 				throw new SocketException('Forbidden', '상대방이 초대를 거절했습니다');
 		} catch (e) {
+			console.log(e);
 			this.userState.delete(payload.opponentId);
 			this.userState.delete(client.userId);
 			throw new SocketException('Forbidden', '상대방이 초대를 거절했습니다');
