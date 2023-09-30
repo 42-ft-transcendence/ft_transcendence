@@ -33,7 +33,8 @@ export function startGame(
 				playing = false;
 				clearInterval(intervalId);
 			}
-			broadcastOp.emit('update Game', gameStatus.toJson());
 		}
+		broadcastOp.emit('update Game', gameStatus.toJson());
+		// }
 	}, 1000 / 60);
 }

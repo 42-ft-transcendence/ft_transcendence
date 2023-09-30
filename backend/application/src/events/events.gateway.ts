@@ -374,6 +374,17 @@ export class EventsGateway
 		}
 	}
 
+	@SubscribeMessage('move Player')
+	movePlayer(
+		@ConnectedSocket() client: SocketWithUserId,
+		@MessageBody() payload,
+	) {
+		const userState = this.userState.get(client.userId);
+		if (userState && userState !== 'waiting') {
+			(userState as GameStatus).movePlayer(client.userId, payload.direction);
+		}
+	}
+
 	@SubscribeMessage('get UserState')
 	getUserState(@ConnectedSocket() client: SocketWithUserId) {
 		const state = this.userState.get(client.userId);

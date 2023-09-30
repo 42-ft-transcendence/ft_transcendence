@@ -22,8 +22,8 @@ export class Ball {
 	}
 
 	move = () => {
-		this.x += this.dx;
-		this.y += this.dy;
+		this.x += this.dx * ballSpeed;
+		this.y += this.dy * ballSpeed;
 	};
 
 	reset = () => {
@@ -40,17 +40,17 @@ export class Player {
 	y: number;
 	score: number;
 
-	constructor(uid: number) {
+	constructor(uid: number, x: number) {
 		this.uid = uid;
-		this.x = paddleBackSideMargin;
-		this.y = resolveHeight / 2 - paddleHeight / 2;
+		this.x = x;
+		this.y = resolveHeight / 2;
 		this.score = 0;
 	}
 
 	move = (dir: 'up' | 'down') => {
 		if (dir === 'up') {
 			const dest = this.y - 15;
-			this.y = dest - paddleHeight / 2 < 0 ? 0 : dest;
+			this.y = dest < paddleHeight / 2 ? paddleHeight / 2 : dest;
 		} else {
 			const dest = this.y + 15;
 			this.y =
@@ -64,9 +64,9 @@ export class Player {
 		this.score += 1;
 	};
 
-	reset = () => {
-		this.x = paddleBackSideMargin;
-		this.y = resolveHeight / 2 - paddleHeight / 2;
+	reset = (x: number) => {
+		this.x = x;
+		this.y = resolveHeight / 2;
 	};
 }
 
@@ -79,18 +79,27 @@ export class GameStatus {
 	constructor(uid1: number, uid2: number, roomTitle: string) {
 		this.roomTitle = roomTitle;
 		this.ball = new Ball();
-		this.player1 = new Player(uid1);
-		this.player2 = new Player(uid2);
+		this.player1 = new Player(uid1, paddleBackSideMargin + paddleWidth / 2);
+		this.player2 = new Player(
+			uid2,
+			resolveWidth - paddleBackSideMargin - paddleWidth / 2,
+		);
 	}
 
 	reset = () => {
 		this.ball.reset();
-		this.player1.reset();
-		this.player2.reset();
+		this.player1.reset(paddleBackSideMargin + paddleWidth / 2);
+		this.player2.reset(resolveWidth - paddleBackSideMargin - paddleWidth / 2);
 	};
 
 	moveBall = () => {
 		this.ball.move();
+	};
+
+	movePlayer = (userId: number, key: string) => {
+		const player = this.player1.uid === userId ? this.player1 : this.player2;
+		if (key === 'up') player.move('up');
+		else if (key === 'down') player.move('down');
 	};
 
 	leftWallHit = () => {
@@ -109,7 +118,7 @@ export class GameStatus {
 			top: player.y - paddleHeight / 2,
 			bottom: player.y + paddleHeight / 2,
 			left: player.x - paddleWidth / 2,
-			right: player.y - paddleWidth / 2,
+			right: player.x + paddleWidth / 2,
 			center: player.y,
 		};
 
@@ -117,7 +126,7 @@ export class GameStatus {
 			top: this.ball.y - ballRadius,
 			bottom: this.ball.y + ballRadius,
 			left: this.ball.x - ballRadius,
-			right: this.ball.y - ballRadius,
+			right: this.ball.x + ballRadius,
 			center: this.ball.y,
 		};
 
@@ -131,8 +140,8 @@ export class GameStatus {
 			const ratio = heightDiff / (paddleHeight / 2);
 			const angle = (ratio * Math.PI) / 4;
 			const direction = this.ball.x < resolveWidth / 2 ? 1 : -1;
-			this.ball.dx = direction * ballSpeed * Math.cos(angle);
-			this.ball.dy = ballSpeed * Math.sin(angle);
+			this.ball.dx = direction * Math.cos(angle);
+			this.ball.dy = Math.sin(angle);
 		} else if (ballPos.top < 0 || ballPos.bottom > resolveHeight) {
 			this.ball.dy = -this.ball.dy;
 		}
@@ -153,6 +162,7 @@ export class GameStatus {
 	checkP2Win = () => {
 		return this.player2.score === 10;
 	};
+
 	toJson = () => {
 		return {
 			ball: {
