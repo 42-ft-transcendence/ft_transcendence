@@ -363,7 +363,7 @@ export class EventsGateway
 				this.userState.set(payload.opponentId, gameStatus);
 				this.userState.set(client.userId, gameStatus);
 				setTimeout(() => {
-					startGame(gameStatus);
+					startGame(gameStatus, this.server.to(roomTitle));
 				}, 3000);
 			} else
 				throw new SocketException('Forbidden', '상대방이 초대를 거절했습니다');
@@ -372,6 +372,14 @@ export class EventsGateway
 			this.userState.delete(client.userId);
 			throw new SocketException('Forbidden', '상대방이 초대를 거절했습니다');
 		}
+	}
+
+	@SubscribeMessage('get UserState')
+	getUserState(@ConnectedSocket() client: SocketWithUserId) {
+		const state = this.userState.get(client.userId);
+		if (state === undefined) return [];
+		if (state === 'waiting') return state;
+		return 'gamming';
 	}
 
 	handleConnection(client: SocketWithUserId, ...args: any) {
