@@ -335,12 +335,13 @@ export class EventsGateway
 		this.userState.add(client.userId);
 		// 3. 어떤 맵에 대해 누가 초대했는지 대상 사용자에게 알림을 보내 수락/거절을 요청하기
 		try {
-			const response: { answer: boolean } = await this.server
+			const response: { answer: boolean }[] = await this.server
 				.to(`private/${payload.opponentId}`)
 				.timeout(15000)
 				.emitWithAck('show Invitation', payload);
-			console.log(response);
-			if (response[0].answer) {
+			const trueIndex = response.indexOf({ answer: true });
+			console.log(trueIndex);
+			if (trueIndex !== -1) {
 				//TODO: 게임 실행 로직 구현
 				// 두 사용자가 게임을 하기 위한 소켓 룸 생성
 				// 두 사용자가 모두 소켓 룸에 들어왔는지 확인하고 게임을 시작 -> 둘 중 한 명이라도 들어오지 않았다면 들어온 쪽에 상대를 기다리는 중입니다... 출력하기
