@@ -24,7 +24,8 @@ import {
 import { MessagesService } from 'src/messages/messages.service';
 import { UsersService } from 'src/users/users.service';
 import { SocketExceptionFilter } from './filter';
-import { SocketWithUserId } from './type';
+import { GameStatus, SocketWithUserId, UserState } from './type';
+import { startGame } from './game-logic';
 
 @WebSocketGateway()
 export class EventsGateway
@@ -39,8 +40,7 @@ export class EventsGateway
 	) {}
 
 	private mutedUser = new Map<number, Map<string, Date>>();
-	// private userState = new Map<number, Status>();
-	private userState = new Set<number>();
+	private userState = new Map<number, UserState>();
 
 	@WebSocketServer()
 	server: Server;
@@ -310,7 +310,12 @@ export class EventsGateway
 	async handleInvitation(
 		@ConnectedSocket() client: SocketWithUserId,
 		@MessageBody()
-		payload: { userName: string; mapType: string; opponentId: number },
+		payload: {
+			userName: string;
+			mapType: string;
+			opponentId: number;
+			socketId: string;
+		},
 	) {
 		if (!this.server.sockets.adapter.rooms.has(`private/${payload.opponentId}`))
 			throw new SocketException('Forbidden', '상대방이 로그아웃 상태입니다.');
@@ -331,21 +336,35 @@ export class EventsGateway
 				'Forbidden',
 				'상대방이 초대를 받을 수 있는 상태가 아닙니다.',
 			);
-		this.userState.add(payload.opponentId);
-		this.userState.add(client.userId);
+		this.userState.set(payload.opponentId, 'waiting');
+		this.userState.set(client.userId, 'waiting');
 		// 3. 어떤 맵에 대해 누가 초대했는지 대상 사용자에게 알림을 보내 수락/거절을 요청하기
 		try {
-			const response: { answer: boolean }[] = await this.server
-				.to(`private/${payload.opponentId}`)
-				.timeout(15000)
-				.emitWithAck('show Invitation', payload);
-			const trueIndex = response.indexOf({ answer: true });
+			const response: { answer: boolean; socketId: string }[] =
+				await this.server
+					.to(`private/${payload.opponentId}`)
+					.timeout(15000)
+					.emitWithAck('show Invitation', payload);
+			const trueIndex = response.findIndex((res) => res.answer);
 			console.log(trueIndex);
 			if (trueIndex !== -1) {
 				//TODO: 게임 실행 로직 구현
 				// 두 사용자가 게임을 하기 위한 소켓 룸 생성
-				// 두 사용자가 모두 소켓 룸에 들어왔는지 확인하고 게임을 시작 -> 둘 중 한 명이라도 들어오지 않았다면 들어온 쪽에 상대를 기다리는 중입니다... 출력하기
-				// 게임을 시작하면 60fps로 공, 사용자 등에 대한 상태 정보를 사용자에게 보내기
+				const userIds = [client.userId, payload.opponentId].sort(
+					(a, b) => a - b,
+				);
+				const roomTitle = `${userIds[0]}_${userIds[1]}`;
+				this.server.sockets.sockets.get(client.id).join(roomTitle);
+				this.server.sockets.sockets
+					.get(response[trueIndex].socketId)
+					.join(roomTitle);
+				// 두 사용자가 참여하는 게임 룸에 대한 정보 생성
+				const gameStatus = new GameStatus(userIds[0], userIds[1], roomTitle);
+				this.userState.set(payload.opponentId, gameStatus);
+				this.userState.set(client.userId, gameStatus);
+				setTimeout(() => {
+					startGame(gameStatus);
+				}, 3000);
 			} else
 				throw new SocketException('Forbidden', '상대방이 초대를 거절했습니다');
 		} catch (e) {
