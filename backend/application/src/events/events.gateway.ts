@@ -11,7 +11,7 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
-import { ChannelType } from '@prisma/client';
+import { ChannelType, MapType } from '@prisma/client';
 import { Server } from 'socket.io';
 import {
 	PrismaService,
@@ -26,6 +26,7 @@ import { UsersService } from 'src/users/users.service';
 import { SocketExceptionFilter } from './filter';
 import { GameStatus, SocketWithUserId, UserState } from './type';
 import { PongService } from './pong/pong.service';
+import { GameQueue } from './type/game-queue';
 
 @WebSocketGateway()
 export class EventsGateway
@@ -42,6 +43,7 @@ export class EventsGateway
 
 	private mutedUser = new Map<number, Map<string, Date>>();
 	private userState = new Map<number, UserState>();
+	private gameQueue = new GameQueue();
 
 	@WebSocketServer()
 	server: Server;
@@ -304,6 +306,63 @@ export class EventsGateway
 			this.server
 				.to('private/' + client.userId)
 				.emit('change followeeState', { userId: targetId, state: false });
+	}
+
+	@SubscribeMessage('join GameQueue')
+	handleJoinGameQueue(@ConnectedSocket() client: SocketWithUserId, @MessageBody('mapType') mapType: MapType) {
+		// 사용자가 상태가 '' 아닌 경우 throw? 큐의 등록 조건이 ''상태일 때
+		// 사용자 상태 변경
+		this.userState.set(client.userId, 'waiting');
+		// 게임큐 넣기 전에 확인
+		// 1명 대기하고 온라인 상태인지 확인 => 대기하고 있는 사람이 나갈 수 있음.
+		let legnth = this.gameQueue.legnth(mapType);
+		if (legnth === 0){
+			this.gameQueue.push(mapType, { socketId:client.id, userId:client.userId });
+			return ;
+		}
+		let opponentInfo = undefined;
+		while (this.gameQueue.legnth(mapType) !== 0) {
+			const socketInfo = this.gameQueue.shift(mapType);
+			// 상대방이 온라인인지 확인 => 대기큐에 있다가 tab을 종료한 경우
+			if (this.server.sockets.adapter.rooms.has(socketInfo.socketId)) {
+				opponentInfo = socketInfo;
+				break;
+			}
+			else {
+				// 해당 유저가 다른 socket.id로 게임을 할 수 있게 설정
+				this.userState.delete(socketInfo.userId);
+			}
+		}
+		if (opponentInfo === undefined){
+			this.gameQueue.push(mapType, { socketId:client.id, userId:client.userId });
+			return ;
+		};
+		const userIds = [client.userId, opponentInfo.userId].sort(
+			(a, b) => a - b,
+		);
+		const roomTitle = `${userIds[0]}_${userIds[1]}`;
+		this.server.sockets.sockets.get(client.id).join(roomTitle);
+		this.server.sockets.sockets
+					.get(opponentInfo.socketId)
+					.join(roomTitle);
+		const gameStatus = new GameStatus(
+			userIds[0],
+			userIds[1],
+			mapType,
+			roomTitle,
+		);
+		this.userState.set(opponentInfo.userId, gameStatus);
+		this.userState.set(client.userId, gameStatus);
+		this.server.to(roomTitle).emit('goto Game');
+		this.server.to(roomTitle).emit('get UserState', 'gamming');
+		setTimeout(() => {
+			this.pongService.startGame(
+				gameStatus,
+				this.server.to(roomTitle),
+				mapType,
+				this.userState,
+			);
+		}, 3000);
 	}
 
 	@SubscribeMessage('invite')
