@@ -366,6 +366,8 @@ export class EventsGateway
 				);
 				this.userState.set(payload.opponentId, gameStatus);
 				this.userState.set(client.userId, gameStatus);
+				this.server.to(roomTitle).emit('goto Game');
+				this.server.to(roomTitle).emit('get UserState', 'gamming');
 				setTimeout(() => {
 					this.pongService.startGame(
 						gameStatus,
@@ -415,6 +417,11 @@ export class EventsGateway
 		const state = this.userState.get(client.userId);
 		if (state === undefined) return [];
 		if (state === 'waiting') return state;
+		const room = this.server.sockets.adapter.rooms.get(state.roomTitle);
+		if (room.size !== 2) {
+			const socket: any = this.server.sockets.sockets.get([...room][0]);
+			if (client.userId !== socket.userId) client.join(state.roomTitle);
+		}
 		return 'gamming';
 	}
 
