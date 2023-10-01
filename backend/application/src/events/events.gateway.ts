@@ -11,7 +11,7 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
-import { ChannelType, MapType } from '@prisma/client';
+import { ChannelType } from '@prisma/client';
 import { Server } from 'socket.io';
 import {
 	PrismaService,
@@ -25,7 +25,7 @@ import { MessagesService } from 'src/messages/messages.service';
 import { UsersService } from 'src/users/users.service';
 import { SocketExceptionFilter } from './filter';
 import { GameStatus, SocketWithUserId, UserState } from './type';
-import { startGame } from './game-logic';
+import { PongService } from './pong/pong.service';
 
 @WebSocketGateway()
 export class EventsGateway
@@ -37,6 +37,7 @@ export class EventsGateway
 		private usersService: UsersService,
 		private prisma: PrismaService,
 		private readonly messagesService: MessagesService,
+		private pongService: PongService,
 	) {}
 
 	private mutedUser = new Map<number, Map<string, Date>>();
@@ -317,8 +318,6 @@ export class EventsGateway
 			socketId: string;
 		},
 	) {
-		if (!this.server.sockets.adapter.rooms.has(`private/${payload.opponentId}`))
-			throw new SocketException('Forbidden', '상대방이 로그아웃 상태입니다.');
 		// 1. 상대방이 로그인 중인지 확인하고 로그인 중이 아니라면 취소
 		if (!this.server.sockets.adapter.rooms.has(`private/${payload.opponentId}`))
 			//상대방이 로그인 상태가 아니어서 게임을 진행할 수 없다고 사용자에게 알리기
@@ -368,16 +367,16 @@ export class EventsGateway
 				this.userState.set(payload.opponentId, gameStatus);
 				this.userState.set(client.userId, gameStatus);
 				setTimeout(() => {
-					startGame(
+					this.pongService.startGame(
 						gameStatus,
 						this.server.to(roomTitle),
-						payload.mapType === MapType.FAST,
+						payload.mapType,
+						this.userState,
 					);
 				}, 3000);
 			} else
 				throw new SocketException('Forbidden', '상대방이 초대를 거절했습니다');
 		} catch (e) {
-			console.log(e);
 			this.userState.delete(payload.opponentId);
 			this.userState.delete(client.userId);
 			throw new SocketException('Forbidden', '상대방이 초대를 거절했습니다');
@@ -394,6 +393,22 @@ export class EventsGateway
 			(userState as GameStatus).movePlayer(client.userId, payload.direction);
 		}
 	}
+
+	// @SubscribeMessage('update WinCount')
+	// updateWinCount(@ConnectedSocket() client: SocketWithUserId) {
+	// 	this.prisma.user.update({
+	// 		where: { id: client.userId },
+	// 		data: { winCount: { increment: 1 } },
+	// 	});
+	// }
+
+	// @SubscribeMessage('update LoseCount')
+	// updateLoseCount(@ConnectedSocket() client: SocketWithUserId) {
+	// 	this.prisma.user.update({
+	// 		where: { id: client.userId },
+	// 		data: { loseCount: { increment: 1 } },
+	// 	});
+	// }
 
 	@SubscribeMessage('get UserState')
 	getUserState(@ConnectedSocket() client: SocketWithUserId) {

@@ -33,6 +33,11 @@ export class MatchesController {
 		return await this.matchesService.findAll();
 	}
 
+	@Get(':userId/top5')
+	async findTop5(@Param('userId', ParsePositiveIntPipe) userId: number) {
+		return await this.matchesService.findTop5(userId);
+	}
+
 	@Get(':id')
 	@ApiOkResponse({ type: MatchEntity })
 	async findOne(@Param('id', ParsePositiveIntPipe) id: number) {

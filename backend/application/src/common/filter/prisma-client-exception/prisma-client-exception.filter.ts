@@ -7,7 +7,7 @@ import { Response } from 'express';
 export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 	catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
 		const response = host.switchToHttp().getResponse<Response>();
-
+		console.log(exception);
 		switch (exception.code) {
 			case 'P2002': // unique constraints
 				console.error(exception);
@@ -29,6 +29,16 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 					statusCode: HttpStatus.NOT_FOUND,
 				});
 				break;
+			case 'P2028':
+			case 'P2034':
+			case 'P5015':
+			case 'P6005':
+				console.error(exception);
+				response.status(HttpStatus.CONFLICT).json({
+					message: undefined,
+					error: 'Conflict',
+					statusCode: HttpStatus.CONFLICT,
+				});
 			default:
 				// super.catch(exception, host);
 				console.error(exception);

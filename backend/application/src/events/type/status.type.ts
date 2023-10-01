@@ -169,12 +169,26 @@ export class GameStatus {
 		this.player2.increaseScore();
 	};
 
-	checkP1Win = () => {
+	private checkP1Win = () => {
 		return this.player1.score === constant.getWinningScore();
 	};
 
-	checkP2Win = () => {
+	private checkP2Win = () => {
 		return this.player2.score === constant.getWinningScore();
+	};
+
+	checkGameEnd = () => {
+		return this.checkP1Win() || this.checkP2Win();
+	};
+
+	winnerId = () => {
+		if (this.checkP1Win()) return this.player1.uid;
+		else if (this.checkP2Win()) return this.player2.uid;
+	};
+
+	loserId = () => {
+		if (this.checkP1Win()) return this.player2.uid;
+		else if (this.checkP2Win()) return this.player1.uid;
 	};
 
 	toJson = () => {
