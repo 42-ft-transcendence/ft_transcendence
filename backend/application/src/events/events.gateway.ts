@@ -367,6 +367,7 @@ export class EventsGateway
 				this.userState.set(payload.opponentId, gameStatus);
 				this.userState.set(client.userId, gameStatus);
 				this.server.to(roomTitle).emit('goto Game');
+				this.server.to(roomTitle).emit('deactivate Sidebars');
 				this.server.to(roomTitle).emit('get UserState', 'gamming');
 				setTimeout(() => {
 					this.pongService.startGame(
