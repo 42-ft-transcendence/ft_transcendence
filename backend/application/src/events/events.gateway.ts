@@ -367,11 +367,14 @@ export class EventsGateway
 				);
 				this.userState.set(payload.opponentId, gameStatus);
 				this.userState.set(client.userId, gameStatus);
+				this.server.to(roomTitle).emit('goto Game');
+				this.server.to(roomTitle).emit('get UserState', 'gamming');
 				setTimeout(() => {
 					startGame(
 						gameStatus,
 						this.server.to(roomTitle),
 						payload.mapType === MapType.FAST,
+						this.server.sockets.adapter.rooms.get(roomTitle),
 					);
 				}, 3000);
 			} else
@@ -400,6 +403,12 @@ export class EventsGateway
 		const state = this.userState.get(client.userId);
 		if (state === undefined) return [];
 		if (state === 'waiting') return state;
+		const room = this.server.sockets.adapter.rooms.get(state.roomTitle);
+		if (room.size !== 2){
+			const socket:any = this.server.sockets.sockets.get([...room][0]);
+			if (client.userId !== socket.userId)
+				client.join(state.roomTitle);
+		}
 		return 'gamming';
 	}
 
