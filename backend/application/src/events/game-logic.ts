@@ -6,9 +6,11 @@ export function startGame(
 	gameStatus: GameStatus,
 	broadcastOp: BroadcastOperator<DefaultEventsMap, any>,
 	speedFlag: boolean,
+	room:Set<string>,
 ) {
 	let playing = true;
 	let booster = 0;
+	let waiting = 30 * 60;
 	const intervalId = setInterval(() => {
 		if (playing) {
 			if (speedFlag) gameStatus.moveBall(booster);
@@ -37,7 +39,15 @@ export function startGame(
 				clearInterval(intervalId);
 			}
 		}
-		broadcastOp.emit('update Game', gameStatus.toJson());
+		if (room.size !== 2) {
+			waiting -= 1;
+			playing = false;
+			broadcastOp.emit('pause Game', gameStatus.toJson(), {count:waiting});
+		}
+		else {
+			playing = true;
+			broadcastOp.emit('update Game', gameStatus.toJson());
+		}
 		// }
 	}, 1000 / 60);
 }
