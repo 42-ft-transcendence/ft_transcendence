@@ -353,7 +353,7 @@ export class EventsGateway
 		);
 		this.userState.set(opponentInfo.userId, gameStatus);
 		this.userState.set(client.userId, gameStatus);
-		this.server.to(roomTitle).emit('goto Game');
+		this.server.to(roomTitle).emit('goto Url', '/game');
 		this.server.to(roomTitle).emit('get UserState', 'gamming');
 		setTimeout(() => {
 			this.pongService.startGame(
@@ -361,6 +361,7 @@ export class EventsGateway
 				this.server.to(roomTitle),
 				mapType,
 				this.userState,
+				this.server,
 			);
 		}, 3000);
 	}
@@ -425,7 +426,7 @@ export class EventsGateway
 				);
 				this.userState.set(payload.opponentId, gameStatus);
 				this.userState.set(client.userId, gameStatus);
-				this.server.to(roomTitle).emit('goto Game');
+				this.server.to(roomTitle).emit('goto Url', '/game');
 				this.server.to(roomTitle).emit('deactivate Sidebars');
 				this.server.to(roomTitle).emit('get UserState', 'gamming');
 				setTimeout(() => {
@@ -434,6 +435,7 @@ export class EventsGateway
 						this.server.to(roomTitle),
 						payload.mapType,
 						this.userState,
+						this.server,
 					);
 				}, 3000);
 			} else

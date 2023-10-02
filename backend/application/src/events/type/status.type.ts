@@ -207,6 +207,14 @@ export class GameStatus {
 			},
 		};
 	};
+
+	getPlayer1UserId = () => {
+		return this.player1.uid;
+	};
+
+	getPlayer2UserId = () => {
+		return this.player2.uid;
+	}
 }
 
 export type UserState = 'waiting' | GameStatus;
