@@ -19,6 +19,7 @@ import {
 } from 'src/common';
 import { BanEntity } from './entities';
 import { JwtTwoFactorAuthGuard } from 'src/auth';
+import { CheckUnbanGuard } from 'src/common/guard/check-unban/check-unban.guard';
 
 @Controller('bans')
 @UseGuards(JwtTwoFactorAuthGuard)
@@ -55,7 +56,7 @@ export class BansController {
 	}
 
 	@Delete('userId/:userId/channelId/:channelId')
-	@UseGuards(ChannelAdminGuard)
+	@UseGuards(ChannelAdminGuard, CheckUnbanGuard)
 	@ApiOkResponse({ type: BanEntity })
 	async remove(
 		@Param('userId', ParsePositiveIntPipe) userId: number,
