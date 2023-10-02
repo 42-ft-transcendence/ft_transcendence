@@ -17,6 +17,7 @@ import {
 	CheckTargetInGuard,
 	CurrentUser,
 	ParsePositiveIntPipe,
+	TargetRoleGuard,
 	UserPropertyString,
 } from 'src/common';
 import { ParticipantEntity } from './entities';
@@ -78,7 +79,7 @@ export class ParticipantsController {
 	}
 
 	@Delete('userId/:userId/channelId/:channelId')
-	@UseGuards(CheckTargetInGuard)
+	@UseGuards(TargetRoleGuard, CheckTargetInGuard)
 	@ApiOkResponse({ type: ParticipantEntity })
 	async remove(
 		@Param('userId', ParsePositiveIntPipe) userId: number,

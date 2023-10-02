@@ -5,35 +5,43 @@ services:
     image: postgres:15.3
     ports:
       - 5432:5432
-    environment:
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_DB=test
+    env_file:
+      - .env
     networks:
       - ft_transcendence
     restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "$POSTGRES_USER", "-d", "$POSTGRES_DB"]
+      interval: 5s
+      # timeout: 60s
+      # retries: 5
+      # start_period: 80s
 
   backend:
     build: ./backend/
     ports:
       - 3000:3000
-    environment:
-      - NODE_ENV=production # 완성 시 production으로 변경
+    env_file:
+      - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - ft_transcendence
     restart: always
     volumes:
       - upload:/application/avatar-upload
+    # healthcheck:
+    #    test: ["CMD", "curl", "-f", "http://localhost:3000"]
+    #    interval: 15s
 
   frontend:
     build: ./frontend/
     ports:
       - 8080:80
       # - 8080:8080
-    environment:
-      - NODE_ENV=production # 완성 시 production으로 변경
+    env_file:
+      - .env
     depends_on:
       - backend
     networks:

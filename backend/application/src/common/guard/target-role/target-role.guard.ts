@@ -1,6 +1,8 @@
 import {
 	CanActivate,
+	ConflictException,
 	ExecutionContext,
+	ForbiddenException,
 	Inject,
 	Injectable,
 } from '@nestjs/common';
@@ -23,6 +25,10 @@ export class TargetRoleGuard implements CanActivate {
 			where: { channelId_userId: { channelId: channelId, userId: targetId } },
 			select: { id: true },
 		});
-		return !result;
+		if (result)
+			throw new ForbiddenException(
+				'관리자에 대해 해당 요청을 처리할 수 없습니다.',
+			);
+		return true;
 	}
 }
