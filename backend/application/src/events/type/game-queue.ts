@@ -22,4 +22,16 @@ export class GameQueue {
 		const queue = this.gameQueue.get(mapType);
 		return queue.shift();
 	}
+
+	has(socketId:string) {
+		for (let socketinfo of this.gameQueue.get(MapType.NORMAL).toArray()){
+			if (socketinfo.socketId === socketId)
+				return true;
+		}
+		for (let socketinfo of this.gameQueue.get(MapType.FAST).toArray()){
+			if (socketinfo.socketId === socketId)
+				return true;
+		}
+		return false;
+	}
 };
