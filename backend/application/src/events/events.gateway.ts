@@ -81,6 +81,7 @@ export class EventsGateway
 		@MessageBody()
 		payload: { id: number; userName: string; avatar: string; userId: number },
 	) {
+		console.log(payload);
 		this.server
 			.to('private/' + client.userId)
 			.emit('create DMChannel', payload);

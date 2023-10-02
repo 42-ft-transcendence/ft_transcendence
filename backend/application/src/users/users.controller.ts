@@ -160,7 +160,7 @@ export class UsersController {
 	) {
 		return await this.usersService.update(id, {
 			...updateUserProfileDto,
-			avatar: avatar.path,
+			avatar: `/${avatar.path}`,
 		});
 	}
 

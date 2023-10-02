@@ -19,7 +19,7 @@ import { AuthModule } from 'src/auth/auth.module';
 				storage: diskStorage({
 					destination(req, file, callback) {
 						const dest = configService.get<string>('MULTER_DEST');
-						if (!dest) callback(null, './avatar-upload');
+						if (!dest) callback(null, '/avatar-upload');
 						else callback(null, dest);
 					},
 					filename(req, file, callback) {
