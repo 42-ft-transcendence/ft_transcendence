@@ -13,11 +13,12 @@ import { BansService } from './bans.service';
 import { CreateBanDto, UpdateBanDto } from './dto';
 import {
 	ChannelAdminGuard,
+	CheckTargetInGuard,
 	ParsePositiveIntPipe,
 	TargetRoleGuard,
 } from 'src/common';
 import { BanEntity } from './entities';
-import { JwtAuthGuard, JwtTwoFactorAuthGuard } from 'src/auth';
+import { JwtTwoFactorAuthGuard } from 'src/auth';
 
 @Controller('bans')
 @UseGuards(JwtTwoFactorAuthGuard)
@@ -26,7 +27,7 @@ export class BansController {
 	constructor(private readonly bansService: BansService) {}
 
 	@Post()
-	@UseGuards(ChannelAdminGuard, TargetRoleGuard)
+	@UseGuards(ChannelAdminGuard, TargetRoleGuard, CheckTargetInGuard)
 	@ApiCreatedResponse({ type: BanEntity })
 	async create(@Body() createBanDto: CreateBanDto) {
 		return await this.bansService.create(createBanDto);

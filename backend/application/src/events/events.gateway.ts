@@ -18,6 +18,7 @@ import {
 	SocketException,
 	WsChannelAdminGuard,
 	WsCheckBlockGuard,
+	WsCheckTargetInGuard,
 	WsCheckUserInGuard,
 	WsTargetRoleGuard,
 } from 'src/common';
@@ -281,7 +282,7 @@ export class EventsGateway
 
 	@SubscribeMessage('mute User')
 	@UseFilters(SocketExceptionFilter)
-	@UseGuards(WsChannelAdminGuard, WsTargetRoleGuard)
+	@UseGuards(WsChannelAdminGuard, WsTargetRoleGuard, WsCheckTargetInGuard)
 	handleMuteUser(client: any, payload: any) {
 		this.server.to('private/' + payload.targetId).emit('mute User', payload);
 		if (!this.mutedUser.has(payload.targetId))
