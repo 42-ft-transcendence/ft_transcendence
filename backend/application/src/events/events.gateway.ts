@@ -486,6 +486,8 @@ export class EventsGateway
 				return 'gamming';
 			}
 		}
+		if (room.has(client.id))
+			return 'gamming';
 		return '';
 	}
 
