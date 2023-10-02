@@ -38,6 +38,11 @@ export class MatchesController {
 		return await this.matchesService.findTop5(userId);
 	}
 
+	@Get(':userId/detail')
+	async findOneByOfUser(@Param('userId', ParsePositiveIntPipe) userId: number) {
+		return await this.matchesService.findOneOfUser(userId);
+	}
+
 	@Get(':id')
 	@ApiOkResponse({ type: MatchEntity })
 	async findOne(@Param('id', ParsePositiveIntPipe) id: number) {

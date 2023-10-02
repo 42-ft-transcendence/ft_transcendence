@@ -22,6 +22,22 @@ export class MatchesService {
 		});
 	}
 
+	async findOneOfUser(userId: number) {
+		return await this.prisma.match.findMany({
+			where: { OR: [{ winnerId: userId }, { loserId: userId }] },
+			orderBy: { matchAt: 'desc' },
+			select: {
+				type: true,
+				mapType: true,
+				matchAt: true,
+				winnerId: true,
+				loserId: true,
+				winner: { select: { avatar: true, nickname: true } },
+				loser: { select: { avatar: true, nickname: true } },
+			},
+		});
+	}
+
 	async findAll() {
 		return await this.prisma.match.findMany();
 	}
