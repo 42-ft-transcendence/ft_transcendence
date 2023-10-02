@@ -18,7 +18,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      - NODE_ENV=development # 완성 시 production으로 변경
+      - NODE_ENV=production # 완성 시 production으로 변경
     depends_on:
       - db
     networks:
@@ -26,15 +26,14 @@ services:
     restart: always
     volumes:
       - upload:/application/avatar-upload
-      - vbackend:/application
 
   frontend:
     build: ./frontend/
     ports:
-      # - 8080:80
-      - 8080:8080
+      - 8080:80
+      # - 8080:8080
     environment:
-      - NODE_ENV=development # 완성 시 production으로 변경
+      - NODE_ENV=production # 완성 시 production으로 변경
     depends_on:
       - backend
     networks:
@@ -42,12 +41,9 @@ services:
     restart: always
     volumes:
       - upload:/application/avatar-upload
-      - vfrontend:/application
 
 networks:
   ft_transcendence:
 
 volumes:
   upload:
-  vbackend:
-  vfrontend:

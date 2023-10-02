@@ -14,7 +14,9 @@ import {
 import { HasPassword } from 'src/common';
 
 export class CreateChannelDto {
-	@MinLength(3, { message: '채널의 제목은 최소 3글자 이상이어야 합니다.' })
+	@Length(3, 10, {
+		message: '채널의 제목은 최소 3글자, 최대 10글자여야 합니다.',
+	})
 	@NotContains(',', { message: "채널의 제목으로 ','를 사용할 수 없습니다." })
 	@NotContains(' ', { message: '채널의 제목으로 공백을 사용할 수 없습니다.' })
 	@IsString()
