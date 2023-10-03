@@ -18,6 +18,7 @@ import {
 import { AdministratorEntity } from './entities';
 import { JwtTwoFactorAuthGuard } from 'src/auth';
 import { CheckTargetAdminGuard } from 'src/common/guard/check-target-admin/check-target-admin.guard';
+import { CheckTargetOwnerGuard } from 'src/common/guard/check-target-owner/check-target-owner.guard';
 
 @Controller('administrators')
 @UseGuards(JwtTwoFactorAuthGuard)
@@ -39,7 +40,7 @@ export class AdministratorsController {
 	}
 
 	@Delete('/channelId/:channelId/userId/:userId')
-	@UseGuards(CheckTargetAdminGuard, ChannelOwnerGuard)
+	@UseGuards(CheckTargetAdminGuard, CheckTargetOwnerGuard, ChannelOwnerGuard)
 	@ApiOkResponse({ type: AdministratorEntity })
 	async removeOne(
 		@Param('channelId', ParsePositiveIntPipe) channelId: number,
