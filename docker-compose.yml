@@ -49,6 +49,7 @@ services:
     restart: always
     volumes:
       - upload:/application/avatar-upload
+      - ./templates:/etc/nginx/templates
 
 networks:
   ft_transcendence:

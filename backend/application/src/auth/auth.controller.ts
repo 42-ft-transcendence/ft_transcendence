@@ -42,12 +42,12 @@ export class AuthController {
 			res.cookie('JWTOAuth', this.authService.signOauth(user), {
 				expires: new Date(Date.now() + 15 * 60 * 1000),
 			});
-			res.redirect('http://localhost:8080/signup');
+			res.redirect(`${this.configService.get<string>('FRONTEND_URL')}/signup`);
 		} else {
 			res.cookie('JWTDatabase', this.authService.signDatabase(user), {
 				expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
 			});
-			res.redirect('http://localhost:8080/');
+			res.redirect(`${this.configService.get<string>('FRONTEND_URL')}`);
 		}
 	}
 
