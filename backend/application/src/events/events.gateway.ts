@@ -249,15 +249,9 @@ export class EventsGateway
 	@SubscribeMessage('leave Room')
 	async handleLeaveRoom(client: any, payload: string) {
 		console.log(`leave Room: ${payload}`);
-		if (payload.includes('/channel/')) {
-			const id = payload.substring(9);
-			const channel = await this.prisma.channel.findUnique({
-				where: { id: Number(id) },
-				select: { type: true },
-			});
-			if (channel.type !== ChannelType.ONETOONE) client.leave(payload);
-			else client.leave('/channel/directChannel/' + id);
-		} else client.leave(payload);
+		const id = payload.substring(9);
+		client.leave(payload);
+		client.leave('/channel/directChannel/' + id);
 	}
 
 	@SubscribeMessage('kick User')
