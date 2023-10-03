@@ -398,7 +398,6 @@ export class EventsGateway
 					.timeout(15000)
 					.emitWithAck('show Invitation', payload);
 			const trueIndex = response.findIndex((res) => res.answer);
-			console.log(trueIndex);
 			if (trueIndex !== -1) {
 				//TODO: 게임 실행 로직 구현
 				// 두 사용자가 게임을 하기 위한 소켓 룸 생성

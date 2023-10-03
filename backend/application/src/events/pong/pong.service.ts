@@ -89,7 +89,6 @@ export class PongService {
 				room.emit('pause Game', gameStatus.toJson(), {count:waiting});
 			}
 			else if (users.size === 0) {
-				console.log(`${gameStatus.getPlayer1UserId()}_${gameStatus.getPlayer2UserId()} 게임 취소`);
 				userState.delete(gameStatus.getPlayer1UserId());
 				userState.delete(gameStatus.getPlayer2UserId());
 				server.socketsLeave(gameStatus.roomTitle);

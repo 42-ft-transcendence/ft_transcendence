@@ -7,7 +7,6 @@ import { Response } from 'express';
 export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 	catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
 		const response = host.switchToHttp().getResponse<Response>();
-		console.log(exception);
 		switch (exception.code) {
 			case 'P2002': // unique constraints
 				console.error(exception);
