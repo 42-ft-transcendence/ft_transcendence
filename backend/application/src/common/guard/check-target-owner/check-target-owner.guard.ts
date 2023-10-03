@@ -13,8 +13,8 @@ export class CheckTargetOwnerGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest<Request>();
-		const targetId = request.body.userId;
-		const channelId = request.body.channelId;
+		const targetId = parseInt(request.params.userId);
+		const channelId = parseInt(request.params.channelId);
 
 		const { ownerId } = await this.prisma.channel.findUnique({
 			where: { id: channelId },
