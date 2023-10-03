@@ -1,7 +1,7 @@
 server {
     listen       80;
     listen  [::]:80;
-    server_name  localhost;
+    server_name  ${HOST};
 
     #access_log  /var/log/nginx/host.access.log  main;
 
@@ -23,7 +23,7 @@ server {
     }
 
     location /api/ {
-        proxy_pass  ${BACKEND_URL};
+        proxy_pass  ${BACKEND_URL}/;
     }
 
     #error_page  404              /404.html;
